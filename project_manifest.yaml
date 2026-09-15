@@ -1,0 +1,47 @@
+# INF2006 Team Project - machine-readable manifest (Appendix A schema).
+# Teams may add fields but must NOT rename or remove the fields below.
+# All paths are relative to the ZIP root and must point to real artefacts.
+
+project:
+  group_id: "Gxxx"
+  title: ""
+  problem_statement: ""
+  cloud_provider: "AWS | Azure | GCP | other"
+  repository_commit: "optional commit hash"
+
+team:
+  members:
+    - name: ""
+      student_id: ""
+      role: ""
+
+architecture:
+  diagram: "evidence/architecture.png"
+  service_model: ""
+  deployment_model: ""
+  components: []
+
+evidence:
+  functional_test: "evidence/test-functional.md"
+  security_test: "evidence/test-security.md"
+  data_ai_test: "evidence/test-data-ai.md"
+  scale_resilience_test: "evidence/test-resilience.md"
+  monitoring: "evidence/monitoring.md"
+
+data_ai:
+  dataset: "data/README.md"
+  method: ""
+  evaluation: ""
+  reproducible_command: ""
+
+security:
+  threat_control_map: "evidence/threat-control-map.md"
+  secrets_handling: ""
+
+run:
+  prerequisites: []
+  commands: []
+
+declarations:
+  ai_use: "AI_USE_DECLARATION.md"
+  contributions: "TEAM_CONTRIBUTIONS.md"

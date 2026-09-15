@@ -1,0 +1,5 @@
+# Python dependencies for the analytics / AI-ML feature.
+# Pin versions for reproducibility, e.g.:
+# pandas==2.2.2
+# scikit-learn==1.5.1
+# numpy==1.26.4
