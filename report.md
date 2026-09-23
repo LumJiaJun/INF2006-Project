@@ -2,11 +2,15 @@
 
 INF2006 Cloud Computing and Big Data Team Project
 
+Class: EP2, Group G014
+
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
 Evidence date: 23 September 2026
 
-Submission note: team names, student IDs, contribution ownership, and personal reflections must be completed by the team before submission. They are not invented in this technical draft.
+Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
+
+Submission note: non-commit contribution ownership, final roles, and personal reflections must be confirmed by the team before submission. They are not invented in this technical draft.
 
 ## 1. Problem, users and success criteria
 
@@ -100,7 +104,7 @@ Before a public or longer-lived deployment, the team should request an appropria
 
 ## 8. Team contribution, ethical considerations and reflection
 
-Team-specific names, student IDs, roles, owned evidence, and personal reflections must be completed in `TEAM_CONTRIBUTIONS.md`, `README.md`, `project_manifest.yaml`, and this section before submission. Commit history provides a technical trace, but commit authorship alone is not sufficient evidence of balanced contribution. Each member should identify concrete artefacts, tests they personally verified, decisions they can explain, and a short individual reflection.
+The EP2 Group G014 roster is Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427). Git history records Lum's initial repository commit and Nixon's twelve implementation and documentation commits. No authored commits for the other three members are visible in the current history. Commit authorship alone is not sufficient evidence of balanced contribution, so `TEAM_CONTRIBUTIONS.md` explicitly asks every member to confirm non-commit work, test ownership, final role, and personal reflection before submission.
 
 The project uses OpenAI Codex for repository inspection, implementation support, Terraform, tests, documentation, and deployment verification. AI-assisted output was not accepted as evidence by itself. Claims were checked with unit tests, live HTTP requests, Terraform plans, AWS CLI output, CloudWatch metrics, and source review. The use and verification process is declared in `AI_USE_DECLARATION.md`.
 

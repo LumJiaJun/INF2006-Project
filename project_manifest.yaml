@@ -3,7 +3,7 @@
 # All paths are relative to the ZIP root and must point to real artefacts.
 
 project:
-  group_id: "Gxxx"
+  group_id: "G014"
   title: "Airbnb Pricing and Market Intelligence Platform"
   problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
   cloud_provider: "AWS"
@@ -11,9 +11,21 @@ project:
 
 team:
   members:
-    - name: ""
-      student_id: ""
-      role: ""
+    - name: "Lum Jia Jun"
+      student_id: "2500022"
+      role: "Repository setup; final role confirmation required"
+    - name: "Nixon Lee Disheng"
+      student_id: "2500594"
+      role: "Implementation and deployment lead"
+    - name: "Madugula Adheesh"
+      student_id: "2500670"
+      role: "Team member; role confirmation required"
+    - name: "Leow Yi Hao Ignatius"
+      student_id: "2501538"
+      role: "Team member; role confirmation required"
+    - name: "Wong Zhen Ho Brendan"
+      student_id: "2503427"
+      role: "Team member; role confirmation required"
 
 architecture:
   diagram: "evidence/architecture.png"

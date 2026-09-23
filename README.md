@@ -13,10 +13,11 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 
 | Name | Student ID | Role |
 |------|-----------|------|
-| <Name> | <ID> | <Role> |
-| <Name> | <ID> | <Role> |
-| <Name> | <ID> | <Role> |
-| <Name> | <ID> | <Role> |
+| Lum Jia Jun | 2500022 | Repository setup; final role confirmation required |
+| Nixon Lee Disheng | 2500594 | Implementation and deployment lead |
+| Madugula Adheesh | 2500670 | Team member; role confirmation required |
+| Leow Yi Hao Ignatius | 2501538 | Team member; role confirmation required |
+| Wong Zhen Ho Brendan | 2503427 | Team member; role confirmation required |
 
 ## Quickstart commands
 
