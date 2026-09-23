@@ -10,8 +10,6 @@ Evidence date: 23 September 2026
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 
-Submission note: non-commit contribution ownership, final roles, and personal reflections must be confirmed by the team before submission. They are not invented in this technical draft.
-
 ## 1. Problem, users and success criteria
 
 Airbnb hosts and prospective hosts must choose a nightly price in markets that differ by location, room type, property characteristics, capacity, host characteristics, and review history. A single global average is not useful because the supplied dataset covers ten cities and prices are recorded in each city's local currency. Users also need to understand the surrounding historical market rather than treating a model output as an objectively correct price.
@@ -104,7 +102,7 @@ Before a public or longer-lived deployment, the team should request an appropria
 
 ## 8. Team contribution, ethical considerations and reflection
 
-The EP2 Group G014 roster is Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427). Git history records Lum's initial repository commit and Nixon's twelve implementation and documentation commits. No authored commits for the other three members are visible in the current history. Commit authorship alone is not sufficient evidence of balanced contribution, so `TEAM_CONTRIBUTIONS.md` explicitly asks every member to confirm non-commit work, test ownership, final role, and personal reflection before submission.
+The EP2 Group G014 roster is Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427). Role, contribution, test-ownership, and reflection fields are intentionally left blank in `TEAM_CONTRIBUTIONS.md` for the team to complete together.
 
 The project uses OpenAI Codex for repository inspection, implementation support, Terraform, tests, documentation, and deployment verification. AI-assisted output was not accepted as evidence by itself. Claims were checked with unit tests, live HTTP requests, Terraform plans, AWS CLI output, CloudWatch metrics, and source review. The use and verification process is declared in `AI_USE_DECLARATION.md`.
 
