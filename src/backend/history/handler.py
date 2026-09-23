@@ -62,6 +62,7 @@ def lambda_handler(event, context):
         return response(401, {"error": {"code": "unauthenticated", "message": "Sign in is required."}})
 
     try:
+        # The partition key always comes from verified claims, never a browser parameter.
         result = history_table().query(
             KeyConditionExpression=Key("user_id").eq(user_id),
             ScanIndexForward=False,

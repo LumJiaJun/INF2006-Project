@@ -41,6 +41,7 @@ valid = listings.filter(
 )
 
 city_thresholds = valid.groupBy("city").agg(
+    # A per-city boundary avoids letting extreme luxury prices dominate typical-market summaries.
     functions.expr("percentile_approx(price, 0.99, 10000)").alias("maximum_supported_price")
 )
 processed = (

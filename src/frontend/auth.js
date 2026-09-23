@@ -60,6 +60,7 @@ function getUser() {
 }
 
 async function signIn() {
+  // PKCE keeps the authorization code unusable without this browser's verifier.
   const state = randomValue();
   const verifier = randomValue(64);
   const challenge = base64Url(await sha256(verifier));
@@ -133,6 +134,7 @@ async function initialize() {
     return;
   }
   const expectedState = sessionStorage.getItem(sessionKeys.state);
+  // Reject callbacks that do not belong to the sign-in request started in this tab.
   if (!expectedState || returnedState !== expectedState) {
     clearSession();
     throw new Error("The sign-in state did not match. Please sign in again.");

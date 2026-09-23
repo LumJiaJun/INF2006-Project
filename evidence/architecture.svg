@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <style>
+      .title { font: 700 34px Arial, sans-serif; fill: #14213d; }
+      .subtitle { font: 18px Arial, sans-serif; fill: #4a5568; }
+      .boundary { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 10 8; }
+      .boundary-label { font: 700 18px Arial, sans-serif; fill: #475569; }
+      .box { fill: #ffffff; stroke: #243b53; stroke-width: 2; rx: 16; }
+      .edge { fill: #eff6ff; stroke: #2563eb; }
+      .compute { fill: #fff7ed; stroke: #ea580c; }
+      .data { fill: #f0fdf4; stroke: #16a34a; }
+      .identity { fill: #faf5ff; stroke: #9333ea; }
+      .ops { fill: #fefce8; stroke: #ca8a04; }
+      .label { font: 700 18px Arial, sans-serif; fill: #172033; text-anchor: middle; }
+      .small { font: 14px Arial, sans-serif; fill: #475569; text-anchor: middle; }
+      .arrow { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .data-arrow { stroke: #16a34a; stroke-width: 3; fill: none; marker-end: url(#greenhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#334155"/></marker>
+    <marker id="greenhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/></marker>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#ffffff"/>
+  <text x="70" y="58" class="title">Airbnb Pricing and Market Intelligence Platform</text>
+  <text x="70" y="88" class="subtitle">Serverless AWS architecture, trust boundaries, application flow, analytics flow, and observability</text>
+
+  <rect x="40" y="120" width="250" height="790" class="boundary" rx="22"/>
+  <text x="65" y="150" class="boundary-label">Public internet</text>
+  <rect x="315" y="120" width="1245" height="790" class="boundary" rx="22"/>
+  <text x="340" y="150" class="boundary-label">AWS account, ap-southeast-1</text>
+
+  <rect x="85" y="240" width="160" height="90" class="box"/>
+  <text x="165" y="275" class="label">User browser</text>
+  <text x="165" y="302" class="small">HTML, CSS, JavaScript</text>
+
+  <rect x="360" y="205" width="200" height="90" class="box edge"/>
+  <text x="460" y="240" class="label">CloudFront</text>
+  <text x="460" y="267" class="small">HTTPS public edge</text>
+  <rect x="360" y="335" width="200" height="90" class="box data"/>
+  <text x="460" y="370" class="label">S3 frontend</text>
+  <text x="460" y="397" class="small">Private OAC origin</text>
+
+  <rect x="625" y="205" width="215" height="90" class="box identity"/>
+  <text x="732" y="240" class="label">Amazon Cognito</text>
+  <text x="732" y="267" class="small">OAuth code + PKCE</text>
+  <rect x="625" y="335" width="215" height="90" class="box edge"/>
+  <text x="732" y="370" class="label">API Gateway</text>
+  <text x="732" y="397" class="small">JWT, CORS, throttling</text>
+
+  <rect x="905" y="180" width="205" height="90" class="box compute"/>
+  <text x="1007" y="215" class="label">Health Lambda</text>
+  <text x="1007" y="242" class="small">GET /health</text>
+  <rect x="905" y="300" width="205" height="90" class="box compute"/>
+  <text x="1007" y="335" class="label">Prediction Lambda</text>
+  <text x="1007" y="362" class="small">ECR model container</text>
+  <rect x="905" y="420" width="205" height="90" class="box compute"/>
+  <text x="1007" y="455" class="label">History Lambda</text>
+  <text x="1007" y="482" class="small">User-scoped query</text>
+  <rect x="905" y="540" width="205" height="90" class="box compute"/>
+  <text x="1007" y="575" class="label">Analytics Lambda</text>
+  <text x="1007" y="602" class="small">Fixed SQL only</text>
+
+  <rect x="1180" y="300" width="200" height="90" class="box data"/>
+  <text x="1280" y="335" class="label">DynamoDB</text>
+  <text x="1280" y="362" class="small">History + PITR</text>
+  <rect x="1180" y="540" width="200" height="90" class="box data"/>
+  <text x="1280" y="575" class="label">Athena + Catalog</text>
+  <text x="1280" y="602" class="small">Projected partitions</text>
+
+  <rect x="625" y="690" width="215" height="90" class="box data"/>
+  <text x="732" y="725" class="label">S3 data lake</text>
+  <text x="732" y="752" class="small">raw / processed / results</text>
+  <rect x="905" y="690" width="205" height="90" class="box compute"/>
+  <text x="1007" y="725" class="label">AWS Glue</text>
+  <text x="1007" y="752" class="small">CSV to Parquet ETL</text>
+
+  <rect x="1180" y="690" width="300" height="130" class="box ops"/>
+  <text x="1330" y="725" class="label">CloudWatch + SNS</text>
+  <text x="1330" y="752" class="small">Logs, metrics, dashboard, alarms</text>
+  <text x="1330" y="775" class="small">KMS-encrypted action topic</text>
+
+  <path d="M245 270 L360 250" class="arrow"/>
+  <path d="M460 295 L460 335" class="arrow"/>
+  <path d="M245 300 L625 365" class="arrow"/>
+  <path d="M560 235 L625 235" class="arrow"/>
+  <path d="M840 365 L905 225" class="arrow"/>
+  <path d="M840 370 L905 345" class="arrow"/>
+  <path d="M840 380 L905 465" class="arrow"/>
+  <path d="M840 390 L905 585" class="arrow"/>
+  <path d="M1110 345 L1180 345" class="data-arrow"/>
+  <path d="M1110 465 L1180 365" class="data-arrow"/>
+  <path d="M1110 585 L1180 585" class="data-arrow"/>
+  <path d="M1180 610 L840 720" class="data-arrow"/>
+  <path d="M840 735 L905 735" class="data-arrow"/>
+  <path d="M1007 690 L1007 650 L760 650 L760 690" class="data-arrow"/>
+  <path d="M1110 225 L1180 715" class="arrow"/>
+  <path d="M1110 345 L1180 735" class="arrow"/>
+  <path d="M1110 465 L1180 755" class="arrow"/>
+  <path d="M1110 585 L1180 775" class="arrow"/>
+
+  <text x="75" y="950" class="subtitle">Solid arrows: requests and telemetry. Green arrows: stored or queried data. Dashed boxes: trust boundaries.</text>
+</svg>

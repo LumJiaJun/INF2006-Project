@@ -45,3 +45,23 @@
 - **Actual result:** Passed. The deployed bucket returned the expected controls and direct object access returned HTTP 403.
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/data_lake.tf`
+
+## Runtime-role blast radius
+
+- **Objective:** Verify selected allowed and denied service-to-service permissions rather than relying only on policy inspection.
+- **Setup:** Deployed prediction, history, and Glue execution roles.
+- **Command / steps:** Run `aws iam simulate-principal-policy` for required and unrelated actions on named resources.
+- **Expected result:** Prediction `dynamodb:PutItem`, history `dynamodb:Query`, and Glue raw-listing reads are allowed. Prediction raw-data reads, history table scans, and Glue raw-review reads are denied by omission.
+- **Actual result:** Passed. Required operations returned `allowed`; all three unrelated operations returned `implicitDeny`.
+- **Date:** 2026-09-23
+- **Artefact path:** `src/infrastructure/prediction.tf`, `src/infrastructure/history.tf`, `src/infrastructure/data_lake.tf`, and `evidence/serverless-zero-trust-review.md`
+
+## Edge response hardening
+
+- **Objective:** Verify defense-in-depth headers on the public frontend.
+- **Setup:** CloudFront response headers policy attached to the default cache behavior.
+- **Command / steps:** Run `tests/smoke_api.ps1` against the deployed frontend and API.
+- **Expected result:** The frontend includes CSP, HSTS, `X-Content-Type-Options`, and `X-Frame-Options`.
+- **Actual result:** Passed. All four headers were present after CloudFront propagation and invalidation.
+- **Date:** 2026-09-23
+- **Artefact path:** `src/infrastructure/frontend.tf` and `tests/smoke_api.ps1`

@@ -115,6 +115,26 @@ resource "aws_cloudwatch_metric_alarm" "analytics_errors" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "health_throttles" {
+  alarm_name          = "${local.name_prefix}-health-throttles"
+  alarm_description   = "Health Lambda was throttled one or more times in five minutes"
+  namespace           = "AWS/Lambda"
+  metric_name         = "Throttles"
+  statistic           = "Sum"
+  period              = 300
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.operational_alerts.arn]
+  ok_actions          = [aws_sns_topic.operational_alerts.arn]
+
+  dimensions = {
+    FunctionName = aws_lambda_function.health.function_name
+  }
+}
+
 resource "aws_cloudwatch_dashboard" "operations" {
   dashboard_name = "${local.name_prefix}-operations"
   dashboard_body = jsonencode({
@@ -132,6 +152,7 @@ resource "aws_cloudwatch_dashboard" "operations" {
             ["AWS/ApiGateway", "Count", "ApiId", aws_apigatewayv2_api.platform.id, "Stage", aws_apigatewayv2_stage.default.name],
             [".", "4xx", ".", ".", ".", "."],
             [".", "5xx", ".", ".", ".", "."],
+            [".", "IntegrationLatency", ".", ".", ".", ".", { stat = "p95", yAxis = "right" }],
           ]
         }
       },
@@ -146,8 +167,10 @@ resource "aws_cloudwatch_dashboard" "operations" {
           metrics = [
             ["AWS/Lambda", "Duration", "FunctionName", aws_lambda_function.prediction.function_name, { stat = "p95" }],
             [".", "Errors", ".", ".", { stat = "Sum", yAxis = "right" }],
+            [".", "Invocations", ".", ".", { stat = "Sum", yAxis = "right" }],
             ["AWS/Lambda", "Duration", "FunctionName", aws_lambda_function.analytics.function_name, { stat = "p95" }],
             [".", "Errors", ".", ".", { stat = "Sum", yAxis = "right" }],
+            ["AWS/Lambda", "Throttles", "FunctionName", aws_lambda_function.health.function_name, { stat = "Sum", yAxis = "right" }],
           ]
         }
       },

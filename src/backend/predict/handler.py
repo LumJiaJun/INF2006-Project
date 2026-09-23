@@ -87,6 +87,7 @@ def error_response(status_code, code, message, details=None):
 
 def load_model():
     global _model_bundle
+    # Warm Lambda containers can reuse the model, while durable state stays in AWS services.
     if _model_bundle is None:
         _model_bundle = joblib.load(MODEL_PATH)
     return _model_bundle
@@ -102,6 +103,7 @@ def history_table():
 
 
 def authenticated_user_id(event):
+    # API Gateway supplies these claims only after the JWT authorizer verifies the token.
     return (
         event.get("requestContext", {})
         .get("authorizer", {})
@@ -112,6 +114,7 @@ def authenticated_user_id(event):
 
 
 def persist_prediction(user_id, model_input, result):
+    # Coordinates are deliberately excluded from history because they are not needed later.
     prediction_id = str(uuid.uuid4())
     created_at = datetime.now(UTC).isoformat()
     item = {

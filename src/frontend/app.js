@@ -82,6 +82,7 @@ async function loadAnalytics() {
       throw new Error("Market analytics could not be loaded.");
     }
     const result = await response.json();
+    // Currency labels remain visible because city prices cannot be compared as one currency.
     analyticsGrid.replaceChildren(...result.items.map(analyticsItem));
     analyticsMessage.textContent = `${result.scope}. Prices use each city's local currency.`;
   } catch (error) {

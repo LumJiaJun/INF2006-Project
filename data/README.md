@@ -5,12 +5,11 @@ The project uses an Airbnb listings and reviews archive supplied to the team. Ra
 ## Dataset provenance
 
 - Supplied archive: `archive (8).zip`
-- Original publisher and download URL: not yet verified
-- Licence: not yet verified
+- Dataset: Airbnb Listings & Reviews by mysarahmadbhat on Kaggle
+- Download URL: https://www.kaggle.com/datasets/mysarahmadbhat/airbnb-listings-reviews/data
+- Licence: CC0 1.0 Public Domain, as declared on the Kaggle data card
 - Coverage: 279,712 listings across 10 cities and 5,373,143 review records
 - Review dates: 2008-11-16 through 2021-03-01
-
-The original publisher, URL, and licence must be confirmed before final submission. The data must not be redistributed until its licence is verified.
 
 Only `Listings.csv` is uploaded to the development data lake because the implemented market summaries do not use review records. The raw object remains private and encrypted. Glue writes a selected, cleaned subset to `processed/listings/` as city-partitioned Parquet; raw and processed data remain excluded from Git.
 

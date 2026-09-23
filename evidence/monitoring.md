@@ -27,7 +27,7 @@
 
 ## Alarms and notification path
 
-- **What is monitored:** API Gateway 5xx responses plus prediction and analytics Lambda errors over five-minute periods. A CloudWatch dashboard displays API request/error counts and Lambda p95 duration/error metrics.
+- **What is monitored:** API Gateway request, 4xx, 5xx, and p95 integration latency metrics plus Lambda invocations, errors, p95 duration, and health throttles. Four alarms cover API 5xx, prediction errors, analytics errors, and observed health throttling.
 - **Operational test / query:** Set the prediction-error alarm to `ALARM` with `aws cloudwatch set-alarm-state`, inspect action history, then reset it to `OK`.
 - **Result:** The first action failed because the AWS-managed SNS key did not grant CloudWatch access. After replacing it with a rotating customer-managed key scoped to this account's named alarms, action history reported `Successfully executed action` for the encrypted SNS topic. The test alarm was reset to `OK`.
 - **Interpretation:** Alarm-to-topic publishing works. The topic currently has no human subscription, so operators must add a confirmed endpoint outside the submission before relying on notifications.

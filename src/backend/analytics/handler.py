@@ -99,6 +99,7 @@ def parse_rows(result):
 def lambda_handler(event, context):
     try:
         client = athena_client()
+        # Clients cannot supply SQL; this fixed query is the complete public analytics surface.
         query = CITY_SUMMARY_QUERY.format(table_name=TABLE_NAME)
         started = client.start_query_execution(
             QueryString=query,

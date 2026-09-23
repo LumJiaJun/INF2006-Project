@@ -27,6 +27,18 @@ foreach ($asset in $expectedAssets.GetEnumerator()) {
     }
 }
 
+$frontendResponse = Invoke-WebRequest -Uri $FrontendUrl -UseBasicParsing
+foreach ($header in @(
+    'Content-Security-Policy',
+    'Strict-Transport-Security',
+    'X-Content-Type-Options',
+    'X-Frame-Options'
+)) {
+    if (-not $frontendResponse.Headers[$header]) {
+        throw "The frontend response is missing security header $header."
+    }
+}
+
 $healthResponse = Invoke-WebRequest `
     -Uri "$ApiBaseUrl/health" `
     -Headers @{ Origin = $FrontendUrl } `
@@ -119,6 +131,7 @@ try {
 
 Write-Output 'Health check passed.'
 Write-Output 'Frontend asset checks passed.'
+Write-Output 'Frontend security header checks passed.'
 Write-Output "Prediction passed: $($predictionBody.estimated_nightly_price) $($predictionBody.currency)."
 Write-Output "Analytics passed: $($analyticsBody.count) city summaries."
 Write-Output 'Protected route authentication checks passed.'

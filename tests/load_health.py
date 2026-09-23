@@ -51,6 +51,7 @@ def main():
     print(json.dumps(output, indent=2, sort_keys=True))
 
     unexpected = set(statuses) - {200, 429}
+    # Controlled throttling is acceptable, but backend failures make the check fail.
     if unexpected or statuses.get(200, 0) == 0:
         raise SystemExit(1)
 

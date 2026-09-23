@@ -7,7 +7,7 @@ project:
   title: "Airbnb Pricing and Market Intelligence Platform"
   problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
   cloud_provider: "AWS"
-  repository_commit: "optional commit hash"
+  repository_commit: "342b065"
 
 team:
   members:
@@ -17,6 +17,7 @@ team:
 
 architecture:
   diagram: "evidence/architecture.png"
+  review: "evidence/serverless-zero-trust-review.md"
   service_model: "Serverless managed services"
   deployment_model: "Public cloud"
   components:
