@@ -7,7 +7,7 @@ project:
   title: "Airbnb Pricing and Market Intelligence Platform"
   problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
   cloud_provider: "AWS"
-  repository_commit: "342b065"
+  repository_commit: "c013c01"
 
 team:
   members:
