@@ -57,8 +57,117 @@ resource "aws_cognito_user_pool_client" "frontend" {
 }
 
 resource "aws_cognito_user_pool_domain" "users" {
-  domain       = "${local.name_prefix}-${random_id.bucket_suffix.hex}"
+  domain                = "${local.name_prefix}-${random_id.bucket_suffix.hex}"
+  user_pool_id          = aws_cognito_user_pool.users.id
+  managed_login_version = 2
+}
+
+# Managed Login v2 gives sign-in and sign-up a modern responsive interface.
+resource "aws_cognito_managed_login_branding" "frontend" {
+  client_id    = aws_cognito_user_pool_client.frontend.id
   user_pool_id = aws_cognito_user_pool.users.id
+
+  asset {
+    bytes      = filebase64("${path.module}/assets/cognito-background.jpg")
+    category   = "PAGE_BACKGROUND"
+    color_mode = "LIGHT"
+    extension  = "JPEG"
+  }
+
+  settings = jsonencode({
+    components = {
+      form = {
+        borderRadius = 18
+        lightMode = {
+          backgroundColor = "fffffff5"
+          borderColor     = "d8e1dcff"
+        }
+      }
+      pageBackground = {
+        image = {
+          enabled = true
+        }
+        lightMode = {
+          color = "f2f5f0ff"
+        }
+      }
+      pageText = {
+        lightMode = {
+          bodyColor        = "60716bff"
+          descriptionColor = "60716bff"
+          headingColor     = "10231eff"
+        }
+      }
+      primaryButton = {
+        lightMode = {
+          defaults = {
+            backgroundColor = "174f42ff"
+            textColor       = "ffffffff"
+          }
+          hover = {
+            backgroundColor = "0f382fff"
+            textColor       = "ffffffff"
+          }
+          active = {
+            backgroundColor = "0f382fff"
+            textColor       = "ffffffff"
+          }
+        }
+      }
+    }
+    componentClasses = {
+      buttons = {
+        borderRadius = 12
+      }
+      focusState = {
+        lightMode = {
+          borderColor = "174f42ff"
+        }
+      }
+      input = {
+        borderRadius = 10
+        lightMode = {
+          defaults = {
+            backgroundColor = "ffffffff"
+            borderColor     = "9cada5ff"
+          }
+          placeholderColor = "60716bff"
+        }
+      }
+      link = {
+        lightMode = {
+          defaults = {
+            textColor = "174f42ff"
+          }
+          hover = {
+            textColor = "0f382fff"
+          }
+        }
+      }
+      optionControls = {
+        lightMode = {
+          selected = {
+            backgroundColor = "174f42ff"
+            foregroundColor = "ffffffff"
+          }
+        }
+      }
+    }
+    categories = {
+      form = {
+        location = {
+          horizontal = "START"
+          vertical   = "CENTER"
+        }
+      }
+      global = {
+        colorSchemeMode = "LIGHT"
+        spacingDensity  = "REGULAR"
+      }
+    }
+  })
+
+  depends_on = [aws_cognito_user_pool_domain.users]
 }
 
 # API Gateway checks Cognito JWTs before allowing private routes.

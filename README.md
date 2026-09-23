@@ -58,7 +58,7 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - Cloud provider: AWS
 - Compute/deployment: API Gateway and AWS Lambda, provisioned with Terraform
 - Frontend: private Amazon S3 origin and Amazon CloudFront
-- Identity and data: Amazon Cognito and encrypted Amazon DynamoDB prediction history
+- Identity and data: branded Cognito Managed Login v2 and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
 - Operations: CloudWatch structured logs, metrics, dashboard and alarms with an encrypted SNS action topic
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline with held-out evaluation
