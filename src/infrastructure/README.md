@@ -11,6 +11,7 @@ Terraform provisions the AWS resources for the serverless application, identity,
 - A Cognito user pool and DynamoDB prediction-history table
 - A private encrypted S3 data lake, Glue transform, catalog table, and Athena workgroup
 - A fixed-query analytics Lambda and `GET /analytics` route
+- CloudWatch alarms and dashboard with an encrypted SNS action topic
 
 ## Prerequisites
 
@@ -41,6 +42,8 @@ terraform output prediction_history_url
 terraform output data_lake_bucket_name
 terraform output glue_transform_job_name
 terraform output analytics_url
+terraform output operations_dashboard_name
+terraform output operational_alerts_topic_arn
 ```
 
 The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`.
@@ -66,6 +69,12 @@ aws glue start-job-run --job-name $job
 ```
 
 The job is limited to two `G.1X` workers, a ten-minute timeout, and no retries. Athena queries run in a workgroup with enforced encrypted output, CloudWatch metrics, a 1 GiB scan cutoff, and seven-day query-result expiry.
+
+## Monitoring
+
+CloudWatch alarms track API 5xx responses and prediction/analytics Lambda errors. Their SNS topic uses a rotating customer-managed KMS key whose policy permits only this account's named CloudWatch alarms to publish. No subscription is committed because recipient addresses are personal deployment configuration. Add and confirm an operator endpoint separately before treating the topic as a complete notification channel.
+
+The development account has a Lambda concurrency quota of 10, so the API stage uses a conservative two-request burst and two-request-per-second limit. See `evidence/test-resilience.md` for passing expected-load results and the honestly recorded higher-concurrency failure.
 
 ## Build prediction image
 

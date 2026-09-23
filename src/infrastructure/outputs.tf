@@ -72,3 +72,13 @@ output "analytics_url" {
   description = "Public market analytics endpoint backed by Athena."
   value       = "${aws_apigatewayv2_api.platform.api_endpoint}/analytics"
 }
+
+output "operational_alerts_topic_arn" {
+  description = "Encrypted SNS topic used by CloudWatch operational alarms."
+  value       = aws_sns_topic.operational_alerts.arn
+}
+
+output "operations_dashboard_name" {
+  description = "CloudWatch dashboard containing API and Lambda operational metrics."
+  value       = aws_cloudwatch_dashboard.operations.dashboard_name
+}

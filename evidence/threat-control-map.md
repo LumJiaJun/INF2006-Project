@@ -7,6 +7,7 @@ Map named threats to the controls that mitigate them, with evidence links.
 | Direct public access to frontend objects | S3 Block Public Access and a bucket policy scoped to the CloudFront distribution | `src/infrastructure/frontend.tf`, `evidence/test-security.md` |
 | Public or unintended access to raw analytical data | A separate S3 data-lake bucket has Block Public Access, bucket-owner enforcement, encryption, and role-scoped object access | `src/infrastructure/data_lake.tf` |
 | Arbitrary or unexpectedly expensive analytics queries | Clients can invoke only a fixed server-side query; the Athena workgroup enforces a 1 GiB scan cutoff and seven-day result expiry | `src/backend/analytics/handler.py`, `src/infrastructure/data_lake.tf` |
+| Operational failures going unnoticed | CloudWatch alarms publish to an encrypted SNS topic, and a dashboard exposes API errors and Lambda duration/errors | `src/infrastructure/monitoring.tf`, `evidence/monitoring.md` |
 | Over-privileged compute identity | The health Lambda role can only write to its dedicated CloudWatch log group | `src/infrastructure/api.tf` |
 | Unauthorized prediction-history access | API Gateway validates Cognito JWTs, and handlers derive the DynamoDB partition key only from the verified `sub` claim | `src/infrastructure/auth.tf`, `src/backend/history/handler.py`, `evidence/test-security.md` |
 | OAuth authorization-code interception or request forgery | The browser uses PKCE with SHA-256 and validates a cryptographically random state value | `src/frontend/auth.js` |

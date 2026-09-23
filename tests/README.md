@@ -21,3 +21,11 @@ $frontendUrl = terraform -chdir=src/infrastructure output -raw frontend_url
 $apiBaseUrl = (terraform -chdir=src/infrastructure output -raw health_url) -replace '/health$', ''
 ./tests/smoke_api.ps1 -FrontendUrl $frontendUrl -ApiBaseUrl $apiBaseUrl
 ```
+
+Run the bounded live health check only against an environment you own:
+
+```powershell
+python tests/load_health.py --url <health-url> --requests 20 --concurrency 2
+```
+
+The command passes only when every response is HTTP 200 or an explicit HTTP 429 throttle response and at least one request succeeds.

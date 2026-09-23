@@ -31,6 +31,9 @@ architecture:
     - "AWS Glue ETL and Data Catalog"
     - "Amazon Athena"
     - "Amazon CloudWatch Logs"
+    - "Amazon CloudWatch dashboard and alarms"
+    - "Amazon SNS"
+    - "AWS Key Management Service"
 
 evidence:
   functional_test: "evidence/test-functional.md"

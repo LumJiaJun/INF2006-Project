@@ -53,6 +53,7 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - Frontend: private Amazon S3 origin and Amazon CloudFront
 - Identity and data: Amazon Cognito and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
+- Operations: CloudWatch structured logs, metrics, dashboard and alarms with an encrypted SNS action topic
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline with held-out evaluation
 - Application: HTML, CSS, JavaScript, and Python
 
@@ -62,4 +63,6 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - The city analytics use different local currencies and must not be compared as if they shared one currency.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
+- The development AWS account has a concurrency quota of 10. A high-concurrency stress test caused Lambda throttles despite API Gateway rate limits; see `evidence/test-resilience.md`.
+- The SNS alert topic has no human subscription in source control and needs an operator-managed confirmed endpoint.
 - Cloud deployment requires an AWS account and may incur a small cost.
