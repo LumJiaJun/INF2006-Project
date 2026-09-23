@@ -15,6 +15,13 @@ const roomTypeSelect = document.querySelector("#room-type");
 const latitudeInput = document.querySelector("#latitude");
 const longitudeInput = document.querySelector("#longitude");
 let modelOptions;
+const accountLabel = document.querySelector("#account-label");
+const signInButton = document.querySelector("#sign-in");
+const signOutButton = document.querySelector("#sign-out");
+const historySection = document.querySelector("#history-section");
+const historyMessage = document.querySelector("#history-message");
+const historyList = document.querySelector("#history-list");
+const refreshHistoryButton = document.querySelector("#refresh-history");
 
 async function checkPlatformHealth() {
   if (!apiBaseUrl) {
@@ -139,9 +146,15 @@ predictionForm.addEventListener("submit", async (event) => {
   predictionSubmit.textContent = "Estimating...";
 
   try {
-    const response = await fetch(`${apiBaseUrl}/predict`, {
+    const idToken = window.Auth.getIdToken();
+    const route = idToken ? "predictions" : "predict";
+    const headers = { "content-type": "application/json" };
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+    const response = await fetch(`${apiBaseUrl}/${route}`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers,
       body: JSON.stringify(predictionPayload(predictionForm)),
     });
     const result = await response.json();
@@ -154,9 +167,14 @@ predictionForm.addEventListener("submit", async (event) => {
     price.className = "prediction-price";
     price.textContent = `${result.currency} ${result.estimated_nightly_price.toLocaleString()}`;
     const disclaimer = document.createElement("span");
-    disclaimer.textContent = result.disclaimer;
+    disclaimer.textContent = result.saved
+      ? `${result.disclaimer} This estimate was saved to your history.`
+      : result.disclaimer;
     content.append(price, disclaimer);
     showPredictionResult(content);
+    if (result.saved) {
+      await loadHistory();
+    }
   } catch (error) {
     const message = document.createElement("span");
     message.textContent = error.message || "The prediction service is unavailable.";
@@ -165,6 +183,64 @@ predictionForm.addEventListener("submit", async (event) => {
     predictionSubmit.disabled = false;
     predictionSubmit.textContent = "Estimate nightly price";
   }
+});
+
+function updateAccountUi() {
+  const user = window.Auth.getUser();
+  accountLabel.textContent = user?.email || "Not signed in";
+  signInButton.hidden = Boolean(user);
+  signOutButton.hidden = !user;
+  historySection.hidden = !user;
+  if (user) {
+    loadHistory();
+  } else {
+    historyList.replaceChildren();
+  }
+}
+
+function historyItem(record) {
+  const item = document.createElement("article");
+  item.className = "history-item";
+  const title = document.createElement("span");
+  title.textContent = `${record.city}, ${record.neighbourhood}`;
+  const details = document.createElement("p");
+  const createdAt = new Date(record.created_at).toLocaleString();
+  details.textContent = `${record.room_type} for ${record.accommodates} guests, ${createdAt}`;
+  const price = document.createElement("strong");
+  price.textContent = `${record.currency} ${Number(record.predicted_price).toLocaleString()}`;
+  item.append(title, details, price);
+  return item;
+}
+
+async function loadHistory() {
+  const idToken = window.Auth.getIdToken();
+  if (!idToken) {
+    return;
+  }
+  historyMessage.textContent = "Loading prediction history...";
+  try {
+    const response = await fetch(`${apiBaseUrl}/history`, {
+      headers: { authorization: `Bearer ${idToken}` },
+    });
+    if (!response.ok) {
+      throw new Error("Prediction history could not be loaded.");
+    }
+    const result = await response.json();
+    historyList.replaceChildren(...result.items.map(historyItem));
+    historyMessage.textContent = result.count
+      ? `Showing ${result.count} most recent prediction${result.count === 1 ? "" : "s"}.`
+      : "No saved predictions yet.";
+  } catch (error) {
+    historyMessage.textContent = error.message;
+  }
+}
+
+signInButton.addEventListener("click", () => window.Auth.signIn());
+signOutButton.addEventListener("click", () => window.Auth.signOut());
+refreshHistoryButton.addEventListener("click", loadHistory);
+
+window.Auth.ready.then(updateAccountUi).catch((error) => {
+  accountLabel.textContent = error.message;
 });
 
 loadModelOptions().catch((error) => {

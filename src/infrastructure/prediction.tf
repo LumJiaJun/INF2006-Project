@@ -1,7 +1,7 @@
 variable "prediction_image_tag" {
   description = "Immutable ECR image tag used by the prediction Lambda."
   type        = string
-  default     = "1.0.2"
+  default     = "1.0.3"
 }
 
 data "aws_iam_policy_document" "prediction_lambda_assume_role" {
@@ -27,6 +27,12 @@ resource "aws_cloudwatch_log_group" "prediction_lambda" {
 
 data "aws_iam_policy_document" "prediction_lambda_logs" {
   statement {
+    sid       = "WritePredictionHistory"
+    actions   = ["dynamodb:PutItem"]
+    resources = [aws_dynamodb_table.prediction_history.arn]
+  }
+
+  statement {
     sid = "WritePredictionFunctionLogs"
     actions = [
       "logs:CreateLogStream",
@@ -37,7 +43,7 @@ data "aws_iam_policy_document" "prediction_lambda_logs" {
 }
 
 resource "aws_iam_role_policy" "prediction_lambda_logs" {
-  name   = "write-prediction-function-logs"
+  name   = "prediction-history-and-logs"
   role   = aws_iam_role.prediction_lambda.id
   policy = data.aws_iam_policy_document.prediction_lambda_logs.json
 }
@@ -56,6 +62,12 @@ resource "aws_lambda_function" "prediction" {
     log_format            = "JSON"
     application_log_level = "INFO"
     system_log_level      = "WARN"
+  }
+
+  environment {
+    variables = {
+      HISTORY_TABLE_NAME = aws_dynamodb_table.prediction_history.name
+    }
   }
 
   depends_on = [

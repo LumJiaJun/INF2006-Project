@@ -12,6 +12,12 @@
   </head>
   <body>
     <main class="page-shell">
+      <nav class="account-bar" aria-label="Account">
+        <span id="account-label">Not signed in</span>
+        <button id="sign-in" class="secondary-button" type="button">Sign in or create account</button>
+        <button id="sign-out" class="secondary-button" type="button" hidden>Sign out</button>
+      </nav>
+
       <header class="hero">
         <p class="eyebrow">INF2006 Cloud Computing and Big Data</p>
         <h1>Understand the market before setting the nightly price.</h1>
@@ -101,6 +107,18 @@
         <div id="prediction-result" class="prediction-result" aria-live="polite" hidden></div>
       </section>
 
+      <section id="history-section" class="history-section" aria-labelledby="history-heading" hidden>
+        <div class="history-heading-row">
+          <div>
+            <p class="section-label">Your account</p>
+            <h2 id="history-heading">Recent predictions</h2>
+          </div>
+          <button id="refresh-history" class="secondary-button" type="button">Refresh history</button>
+        </div>
+        <p id="history-message" class="status-message">Sign in to save and review predictions.</p>
+        <div id="history-list" class="history-list"></div>
+      </section>
+
       <section class="feature-grid" aria-label="Planned platform capabilities">
         <article>
           <p class="feature-number">01</p>
@@ -124,6 +142,8 @@
       </p>
     </main>
     <script src="config.js"></script>
+    <script src="auth-config.js"></script>
+    <script src="auth.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>

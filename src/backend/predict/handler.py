@@ -2,7 +2,11 @@ import base64
 import json
 import logging
 import os
+import uuid
+from datetime import UTC, datetime
+from decimal import Decimal
 
+import boto3
 import joblib
 import numpy as np
 import pandas as pd
@@ -15,6 +19,7 @@ MODEL_PATH = os.environ.get(
     "MODEL_PATH",
     os.path.join(os.path.dirname(__file__), "model", "airbnb_price_model.joblib"),
 )
+HISTORY_TABLE_NAME = os.environ.get("HISTORY_TABLE_NAME")
 CURRENCY_BY_CITY = {
     "Bangkok": "THB",
     "Cape Town": "ZAR",
@@ -59,6 +64,7 @@ REQUIRED_FIELDS = (
 ALLOWED_FIELDS = REQUIRED_FIELDS | OPTIONAL_NUMERIC_FIELDS
 
 _model_bundle = None
+_history_table = None
 
 
 def response(status_code, body):
@@ -84,6 +90,53 @@ def load_model():
     if _model_bundle is None:
         _model_bundle = joblib.load(MODEL_PATH)
     return _model_bundle
+
+
+def history_table():
+    global _history_table
+    if _history_table is None:
+        if not HISTORY_TABLE_NAME:
+            raise RuntimeError("HISTORY_TABLE_NAME is not configured")
+        _history_table = boto3.resource("dynamodb").Table(HISTORY_TABLE_NAME)
+    return _history_table
+
+
+def authenticated_user_id(event):
+    return (
+        event.get("requestContext", {})
+        .get("authorizer", {})
+        .get("jwt", {})
+        .get("claims", {})
+        .get("sub")
+    )
+
+
+def persist_prediction(user_id, model_input, result):
+    prediction_id = str(uuid.uuid4())
+    created_at = datetime.now(UTC).isoformat()
+    item = {
+        "user_id": user_id,
+        "created_at_prediction_id": f"{created_at}#{prediction_id}",
+        "prediction_id": prediction_id,
+        "created_at": created_at,
+        "city": model_input["city"],
+        "neighbourhood": model_input["neighbourhood"],
+        "property_type": model_input["property_type"],
+        "room_type": model_input["room_type"],
+        "accommodates": Decimal(str(model_input["accommodates"])),
+        "minimum_nights": Decimal(str(model_input["minimum_nights"])),
+        "predicted_price": Decimal(str(result["estimated_nightly_price"])),
+        "currency": result["currency"],
+        "model_version": result["model_version"],
+    }
+    if model_input.get("bedrooms") is not None:
+        item["bedrooms"] = Decimal(str(model_input["bedrooms"]))
+
+    history_table().put_item(
+        Item=item,
+        ConditionExpression="attribute_not_exists(created_at_prediction_id)",
+    )
+    return prediction_id
 
 
 def parse_body(event):
@@ -202,18 +255,22 @@ def lambda_handler(event, context):
             )
         )
 
-        return response(
-            200,
-            {
-                "estimated_nightly_price": round(capped_prediction, 2),
-                "currency": CURRENCY_BY_CITY[city],
-                "city": city,
-                "model_version": metadata["model_version"],
-                "prediction_capped": was_capped,
-                "supported_market_upper_bound": maximum,
-                "disclaimer": "This is a model estimate, not a guaranteed market price.",
-            },
-        )
+        result = {
+            "estimated_nightly_price": round(capped_prediction, 2),
+            "currency": CURRENCY_BY_CITY[city],
+            "city": city,
+            "model_version": metadata["model_version"],
+            "prediction_capped": was_capped,
+            "supported_market_upper_bound": maximum,
+            "disclaimer": "This is a model estimate, not a guaranteed market price.",
+            "saved": False,
+        }
+        user_id = authenticated_user_id(event)
+        if user_id:
+            result["prediction_id"] = persist_prediction(user_id, model_input, result)
+            result["saved"] = True
+
+        return response(200, result)
     except Exception:
         logger.exception("price_prediction_failed")
         return error_response(500, "internal_error", "The prediction service is temporarily unavailable.")

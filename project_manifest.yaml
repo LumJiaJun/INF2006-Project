@@ -25,6 +25,8 @@ architecture:
     - "Amazon API Gateway HTTP API"
     - "AWS Lambda"
     - "Amazon Elastic Container Registry"
+    - "Amazon Cognito"
+    - "Amazon DynamoDB"
     - "Amazon CloudWatch Logs"
 
 evidence:
@@ -43,6 +45,7 @@ data_ai:
 security:
   threat_control_map: "evidence/threat-control-map.md"
   secrets_handling: "No credentials are stored in source or Terraform variables; deployment uses the standard AWS credential chain and Lambda IAM roles."
+  authentication: "Cognito authorization-code flow with PKCE; API Gateway JWT authorization derives history ownership from the verified subject claim."
 
 run:
   prerequisites:

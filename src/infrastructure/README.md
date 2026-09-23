@@ -33,6 +33,17 @@ terraform apply
 terraform output frontend_url
 terraform output health_url
 terraform output prediction_ecr_repository_url
+terraform output cognito_hosted_ui_url
+terraform output prediction_history_url
+```
+
+The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`.
+
+After changing frontend files, invalidate CloudFront so cached objects are refreshed:
+
+```powershell
+$distributionId = terraform output -raw cloudfront_distribution_id
+aws cloudfront create-invalidation --distribution-id $distributionId --paths "/*"
 ```
 
 ## Build prediction image
@@ -40,7 +51,7 @@ terraform output prediction_ecr_repository_url
 Run from the repository root after recreating `analytics/artifacts/airbnb_price_model.joblib`:
 
 ```powershell
-$imageTag = "1.0.2"
+$imageTag = "1.0.3"
 $repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
 $registry = $repositoryUrl.Split('/')[0]
 

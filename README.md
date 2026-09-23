@@ -43,21 +43,21 @@ terraform output health_url
 
 ![Architecture diagram](evidence/architecture.png)
 
-CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health` provides a public health check, while `POST /predict` runs the evaluated model from an ECR-backed Lambda container. DynamoDB, Cognito, the analytical data lake, and prediction history remain later milestones.
+CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health` and `POST /predict` are public. Cognito protects `POST /predictions` and `GET /history`; authenticated predictions are stored under the token-derived user identifier in an encrypted DynamoDB table. The evaluated model runs from an ECR-backed Lambda container.
 
 ## Technology list
 
 - Cloud provider: AWS
 - Compute/deployment: API Gateway and AWS Lambda, provisioned with Terraform
 - Frontend: private Amazon S3 origin and Amazon CloudFront
-- Data layer: Amazon S3 now, with DynamoDB planned for prediction records
+- Identity and data: Amazon Cognito and encrypted Amazon DynamoDB prediction history
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline with held-out evaluation
 - Application: HTML, CSS, JavaScript, and Python
 
 ## Known limitations
 
-- The current milestone provides the serverless frontend and health endpoint only.
-- Market analytics, authentication, and prediction history are not implemented yet.
+- Market analytics dashboards and an analytical query layer are not implemented yet.
+- Full sign-up, email verification, prediction save, and history retrieval require a manual browser test with a real email account.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
 - Cloud deployment requires an AWS account and may incur a small cost.

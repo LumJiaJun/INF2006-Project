@@ -21,7 +21,17 @@
 - **Objective:** Verify that malformed or unsupported prediction requests are rejected without exposing stack traces and that the prediction role cannot access unrelated AWS data services.
 - **Setup:** Public `POST /predict` route, prediction handler validation, and a dedicated Lambda execution role.
 - **Command / steps:** Run `python -m unittest discover -s tests -p "test_prediction.py" -v`, run `tests/smoke_api.ps1`, and inspect `aws_iam_role_policy.prediction_lambda_logs` in `src/infrastructure/prediction.tf`.
-- **Expected result:** Invalid JSON, missing fields, unsupported categories, invalid coordinates, and unreasonable values return HTTP 400. The client receives safe errors. The Lambda role can write only to its own log group.
-- **Actual result:** Passed. Six focused prediction-handler tests passed, the live malformed request returned HTTP 400, and the role policy contains only `logs:CreateLogStream` and `logs:PutLogEvents` on the prediction log group.
+- **Expected result:** Invalid JSON, missing fields, unsupported categories, invalid coordinates, and unreasonable values return HTTP 400. The client receives safe errors. The Lambda role can write only to its own log group and the prediction-history table.
+- **Actual result:** Passed. Prediction-handler tests passed, the live malformed request returned HTTP 400, and the role policy is limited to its log group plus `dynamodb:PutItem` on the prediction-history table.
 - **Date:** 2026-09-23
 - **Artefact path:** `tests/test_prediction.py`, `tests/smoke_api.ps1`, and `src/infrastructure/prediction.tf`
+
+## Authentication and history isolation
+
+- **Objective:** Verify that only valid Cognito JWTs can save or read history and that a caller cannot select another user's partition.
+- **Setup:** Cognito authorization-code flow with PKCE, API Gateway JWT authorizer, and a DynamoDB table partitioned by the verified `sub` claim.
+- **Command / steps:** Run `python -m unittest discover -s tests -p "test_*.py" -v` and `./tests/smoke_api.ps1 -FrontendUrl $frontendUrl -ApiBaseUrl $apiBaseUrl`.
+- **Expected result:** Unauthenticated `POST /predictions` and `GET /history` requests return HTTP 401. The history function queries only the subject from API Gateway's verified claims.
+- **Actual result:** Passed. Both deployed routes returned HTTP 401 without a token, and the handler test confirmed the query key comes from `requestContext.authorizer.jwt.claims.sub`.
+- **Date:** 2026-09-23
+- **Artefact path:** `src/infrastructure/auth.tf`, `src/infrastructure/history.tf`, `src/backend/history/handler.py`, and `tests/test_history.py`

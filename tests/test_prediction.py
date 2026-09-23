@@ -22,6 +22,14 @@ class FakeModel:
         return np.array([self.prediction])
 
 
+class FakeHistoryTable:
+    def __init__(self):
+        self.items = []
+
+    def put_item(self, **kwargs):
+        self.items.append(kwargs["Item"])
+
+
 def model_bundle(prediction=125.5):
     return {
         "model": FakeModel(prediction),
@@ -71,6 +79,8 @@ def valid_payload():
 class PredictionHandlerTests(unittest.TestCase):
     def setUp(self):
         prediction_handler._model_bundle = model_bundle()
+        self.history_table = FakeHistoryTable()
+        prediction_handler._history_table = self.history_table
 
     def test_returns_real_model_response_shape(self):
         event = {"body": json.dumps(valid_payload()), "requestContext": {"requestId": "test"}}
@@ -83,6 +93,8 @@ class PredictionHandlerTests(unittest.TestCase):
         self.assertEqual(body["currency"], "EUR")
         self.assertEqual(body["model_version"], "test")
         self.assertFalse(body["prediction_capped"])
+        self.assertFalse(body["saved"])
+        self.assertEqual(self.history_table.items, [])
 
     def test_rejects_missing_fields(self):
         payload = valid_payload()
@@ -125,6 +137,23 @@ class PredictionHandlerTests(unittest.TestCase):
 
         self.assertEqual(body["estimated_nightly_price"], 500)
         self.assertTrue(body["prediction_capped"])
+
+    def test_authenticated_prediction_is_saved_for_claimed_user(self):
+        event = {
+            "body": json.dumps(valid_payload()),
+            "requestContext": {
+                "requestId": "test",
+                "authorizer": {"jwt": {"claims": {"sub": "authenticated-user"}}},
+            },
+        }
+
+        response = prediction_handler.lambda_handler(event, None)
+        body = json.loads(response["body"])
+
+        self.assertEqual(response["statusCode"], 200)
+        self.assertTrue(body["saved"])
+        self.assertEqual(len(self.history_table.items), 1)
+        self.assertEqual(self.history_table.items[0]["user_id"], "authenticated-user")
 
 
 if __name__ == "__main__":

@@ -73,7 +73,7 @@ resource "aws_apigatewayv2_api" "platform" {
   description   = "Public API for the Airbnb Market Intelligence Platform"
 
   cors_configuration {
-    allow_headers = ["content-type"]
+    allow_headers = ["authorization", "content-type"]
     allow_methods = ["GET", "POST", "OPTIONS"]
     allow_origins = ["https://${aws_cloudfront_distribution.frontend.domain_name}"]
     max_age       = 300

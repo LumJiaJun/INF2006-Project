@@ -154,3 +154,12 @@ resource "aws_s3_object" "application" {
   content_type  = "application/javascript; charset=utf-8"
   cache_control = "no-cache"
 }
+
+resource "aws_s3_object" "authentication" {
+  bucket        = aws_s3_bucket.frontend.id
+  key           = "auth.js"
+  source        = "${path.module}/../frontend/auth.js"
+  etag          = filemd5("${path.module}/../frontend/auth.js")
+  content_type  = "application/javascript; charset=utf-8"
+  cache_control = "no-cache"
+}
