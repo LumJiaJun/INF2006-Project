@@ -51,11 +51,12 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - Compute/deployment: API Gateway and AWS Lambda, provisioned with Terraform
 - Frontend: private Amazon S3 origin and Amazon CloudFront
 - Data layer: Amazon S3 now, with DynamoDB planned for prediction records
-- Analytics / AI-ML: reproducible Python ML pipeline planned after dataset inspection
+- Analytics / AI-ML: reproducible scikit-learn price regression pipeline with held-out evaluation
 - Application: HTML, CSS, JavaScript, and Python
 
 ## Known limitations
 
 - The current milestone provides the serverless frontend and health endpoint only.
-- Price prediction, analytics, authentication, and prediction history are not implemented yet.
+- Online price prediction, market analytics, authentication, and prediction history are not implemented yet.
+- The evaluated model has material error and supports only the typical 99% price range learned per city.
 - Cloud deployment requires an AWS account and may incur a small cost.
