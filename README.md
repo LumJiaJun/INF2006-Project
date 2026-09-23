@@ -1,4 +1,4 @@
-# <Project Title>
+# Airbnb Pricing and Market Intelligence Platform
 
 <!--
 Entry point for the submission. Keep this concise and factual.
@@ -7,7 +7,7 @@ A marker should be able to understand the project and run safe, offline commands
 
 ## Problem statement
 
-<One paragraph describing the user problem this service solves and who the users are.>
+Airbnb hosts and prospective hosts can struggle to interpret local listing patterns and choose a reasonable nightly price. This project provides an estimated nightly price from listing characteristics, supported market analytics, and authenticated prediction history through a secure serverless AWS application. Predictions are estimates, not guaranteed market prices.
 
 ## Team members
 
@@ -21,34 +21,41 @@ A marker should be able to understand the project and run safe, offline commands
 ## Quickstart commands
 
 ```bash
-# 1. Install dependencies
-<command>
+# 1. Run offline unit tests
+python -m unittest discover -s tests -p "test_*.py" -v
 
-# 2. Configure environment (copy and fill placeholders)
-cp src/.env.example src/.env
+# 2. Initialise and validate Terraform
+cd src/infrastructure
+terraform init -backend=false
+terraform fmt -check
+terraform validate
 
-# 3. Run the application locally
-<command>
+# 3. Review and deploy the infrastructure
+terraform plan
+terraform apply
 
-# 4. Run tests
-<command>
+# 4. Show the deployed endpoints
+terraform output frontend_url
+terraform output health_url
 ```
 
 ## Architecture
 
 ![Architecture diagram](evidence/architecture.png)
 
-<Short description of the architecture. Labels here must match component names in source/config and evidence.>
+CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. The first milestone implements `GET /health` with CloudWatch logging. DynamoDB, Cognito, the data lake, analytics, and ML inference will be added in later tested milestones.
 
 ## Technology list
 
-- Cloud provider: <AWS | Azure | GCP | other>
-- Compute/deployment: <VM | container service | managed platform>
-- Data layer: <database / storage service>
-- Analytics / AI-ML: <framework / notebook>
-- Application: <language / framework>
+- Cloud provider: AWS
+- Compute/deployment: API Gateway and AWS Lambda, provisioned with Terraform
+- Frontend: private Amazon S3 origin and Amazon CloudFront
+- Data layer: Amazon S3 now, with DynamoDB planned for prediction records
+- Analytics / AI-ML: reproducible Python ML pipeline planned after dataset inspection
+- Application: HTML, CSS, JavaScript, and Python
 
 ## Known limitations
 
-- <Limitation 1>
-- <Limitation 2>
+- The current milestone provides the serverless frontend and health endpoint only.
+- Price prediction, analytics, authentication, and prediction history are not implemented yet.
+- Cloud deployment requires an AWS account and may incur a small cost.

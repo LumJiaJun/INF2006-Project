@@ -49,4 +49,5 @@ models/
 # Local test and deployment output
 tmp/
 dist/
+src/infrastructure/*.zip
 coverage/

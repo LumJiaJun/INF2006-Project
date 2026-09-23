@@ -108,6 +108,16 @@ h2 {
   box-shadow: 0 0 0 0.45rem rgb(49 116 81 / 14%);
 }
 
+.status-indicator-pending {
+  background: #967323;
+  box-shadow: 0 0 0 0.45rem rgb(150 115 35 / 14%);
+}
+
+.status-indicator-error {
+  background: var(--accent);
+  box-shadow: 0 0 0 0.45rem rgb(217 79 53 / 14%);
+}
+
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

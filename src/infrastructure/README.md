@@ -1,6 +1,12 @@
 # Infrastructure
 
-Terraform provisions the AWS resources for the serverless application. The initial milestone creates a private S3 frontend bucket and a CloudFront distribution using Origin Access Control.
+Terraform provisions the AWS resources for the serverless application. The initial milestone creates:
+
+- A private S3 frontend bucket
+- A CloudFront distribution using Origin Access Control
+- An API Gateway HTTP API
+- A Python Lambda health endpoint
+- A retained CloudWatch log group
 
 ## Prerequisites
 
@@ -24,6 +30,7 @@ terraform plan
 ```bash
 terraform apply
 terraform output frontend_url
+terraform output health_url
 ```
 
 ## Cleanup

@@ -12,3 +12,8 @@ output "frontend_url" {
   description = "Public HTTPS URL for the static frontend."
   value       = "https://${aws_cloudfront_distribution.frontend.domain_name}"
 }
+
+output "health_url" {
+  description = "Public API health endpoint."
+  value       = "${aws_apigatewayv2_api.platform.api_endpoint}/health"
+}

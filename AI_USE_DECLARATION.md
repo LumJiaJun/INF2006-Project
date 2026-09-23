@@ -7,7 +7,7 @@ verification the team performed, and any licences/attribution.
 
 | Tool | Where it was used | Purpose |
 |------|-------------------|---------|
-| <e.g. ChatGPT / Copilot / Kiro> | <files / sections> | <what it helped with> |
+| OpenAI Codex | `AGENTS.md`, `.gitignore`, `README.md`, `src/`, `tests/`, `evidence/`, and `project_manifest.yaml` | Repository inspection, implementation support, Terraform configuration, tests, documentation, and deployment verification. |
 
 ## Sources and baselines
 
@@ -17,7 +17,10 @@ verification the team performed, and any licences/attribution.
 
 ## Verification performed
 
-- <How the team checked AI-generated code/text for correctness and safety.>
+- Reviewed the Terraform plan before each apply and confirmed that it contained no destructive actions.
+- Ran `terraform fmt -check`, `terraform validate`, Python unit tests, and JavaScript syntax checking.
+- Verified the deployed CloudFront frontend, API health response, CORS restriction, direct S3 denial, and CloudWatch log event.
+- The team remains responsible for reviewing future generated work and validating all final claims.
 
 ## Licences and attribution
 

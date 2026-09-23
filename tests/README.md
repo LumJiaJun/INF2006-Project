@@ -11,5 +11,5 @@ At least four tests are required (see report Section 6 and evidence/):
 ## How to run
 
 ```bash
-<command>
+python -m unittest discover -s tests -p "test_*.py" -v
 ```

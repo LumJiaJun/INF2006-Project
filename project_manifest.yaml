@@ -4,9 +4,9 @@
 
 project:
   group_id: "Gxxx"
-  title: ""
-  problem_statement: ""
-  cloud_provider: "AWS | Azure | GCP | other"
+  title: "Airbnb Pricing and Market Intelligence Platform"
+  problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
+  cloud_provider: "AWS"
   repository_commit: "optional commit hash"
 
 team:
@@ -17,9 +17,14 @@ team:
 
 architecture:
   diagram: "evidence/architecture.png"
-  service_model: ""
-  deployment_model: ""
-  components: []
+  service_model: "Serverless managed services"
+  deployment_model: "Public cloud"
+  components:
+    - "Amazon CloudFront"
+    - "Amazon S3 private frontend origin"
+    - "Amazon API Gateway HTTP API"
+    - "AWS Lambda"
+    - "Amazon CloudWatch Logs"
 
 evidence:
   functional_test: "evidence/test-functional.md"
@@ -36,11 +41,18 @@ data_ai:
 
 security:
   threat_control_map: "evidence/threat-control-map.md"
-  secrets_handling: ""
+  secrets_handling: "No credentials are stored in source or Terraform variables; deployment uses the standard AWS credential chain and Lambda IAM roles."
 
 run:
-  prerequisites: []
-  commands: []
+  prerequisites:
+    - "Python 3.11 or newer"
+    - "Terraform 1.6 or newer"
+    - "AWS credentials with permission to provision the declared resources"
+  commands:
+    - "python -m unittest discover -s tests -p test_*.py -v"
+    - "cd src/infrastructure && terraform init -backend=false"
+    - "cd src/infrastructure && terraform validate"
+    - "cd src/infrastructure && terraform plan"
 
 declarations:
   ai_use: "AI_USE_DECLARATION.md"
