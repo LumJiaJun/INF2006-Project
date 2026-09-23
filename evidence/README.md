@@ -8,6 +8,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | test-functional.md | Functional workflow test |
 | test-security.md | Security control test |
 | test-data-ai.md | Data / AI validation test |
+| data-pipeline.md | Measured Glue, Parquet, and Athena pipeline evidence |
 | test-resilience.md | Scalability / resilience / recovery test |
 | monitoring.md | Logging / monitoring evidence |
 | threat-control-map.md | Threat-to-control mapping + secrets handling |

@@ -39,3 +39,13 @@
 - **Date:** 2026-09-23
 - **Limitation:** Creating and verifying a real user was not automated because it requires an external email account. The authenticated save-and-read path is covered by handler unit tests but still needs a recorded manual browser test.
 - **Artefact path:** `src/frontend/auth.js`, `src/frontend/app.js`, `src/infrastructure/auth.tf`, and `tests/smoke_api.ps1`
+
+## Live market analytics
+
+- **Objective:** Verify the user-facing market summary from API Gateway through Lambda and Athena to processed Parquet.
+- **Setup:** Successful Glue transform and ten city partitions in the private data lake.
+- **Command / steps:** Run `tests/smoke_api.ps1` against the deployed frontend and API.
+- **Expected result:** `GET /analytics` returns HTTP 200 with ten typed city summaries, and the frontend assets include the analytics section.
+- **Actual result:** Passed. The live route returned ten city summaries and the expanded smoke script completed successfully.
+- **Date:** 2026-09-23
+- **Artefact path:** `evidence/data-pipeline.md`, `src/backend/analytics/handler.py`, and `tests/smoke_api.ps1`

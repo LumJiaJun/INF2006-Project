@@ -35,3 +35,13 @@
 - **Actual result:** Passed. Both deployed routes returned HTTP 401 without a token, and the handler test confirmed the query key comes from `requestContext.authorizer.jwt.claims.sub`.
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/auth.tf`, `src/infrastructure/history.tf`, `src/backend/history/handler.py`, and `tests/test_history.py`
+
+## Data-lake access control
+
+- **Objective:** Verify that raw and processed analytical data are encrypted and unavailable through anonymous S3 requests.
+- **Setup:** Terraform-managed data-lake bucket containing the raw listing object and processed Parquet.
+- **Command / steps:** Run `aws s3api get-public-access-block`, `aws s3api get-bucket-encryption`, and an unauthenticated HTTPS request for `raw/listings/Listings.csv`.
+- **Expected result:** All four public-access settings are enabled, default encryption is AES-256, and direct access returns HTTP 403.
+- **Actual result:** Passed. The deployed bucket returned the expected controls and direct object access returned HTTP 403.
+- **Date:** 2026-09-23
+- **Artefact path:** `src/infrastructure/data_lake.tf`

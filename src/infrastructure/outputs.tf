@@ -57,3 +57,18 @@ output "prediction_history_table_name" {
   description = "DynamoDB table used for user prediction history."
   value       = aws_dynamodb_table.prediction_history.name
 }
+
+output "data_lake_bucket_name" {
+  description = "Private S3 bucket containing raw, processed, model, and query-output data."
+  value       = aws_s3_bucket.data_lake.id
+}
+
+output "glue_transform_job_name" {
+  description = "Glue job that converts raw listings CSV data to partitioned Parquet."
+  value       = aws_glue_job.listings_transform.name
+}
+
+output "analytics_url" {
+  description = "Public market analytics endpoint backed by Athena."
+  value       = "${aws_apigatewayv2_api.platform.api_endpoint}/analytics"
+}

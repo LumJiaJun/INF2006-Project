@@ -22,6 +22,8 @@ const historySection = document.querySelector("#history-section");
 const historyMessage = document.querySelector("#history-message");
 const historyList = document.querySelector("#history-list");
 const refreshHistoryButton = document.querySelector("#refresh-history");
+const analyticsMessage = document.querySelector("#analytics-message");
+const analyticsGrid = document.querySelector("#analytics-grid");
 
 async function checkPlatformHealth() {
   if (!apiBaseUrl) {
@@ -55,6 +57,39 @@ async function checkPlatformHealth() {
 }
 
 checkPlatformHealth();
+
+function analyticsItem(item) {
+  const card = document.createElement("article");
+  const city = document.createElement("h3");
+  city.textContent = item.city;
+  const median = document.createElement("strong");
+  median.textContent = `${item.currency} ${item.median_nightly_price.toLocaleString()}`;
+  const medianLabel = document.createElement("span");
+  medianLabel.textContent = "median nightly price";
+  const details = document.createElement("p");
+  const rating = item.average_rating === null ? "not available" : item.average_rating.toFixed(1);
+  details.textContent = `${item.listing_count.toLocaleString()} listings, average rating ${rating}/100`;
+  card.append(city, median, medianLabel, details);
+  return card;
+}
+
+async function loadAnalytics() {
+  try {
+    const response = await fetch(`${apiBaseUrl}/analytics`, {
+      headers: { accept: "application/json" },
+    });
+    if (!response.ok) {
+      throw new Error("Market analytics could not be loaded.");
+    }
+    const result = await response.json();
+    analyticsGrid.replaceChildren(...result.items.map(analyticsItem));
+    analyticsMessage.textContent = `${result.scope}. Prices use each city's local currency.`;
+  } catch (error) {
+    analyticsMessage.textContent = error.message;
+  }
+}
+
+loadAnalytics();
 
 function populateSelect(select, values) {
   select.replaceChildren(

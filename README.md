@@ -37,13 +37,14 @@ terraform apply
 # 4. Show the deployed endpoints
 terraform output frontend_url
 terraform output health_url
+terraform output analytics_url
 ```
 
 ## Architecture
 
 ![Architecture diagram](evidence/architecture.png)
 
-CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health` and `POST /predict` are public. Cognito protects `POST /predictions` and `GET /history`; authenticated predictions are stored under the token-derived user identifier in an encrypted DynamoDB table. The evaluated model runs from an ECR-backed Lambda container.
+CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions` and `GET /history`; authenticated predictions are stored under the token-derived user identifier in an encrypted DynamoDB table. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
 
 ## Technology list
 
@@ -51,13 +52,14 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - Compute/deployment: API Gateway and AWS Lambda, provisioned with Terraform
 - Frontend: private Amazon S3 origin and Amazon CloudFront
 - Identity and data: Amazon Cognito and encrypted Amazon DynamoDB prediction history
+- Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline with held-out evaluation
 - Application: HTML, CSS, JavaScript, and Python
 
 ## Known limitations
 
-- Market analytics dashboards and an analytical query layer are not implemented yet.
 - Full sign-up, email verification, prediction save, and history retrieval require a manual browser test with a real email account.
+- The city analytics use different local currencies and must not be compared as if they shared one currency.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
 - Cloud deployment requires an AWS account and may incur a small cost.

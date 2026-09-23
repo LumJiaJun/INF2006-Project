@@ -68,6 +68,16 @@ if ($predictionResponse.StatusCode -ne 200 -or -not $predictionBody.estimated_ni
     throw 'Prediction did not return the expected response.'
 }
 
+$analyticsResponse = Invoke-WebRequest `
+    -Uri "$ApiBaseUrl/analytics" `
+    -Headers @{ Origin = $FrontendUrl } `
+    -UseBasicParsing
+$analyticsBody = $analyticsResponse.Content | ConvertFrom-Json
+
+if ($analyticsResponse.StatusCode -ne 200 -or $analyticsBody.count -ne 10) {
+    throw 'Analytics did not return the expected ten-city summary.'
+}
+
 foreach ($protectedRoute in @(
     @{ Method = 'GET'; Path = 'history'; Body = $null },
     @{ Method = 'POST'; Path = 'predictions'; Body = $predictionPayload }
@@ -110,5 +120,6 @@ try {
 Write-Output 'Health check passed.'
 Write-Output 'Frontend asset checks passed.'
 Write-Output "Prediction passed: $($predictionBody.estimated_nightly_price) $($predictionBody.currency)."
+Write-Output "Analytics passed: $($analyticsBody.count) city summaries."
 Write-Output 'Protected route authentication checks passed.'
 Write-Output 'Malformed request validation passed.'

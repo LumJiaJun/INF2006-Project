@@ -5,7 +5,7 @@ Runnable frontend, backend, and Terraform infrastructure.
 ## Contents
 
 - `frontend/`: static HTML, CSS, and JavaScript served through CloudFront
-- `backend/health/`: Python Lambda handler for `GET /health`
+- `backend/`: focused Python Lambda handlers for health, analytics, prediction, and user history
 - `infrastructure/`: Terraform for AWS resources
 - `.env.example`: non-secret local defaults
 

@@ -29,3 +29,9 @@ python train_model.py \
 - Limitations: Cities use different local currencies, historical prices may be stale, some important features are absent, missing values are imputed, and error remains material. Reviews has no text field, so sentiment analysis is unsupported.
 
 Generated `.joblib` model files are intentionally excluded from Git. Recreate the model with the command above and verify its SHA-256 against `artifacts/model_evaluation.json`.
+
+## Cloud analytics transform
+
+`glue_transform.py` is deployed as an AWS Glue 5.0 Spark job. It selects documented listing fields, removes invalid required values, applies a city-specific 99th-percentile price boundary, and writes city-partitioned Parquet. Terraform defines the corresponding projected Glue Catalog table and a governed Athena workgroup. The public analytics Lambda exposes only a fixed city-summary query; clients cannot submit SQL.
+
+Deployment and run commands are documented in `src/infrastructure/README.md`. The measured run is recorded in `evidence/data-pipeline.md`.

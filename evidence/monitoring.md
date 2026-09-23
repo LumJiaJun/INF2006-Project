@@ -15,3 +15,12 @@
 - **Interpretation:** The memory increase materially reduces cold-start timeout risk for the scientific Python container. More load samples are required before making a scalability claim.
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/prediction.tf`, `src/backend/predict/handler.py`, and `evidence/prediction-runtime.md`
+
+## Analytics query operations
+
+- **What is monitored:** Glue job status and duration, Athena bytes scanned and execution time, and analytics Lambda application events in a dedicated 14-day log group.
+- **Operational test / query:** Run the Glue job, inspect it with `aws glue get-job-run`, invoke `GET /analytics`, inspect `aws athena get-query-execution`, and tail `/aws/lambda/airbnb-market-intelligence-dev-analytics`.
+- **Result:** Glue succeeded in 90 seconds. A recorded successful Athena request scanned 566,077 bytes, used 574 ms of engine time, and completed in 697 ms. Lambda logged `city_analytics_read` with `city_count` 10 and no listing-level data.
+- **Interpretation:** The pipeline and query are observable through managed metrics and structured logs. This is a point observation, not a sustained-load result.
+- **Date:** 2026-09-23
+- **Artefact path:** `src/infrastructure/data_lake.tf`, `src/infrastructure/analytics.tf`, and `evidence/data-pipeline.md`

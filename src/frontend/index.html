@@ -107,6 +107,19 @@
         <div id="prediction-result" class="prediction-result" aria-live="polite" hidden></div>
       </section>
 
+      <section class="analytics-section" aria-labelledby="analytics-heading">
+        <div class="section-intro">
+          <p class="section-label">Market analytics</p>
+          <h2 id="analytics-heading">Typical prices by city</h2>
+          <p>
+            Compare historical listing prices within each city's local currency. Values are not directly
+            comparable across currencies.
+          </p>
+        </div>
+        <p id="analytics-message" class="status-message">Loading processed market data...</p>
+        <div id="analytics-grid" class="analytics-grid" aria-live="polite"></div>
+      </section>
+
       <section id="history-section" class="history-section" aria-labelledby="history-heading" hidden>
         <div class="history-heading-row">
           <div>
@@ -119,7 +132,7 @@
         <div id="history-list" class="history-list"></div>
       </section>
 
-      <section class="feature-grid" aria-label="Planned platform capabilities">
+      <section class="feature-grid" aria-label="Platform capabilities">
         <article>
           <p class="feature-number">01</p>
           <h2>Price estimate</h2>
@@ -128,7 +141,7 @@
         <article>
           <p class="feature-number">02</p>
           <h2>Market analytics</h2>
-          <p>Explore patterns supported by the processed Airbnb dataset.</p>
+          <p>Explore city summaries queried from partitioned Parquet through Athena.</p>
         </article>
         <article>
           <p class="feature-number">03</p>

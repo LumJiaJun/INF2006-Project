@@ -12,6 +12,8 @@ The project uses an Airbnb listings and reviews archive supplied to the team. Ra
 
 The original publisher, URL, and licence must be confirmed before final submission. The data must not be redistributed until its licence is verified.
 
+Only `Listings.csv` is uploaded to the development data lake because the implemented market summaries do not use review records. The raw object remains private and encrypted. Glue writes a selected, cleaned subset to `processed/listings/` as city-partitioned Parquet; raw and processed data remain excluded from Git.
+
 ## Local files
 
 Extract the source archive outside Git or into the ignored `data/raw/` directory so these paths exist:

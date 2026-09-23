@@ -1,6 +1,6 @@
 # Infrastructure
 
-Terraform provisions the AWS resources for the serverless application. The initial milestone creates:
+Terraform provisions the AWS resources for the serverless application, identity, application data, and analytical data path:
 
 - A private S3 frontend bucket
 - A CloudFront distribution using Origin Access Control
@@ -8,6 +8,9 @@ Terraform provisions the AWS resources for the serverless application. The initi
 - A Python Lambda health endpoint
 - A retained CloudWatch log group
 - An encrypted ECR repository for the prediction Lambda image
+- A Cognito user pool and DynamoDB prediction-history table
+- A private encrypted S3 data lake, Glue transform, catalog table, and Athena workgroup
+- A fixed-query analytics Lambda and `GET /analytics` route
 
 ## Prerequisites
 
@@ -35,6 +38,9 @@ terraform output health_url
 terraform output prediction_ecr_repository_url
 terraform output cognito_hosted_ui_url
 terraform output prediction_history_url
+terraform output data_lake_bucket_name
+terraform output glue_transform_job_name
+terraform output analytics_url
 ```
 
 The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`.
@@ -45,6 +51,21 @@ After changing frontend files, invalidate CloudFront so cached objects are refre
 $distributionId = terraform output -raw cloudfront_distribution_id
 aws cloudfront create-invalidation --distribution-id $distributionId --paths "/*"
 ```
+
+## Run the data pipeline
+
+The raw data is not managed by Terraform or committed to Git. From the repository root, upload the supplied listing file and start the deployed transform:
+
+```powershell
+$bucket = terraform -chdir=src/infrastructure output -raw data_lake_bucket_name
+$job = terraform -chdir=src/infrastructure output -raw glue_transform_job_name
+
+aws s3 cp "data/raw/Airbnb Data/Listings.csv" `
+  "s3://$bucket/raw/listings/Listings.csv" --sse AES256
+aws glue start-job-run --job-name $job
+```
+
+The job is limited to two `G.1X` workers, a ten-minute timeout, and no retries. Athena queries run in a workgroup with enforced encrypted output, CloudWatch metrics, a 1 GiB scan cutoff, and seven-day query-result expiry.
 
 ## Build prediction image
 

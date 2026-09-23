@@ -29,3 +29,13 @@
 - **Actual result:** Histogram gradient boosting outperformed the median and ridge baselines. On the supported held-out scope it achieved pooled MAE 191.836, RMSE 629.762, R-squared 0.644, log-price R-squared 0.850, and median city-normalized MAE 0.592. These results are moderate and must not be represented as high accuracy.
 - **Date:** 2026-09-23
 - **Artefact path:** `analytics/artifacts/model_evaluation.json`, `analytics/artifacts/model_evaluation_scoped_base.json`, and `analytics/artifacts/model_evaluation_untrimmed.json`
+
+## Cloud analytical pipeline
+
+- **Objective:** Validate that the cloud transform and fixed Athena query produce an interpretable market summary from the profiled listing fields.
+- **Setup:** Encrypted raw listing object, Glue Spark transform, projected catalog partitions, and Athena workgroup.
+- **Command / steps:** Follow `src/infrastructure/README.md` to upload `Listings.csv`, run Glue, and invoke `GET /analytics`.
+- **Expected result:** Ten city partitions and ten summary records using each city's local currency and the documented supported-price scope.
+- **Actual result:** Passed. Glue succeeded in 90 seconds, produced ten Parquet objects, and Athena returned ten summaries while scanning 566,077 bytes.
+- **Date:** 2026-09-23
+- **Artefact path:** `evidence/data-pipeline.md`
