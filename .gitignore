@@ -1,0 +1,51 @@
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Terraform working files and state
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# JavaScript
+node_modules/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Large or generated project artefacts
+data/raw/
+data/processed/
+models/
+*.pkl
+*.joblib
+*.parquet
+
+# Local test and deployment output
+tmp/
+dist/
+coverage/
