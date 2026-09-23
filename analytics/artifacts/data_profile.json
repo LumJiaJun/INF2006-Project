@@ -1,0 +1,445 @@
+{
+  "listings": {
+    "file": "Listings.csv",
+    "sha256": "097b0bbfea3cce3cd9af7a717408c1027ca7f6dc947b7f27988a5c08085667db",
+    "encoding": "utf-8",
+    "encoding_error_handling": "replace",
+    "replacement_characters": 984,
+    "rows": 279712,
+    "columns": [
+      "listing_id",
+      "name",
+      "host_id",
+      "host_since",
+      "host_location",
+      "host_response_time",
+      "host_response_rate",
+      "host_acceptance_rate",
+      "host_is_superhost",
+      "host_total_listings_count",
+      "host_has_profile_pic",
+      "host_identity_verified",
+      "neighbourhood",
+      "district",
+      "city",
+      "latitude",
+      "longitude",
+      "property_type",
+      "room_type",
+      "accommodates",
+      "bedrooms",
+      "amenities",
+      "price",
+      "minimum_nights",
+      "maximum_nights",
+      "review_scores_rating",
+      "review_scores_accuracy",
+      "review_scores_cleanliness",
+      "review_scores_checkin",
+      "review_scores_communication",
+      "review_scores_location",
+      "review_scores_value",
+      "instant_bookable"
+    ],
+    "column_count": 33,
+    "duplicate_rows": 0,
+    "duplicate_listing_ids": 0,
+    "dtypes": {
+      "listing_id": "int64",
+      "name": "object",
+      "host_id": "int64",
+      "host_since": "object",
+      "host_location": "object",
+      "host_response_time": "object",
+      "host_response_rate": "float64",
+      "host_acceptance_rate": "float64",
+      "host_is_superhost": "object",
+      "host_total_listings_count": "float64",
+      "host_has_profile_pic": "object",
+      "host_identity_verified": "object",
+      "neighbourhood": "object",
+      "district": "object",
+      "city": "object",
+      "latitude": "float64",
+      "longitude": "float64",
+      "property_type": "object",
+      "room_type": "object",
+      "accommodates": "int64",
+      "bedrooms": "float64",
+      "amenities": "object",
+      "price": "int64",
+      "minimum_nights": "int64",
+      "maximum_nights": "int64",
+      "review_scores_rating": "float64",
+      "review_scores_accuracy": "float64",
+      "review_scores_cleanliness": "float64",
+      "review_scores_checkin": "float64",
+      "review_scores_communication": "float64",
+      "review_scores_location": "float64",
+      "review_scores_value": "float64",
+      "instant_bookable": "object"
+    },
+    "missing": {
+      "listing_id": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "name": {
+        "count": 175,
+        "rate": 0.000626
+      },
+      "host_id": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "host_since": {
+        "count": 165,
+        "rate": 0.00059
+      },
+      "host_location": {
+        "count": 840,
+        "rate": 0.003003
+      },
+      "host_response_time": {
+        "count": 128782,
+        "rate": 0.460409
+      },
+      "host_response_rate": {
+        "count": 128782,
+        "rate": 0.460409
+      },
+      "host_acceptance_rate": {
+        "count": 113087,
+        "rate": 0.404298
+      },
+      "host_is_superhost": {
+        "count": 165,
+        "rate": 0.00059
+      },
+      "host_total_listings_count": {
+        "count": 165,
+        "rate": 0.00059
+      },
+      "host_has_profile_pic": {
+        "count": 165,
+        "rate": 0.00059
+      },
+      "host_identity_verified": {
+        "count": 165,
+        "rate": 0.00059
+      },
+      "neighbourhood": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "district": {
+        "count": 242700,
+        "rate": 0.867678
+      },
+      "city": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "latitude": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "longitude": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "property_type": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "room_type": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "accommodates": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "bedrooms": {
+        "count": 29435,
+        "rate": 0.105233
+      },
+      "amenities": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "price": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "minimum_nights": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "maximum_nights": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "review_scores_rating": {
+        "count": 91405,
+        "rate": 0.326783
+      },
+      "review_scores_accuracy": {
+        "count": 91713,
+        "rate": 0.327884
+      },
+      "review_scores_cleanliness": {
+        "count": 91665,
+        "rate": 0.327712
+      },
+      "review_scores_checkin": {
+        "count": 91771,
+        "rate": 0.328091
+      },
+      "review_scores_communication": {
+        "count": 91687,
+        "rate": 0.327791
+      },
+      "review_scores_location": {
+        "count": 91775,
+        "rate": 0.328105
+      },
+      "review_scores_value": {
+        "count": 91785,
+        "rate": 0.328141
+      },
+      "instant_bookable": {
+        "count": 0,
+        "rate": 0.0
+      }
+    },
+    "unique_non_null": {
+      "listing_id": 279712,
+      "name": 265860,
+      "host_id": 182024,
+      "host_since": 4240,
+      "host_location": 7159,
+      "host_response_time": 4,
+      "host_response_rate": 91,
+      "host_acceptance_rate": 101,
+      "host_is_superhost": 2,
+      "host_total_listings_count": 206,
+      "host_has_profile_pic": 2,
+      "host_identity_verified": 2,
+      "neighbourhood": 660,
+      "district": 5,
+      "city": 10,
+      "latitude": 103503,
+      "longitude": 118021,
+      "property_type": 144,
+      "room_type": 4,
+      "accommodates": 17,
+      "bedrooms": 39,
+      "amenities": 245003,
+      "price": 5194,
+      "minimum_nights": 202,
+      "maximum_nights": 508,
+      "review_scores_rating": 63,
+      "review_scores_accuracy": 9,
+      "review_scores_cleanliness": 9,
+      "review_scores_checkin": 9,
+      "review_scores_communication": 9,
+      "review_scores_location": 9,
+      "review_scores_value": 9,
+      "instant_bookable": 2
+    },
+    "price": {
+      "non_numeric_or_missing": 0,
+      "non_positive": 113,
+      "mean": 608.7927368150097,
+      "standard_deviation": 3441.826611043102,
+      "quantiles": {
+        "0.0": 0.0,
+        "0.01": 25.0,
+        "0.05": 40.0,
+        "0.25": 75.0,
+        "0.5": 150.0,
+        "0.75": 474.0,
+        "0.95": 2000.0,
+        "0.99": 6500.0,
+        "1.0": 625216.0
+      }
+    },
+    "categories": {
+      "city": {
+        "unique_non_null": 10,
+        "top_values": {
+          "Paris": 64690,
+          "New York": 37012,
+          "Sydney": 33630,
+          "Rome": 27647,
+          "Rio de Janeiro": 26615,
+          "Istanbul": 24519,
+          "Mexico City": 20065,
+          "Bangkok": 19361,
+          "Cape Town": 19086,
+          "Hong Kong": 7087
+        }
+      },
+      "property_type": {
+        "unique_non_null": 144,
+        "top_values": {
+          "Entire apartment": 138989,
+          "Private room in apartment": 47322,
+          "Private room in house": 13292,
+          "Entire house": 13273,
+          "Entire condominium": 11250,
+          "Room in boutique hotel": 5771,
+          "Entire loft": 4587,
+          "Private room in condominium": 4462,
+          "Private room in bed and breakfast": 4238,
+          "Entire serviced apartment": 3973,
+          "Room in hotel": 3205,
+          "Private room in townhouse": 2959,
+          "Shared room in apartment": 2420,
+          "Entire townhouse": 2331,
+          "Entire guest suite": 2273,
+          "Private room in serviced apartment": 1542,
+          "Entire villa": 1508,
+          "Room in aparthotel": 1495,
+          "Private room in guest suite": 1370,
+          "Private room in guesthouse": 1337
+        }
+      },
+      "room_type": {
+        "unique_non_null": 4,
+        "top_values": {
+          "Entire place": 182005,
+          "Private room": 86988,
+          "Hotel room": 5857,
+          "Shared room": 4862
+        }
+      },
+      "neighbourhood": {
+        "unique_non_null": 660,
+        "top_values": {
+          "I Centro Storico": 14874,
+          "Sydney": 8074,
+          "Copacabana": 7712,
+          "Cuauhtemoc": 7626,
+          "Buttes-Montmartre": 7237,
+          "Beyoglu": 6674,
+          "Popincourt": 6206,
+          "Vaugirard": 4826,
+          "Waverley": 4737,
+          "Enclos-St-Laurent": 4628,
+          "Batignolles-Monceau": 4330,
+          "Menilmontant": 3758,
+          "Buttes-Chaumont": 3728,
+          "Sisli": 3522,
+          "Fatih": 3326,
+          "Ward 115": 3293,
+          "Miguel Hidalgo": 3288,
+          "Passy": 3215,
+          "Opera": 3157,
+          "Benito Juarez": 3133
+        }
+      }
+    },
+    "city_price_statistics": {
+      "Bangkok": {
+        "rows": 19361,
+        "non_positive_prices": 1,
+        "median": 1100.0,
+        "p95": 5286.0,
+        "p99": 15552.600000000115,
+        "maximum": 300177
+      },
+      "Cape Town": {
+        "rows": 19086,
+        "non_positive_prices": 0,
+        "median": 1069.0,
+        "p95": 7867.5,
+        "p99": 22018.900000000183,
+        "maximum": 180000
+      },
+      "Hong Kong": {
+        "rows": 7087,
+        "non_positive_prices": 0,
+        "median": 386.0,
+        "p95": 1938.0,
+        "p99": 8799.0,
+        "maximum": 83665
+      },
+      "Istanbul": {
+        "rows": 24519,
+        "non_positive_prices": 2,
+        "median": 252.0,
+        "p95": 1185.0,
+        "p99": 3805.739999999998,
+        "maximum": 179532
+      },
+      "Mexico City": {
+        "rows": 20065,
+        "non_positive_prices": 7,
+        "median": 661.0,
+        "p95": 2861.0,
+        "p99": 7294.440000000002,
+        "maximum": 499000
+      },
+      "New York": {
+        "rows": 37012,
+        "non_positive_prices": 28,
+        "median": 99.0,
+        "p95": 349.0,
+        "p99": 850.0,
+        "maximum": 10000
+      },
+      "Paris": {
+        "rows": 64690,
+        "non_positive_prices": 62,
+        "median": 80.0,
+        "p95": 270.0,
+        "p99": 600.0,
+        "maximum": 12000
+      },
+      "Rio de Janeiro": {
+        "rows": 26615,
+        "non_positive_prices": 7,
+        "median": 280.0,
+        "p95": 1957.0,
+        "p99": 5693.280000000028,
+        "maximum": 625216
+      },
+      "Rome": {
+        "rows": 27647,
+        "non_positive_prices": 6,
+        "median": 65.0,
+        "p95": 239.6999999999971,
+        "p99": 600.0,
+        "maximum": 10571
+      },
+      "Sydney": {
+        "rows": 33630,
+        "non_positive_prices": 0,
+        "median": 120.0,
+        "p95": 700.0,
+        "p99": 1721.3899999999921,
+        "maximum": 28613
+      }
+    }
+  },
+  "reviews": {
+    "file": "Reviews.csv",
+    "sha256": "f0163d09e65bd9c88bec899eba77edd07101cf05b7aac2d2b0d745320e1d8e3f",
+    "encoding": "utf-8",
+    "encoding_error_handling": "replace",
+    "rows": 5373143,
+    "columns": [
+      "listing_id",
+      "review_id",
+      "date",
+      "reviewer_id"
+    ],
+    "column_count": 4,
+    "unique_listing_ids": 193556,
+    "minimum_date": "2008-11-16",
+    "maximum_date": "2021-03-01",
+    "contains_review_text": false
+  }
+}

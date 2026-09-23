@@ -1,18 +1,34 @@
-# data/
+# Data
 
-Synthetic / sample data used by the service and analytics/AI feature.
-Do NOT include personal, sensitive or proprietary data.
+The project uses an Airbnb listings and reviews archive supplied to the team. Raw files are deliberately excluded from Git because the combined size exceeds 400 MB.
 
 ## Dataset provenance
 
-- Source: <where the data came from / how it was generated>
-- Licence: <licence of any external data>
-- Generation method: <if synthetic, how it was produced>
+- Supplied archive: `archive (8).zip`
+- Original publisher and download URL: not yet verified
+- Licence: not yet verified
+- Coverage: 279,712 listings across 10 cities and 5,373,143 review records
+- Review dates: 2008-11-16 through 2021-03-01
 
-## Files
+The original publisher, URL, and licence must be confirmed before final submission. The data must not be redistributed until its licence is verified.
 
-| File | Description | Rows | Synthetic? |
-|------|-------------|------|-----------|
-| <file.csv> | <description> | <count> | Yes/No |
+## Local files
 
-See `DATA_DICTIONARY.md` for field-level definitions.
+Extract the source archive outside Git or into the ignored `data/raw/` directory so these paths exist:
+
+| File | Description | Rows | SHA-256 |
+|------|-------------|-----:|---------|
+| `data/raw/Airbnb Data/Listings.csv` | Listing attributes and nightly price in each city's local currency | 279,712 | `097b0bbfea3cce3cd9af7a717408c1027ca7f6dc947b7f27988a5c08085667db` |
+| `data/raw/Airbnb Data/Reviews.csv` | Review identifiers and dates, without review text | 5,373,143 | `f0163d09e65bd9c88bec899eba77edd07101cf05b7aac2d2b0d745320e1d8e3f` |
+
+## Observed quality limitations
+
+- `Listings.csv` contains invalid UTF-8 byte sequences. Profiling uses UTF-8 replacement decoding and records 984 replacement characters.
+- Price is highly right-skewed. There are 113 non-positive values and a maximum of 625,216.
+- Prices use different local currencies across cities, so pooled currency-error metrics are not directly meaningful.
+- `review_scores_rating` is missing for 32.7% of listings.
+- `bedrooms` is missing for 10.5% of listings.
+- `district` is missing for 86.8% of listings.
+- Reviews contains no review text, so sentiment analysis is unsupported.
+
+The complete generated profile is stored at `analytics/artifacts/data_profile.json`. See `DATA_DICTIONARY.md` for field definitions.

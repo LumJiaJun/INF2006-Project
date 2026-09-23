@@ -1,21 +1,23 @@
-# analytics/
+# Analytics and machine learning
 
-Notebook(s) or script(s) for the data-driven / AI-ML feature.
+Reproducible scripts for dataset inspection, preprocessing, model training, evaluation, and model export.
 
 ## What this produces
 
-<Describe the interpretable output: dashboard metric, forecast, classifier,
-recommender, anomaly detection or retrieval/insight service.>
+The pipeline will produce an evaluated nightly price estimator and supporting market summaries. Price outputs are estimates and are not guaranteed market prices.
 
 ## How to reproduce results
 
 ```bash
 pip install -r requirements.txt
-<command to run the notebook/script>
+python profile_data.py \
+  --listings "../data/raw/Airbnb Data/Listings.csv" \
+  --reviews "../data/raw/Airbnb Data/Reviews.csv" \
+  --output artifacts/data_profile.json
 ```
 
 ## Method, evaluation and limitations
 
-- Method: <approach used>
-- Evaluation: <metric and result>
-- Limitations: <known limitations and responsible-use notes>
+- Method: Dataset profiling is implemented. Model selection follows after target and feature quality review.
+- Evaluation: Candidate models will be compared on the same held-out split using MAE, RMSE, and R-squared.
+- Limitations: The source represents historical listings across multiple cities and currencies. Reviews has no text field, so sentiment analysis is unsupported.
