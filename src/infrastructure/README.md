@@ -40,7 +40,7 @@ terraform output prediction_ecr_repository_url
 Run from the repository root after recreating `analytics/artifacts/airbnb_price_model.joblib`:
 
 ```powershell
-$imageTag = "1.0.1"
+$imageTag = "1.0.2"
 $repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
 $registry = $repositoryUrl.Split('/')[0]
 

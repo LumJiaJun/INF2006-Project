@@ -13,7 +13,7 @@ Build from the repository root:
 ```powershell
 docker build --platform linux/amd64 --provenance=false `
   -f src/backend/predict/Dockerfile `
-  -t airbnb-prediction:1.0.1 .
+  -t airbnb-prediction:1.0.2 .
 ```
 
 The complete model artifact must first exist at `analytics/artifacts/airbnb_price_model.joblib`.

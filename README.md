@@ -43,7 +43,7 @@ terraform output health_url
 
 ![Architecture diagram](evidence/architecture.png)
 
-CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. The first milestone implements `GET /health` with CloudWatch logging. DynamoDB, Cognito, the data lake, analytics, and ML inference will be added in later tested milestones.
+CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health` provides a public health check, while `POST /predict` runs the evaluated model from an ECR-backed Lambda container. DynamoDB, Cognito, the analytical data lake, and prediction history remain later milestones.
 
 ## Technology list
 
@@ -57,6 +57,7 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 ## Known limitations
 
 - The current milestone provides the serverless frontend and health endpoint only.
-- Online price prediction, market analytics, authentication, and prediction history are not implemented yet.
+- Market analytics, authentication, and prediction history are not implemented yet.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
+- A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
 - Cloud deployment requires an AWS account and may incur a small cost.

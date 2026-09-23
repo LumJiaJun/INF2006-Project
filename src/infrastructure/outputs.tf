@@ -22,3 +22,8 @@ output "prediction_ecr_repository_url" {
   description = "ECR repository URL for the prediction Lambda image."
   value       = aws_ecr_repository.prediction.repository_url
 }
+
+output "prediction_url" {
+  description = "Public model prediction endpoint."
+  value       = "${aws_apigatewayv2_api.platform.api_endpoint}/predict"
+}

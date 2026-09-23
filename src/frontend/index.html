@@ -31,6 +31,76 @@
         <span id="status-indicator" class="status-indicator status-indicator-pending" aria-hidden="true"></span>
       </section>
 
+      <section class="estimator" aria-labelledby="estimator-heading">
+        <div class="section-intro">
+          <p class="section-label">Price estimator</p>
+          <h2 id="estimator-heading">Describe the listing</h2>
+          <p>The model uses historical listings from the selected city. Fields marked optional may be left blank.</p>
+        </div>
+
+        <form id="prediction-form" class="prediction-form">
+          <label>
+            City
+            <select id="city" name="city" required></select>
+          </label>
+          <label>
+            Neighbourhood
+            <select id="neighbourhood" name="neighbourhood" required></select>
+          </label>
+          <label>
+            Property type
+            <select id="property-type" name="property_type" required></select>
+          </label>
+          <label>
+            Room type
+            <select id="room-type" name="room_type" required></select>
+          </label>
+          <label>
+            Latitude
+            <input id="latitude" name="latitude" type="number" step="0.00001" required>
+          </label>
+          <label>
+            Longitude
+            <input id="longitude" name="longitude" type="number" step="0.00001" required>
+          </label>
+          <label>
+            Guests
+            <input name="accommodates" type="number" min="1" max="16" value="2" required>
+          </label>
+          <label>
+            Bedrooms (optional)
+            <input name="bedrooms" type="number" min="0" max="50" value="1">
+          </label>
+          <label>
+            Minimum nights
+            <input name="minimum_nights" type="number" min="1" max="365" value="2" required>
+          </label>
+          <label>
+            Rating out of 100 (optional)
+            <input name="review_scores_rating" type="number" min="20" max="100" value="95">
+          </label>
+          <label>
+            Host listing count
+            <input name="host_total_listings_count" type="number" min="0" max="10000" value="1" required>
+          </label>
+          <label>
+            Number of amenities
+            <input name="amenities_count" type="number" min="0" max="200" value="8" required>
+          </label>
+
+          <fieldset class="boolean-fields">
+            <legend>Listing and host details</legend>
+            <label><input name="instant_bookable" type="checkbox"> Instant bookable</label>
+            <label><input name="host_is_superhost" type="checkbox"> Superhost</label>
+            <label><input name="host_identity_verified" type="checkbox" checked> Identity verified</label>
+          </fieldset>
+
+          <button id="prediction-submit" type="submit">Estimate nightly price</button>
+        </form>
+
+        <div id="prediction-result" class="prediction-result" aria-live="polite" hidden></div>
+      </section>
+
       <section class="feature-grid" aria-label="Planned platform capabilities">
         <article>
           <p class="feature-number">01</p>

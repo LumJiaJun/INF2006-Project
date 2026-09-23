@@ -13,3 +13,11 @@ At least four tests are required (see report Section 6 and evidence/):
 ```bash
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
+
+Run the deployed API smoke test from the repository root:
+
+```powershell
+$frontendUrl = terraform -chdir=src/infrastructure output -raw frontend_url
+$apiBaseUrl = (terraform -chdir=src/infrastructure output -raw health_url) -replace '/health$', ''
+./tests/smoke_api.ps1 -FrontendUrl $frontendUrl -ApiBaseUrl $apiBaseUrl
+```

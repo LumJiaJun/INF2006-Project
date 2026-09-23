@@ -68,6 +68,15 @@ h2 {
   font-size: 1.25rem;
 }
 
+.section-intro {
+  max-width: 680px;
+}
+
+.section-intro > p:last-child {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .hero-copy {
   max-width: 640px;
   color: var(--muted);
@@ -118,6 +127,122 @@ h2 {
   box-shadow: 0 0 0 0.45rem rgb(217 79 53 / 14%);
 }
 
+.estimator {
+  margin: 4rem 0;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--surface);
+}
+
+.prediction-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin-top: 2rem;
+}
+
+.prediction-form > label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  min-height: 2.9rem;
+  border-radius: 0.55rem;
+  font: inherit;
+}
+
+input,
+select {
+  border: 1px solid var(--line);
+  padding: 0.65rem 0.75rem;
+  color: var(--ink);
+  background: #fff;
+}
+
+input:focus,
+select:focus,
+button:focus-visible {
+  outline: 3px solid rgb(217 79 53 / 24%);
+  outline-offset: 2px;
+}
+
+.boolean-fields {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.boolean-fields legend {
+  padding: 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.boolean-fields label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.boolean-fields input {
+  width: 1rem;
+  min-height: auto;
+  accent-color: var(--accent);
+}
+
+button {
+  grid-column: 1 / -1;
+  border: 0;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-weight: 750;
+  background: var(--accent-dark);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--accent);
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.prediction-result {
+  margin-top: 1.5rem;
+  border-left: 0.3rem solid var(--success);
+  padding: 1rem 1.25rem;
+  background: rgb(49 116 81 / 8%);
+}
+
+.prediction-result-error {
+  border-left-color: var(--accent);
+  background: rgb(217 79 53 / 8%);
+}
+
+.prediction-price {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+}
+
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -147,6 +272,11 @@ h2 {
   }
 
   .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prediction-form,
+  .boolean-fields {
     grid-template-columns: 1fr;
   }
 
