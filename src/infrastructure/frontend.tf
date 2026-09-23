@@ -199,3 +199,36 @@ resource "aws_s3_object" "authentication" {
   content_type  = "application/javascript; charset=utf-8"
   cache_control = "no-cache"
 }
+
+# Additional pages share the same private S3 origin and CloudFront distribution.
+resource "aws_s3_object" "site_pages" {
+  for_each = toset(["markets.html", "project.html"])
+
+  bucket        = aws_s3_bucket.frontend.id
+  key           = each.value
+  source        = "${path.module}/../frontend/${each.value}"
+  etag          = filemd5("${path.module}/../frontend/${each.value}")
+  content_type  = "text/html; charset=utf-8"
+  cache_control = "no-cache"
+}
+
+resource "aws_s3_object" "markets_application" {
+  bucket        = aws_s3_bucket.frontend.id
+  key           = "markets.js"
+  source        = "${path.module}/../frontend/markets.js"
+  etag          = filemd5("${path.module}/../frontend/markets.js")
+  content_type  = "application/javascript; charset=utf-8"
+  cache_control = "no-cache"
+}
+
+# Generated editorial images are cached because their filenames stay stable per version.
+resource "aws_s3_object" "site_images" {
+  for_each = toset(["global-markets.webp", "terrace-analytics.webp"])
+
+  bucket        = aws_s3_bucket.frontend.id
+  key           = "assets/${each.value}"
+  source        = "${path.module}/../frontend/assets/${each.value}"
+  etag          = filemd5("${path.module}/../frontend/assets/${each.value}")
+  content_type  = "image/webp"
+  cache_control = "public, max-age=31536000, immutable"
+}

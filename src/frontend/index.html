@@ -14,13 +14,14 @@
     <main class="page-shell">
       <!-- The top navigation keeps the main dashboard sections easy to reach. -->
       <nav class="topbar" aria-label="Primary navigation">
-        <a class="brand" href="#top" aria-label="Airbnb Market Intelligence home">
+        <a class="brand" href="index.html" aria-label="Airbnb Market Intelligence home">
           <span class="brand-mark" aria-hidden="true">AM</span>
           <span>Market Intelligence</span>
         </a>
         <div class="nav-links">
           <a href="#estimator">Estimator</a>
-          <a href="#analytics">Markets</a>
+          <a href="markets.html">Markets</a>
+          <a href="project.html">Project</a>
           <a href="#history-section">History</a>
         </div>
         <div class="account-bar">
@@ -68,6 +69,27 @@
           </div>
         </aside>
       </header>
+
+      <section class="story-banner" aria-labelledby="story-banner-heading">
+        <img
+          src="assets/terrace-analytics.webp"
+          alt="A modern apartment terrace overlooking an international city at sunset"
+          width="1881"
+          height="836"
+        >
+        <div class="story-banner-copy">
+          <p class="section-label">From listing to insight</p>
+          <h2 id="story-banner-heading">A clearer view of every market.</h2>
+          <p>
+            See the cities behind the dataset, understand how the platform works, and then return with
+            stronger context for your estimate.
+          </p>
+          <div class="story-banner-links">
+            <a href="markets.html">Open city guide <span aria-hidden="true">&rarr;</span></a>
+            <a href="project.html">See the architecture</a>
+          </div>
+        </div>
+      </section>
 
       <!-- Presets provide quick starting points while every model input remains editable. -->
       <section id="estimator" class="estimator section-block" aria-labelledby="estimator-heading">
@@ -255,6 +277,11 @@
 
       <footer class="site-footer">
         <p>EP2 &middot; Group G014 &middot; INF2006 Cloud Computing and Big Data</p>
+        <div class="footer-links">
+          <a href="index.html">Estimator</a>
+          <a href="markets.html">Markets</a>
+          <a href="project.html">Project</a>
+        </div>
         <p>Predictions are estimates, not guaranteed market prices.</p>
       </footer>
     </main>

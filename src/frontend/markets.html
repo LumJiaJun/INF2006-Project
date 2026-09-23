@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+      name="description"
+      content="Explore the ten Airbnb city markets covered by the market intelligence platform."
+    >
+    <title>City Markets | Airbnb Market Intelligence</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page-shell inner-page-shell">
+      <nav class="topbar" aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="Airbnb Market Intelligence home">
+          <span class="brand-mark" aria-hidden="true">AM</span>
+          <span>Market Intelligence</span>
+        </a>
+        <div class="nav-links">
+          <a href="index.html#estimator">Estimator</a>
+          <a href="markets.html" aria-current="page">Markets</a>
+          <a href="project.html">Project</a>
+        </div>
+        <a class="secondary-button compact-button" href="index.html#estimator">Open estimator</a>
+      </nav>
+
+      <header class="inner-hero market-page-hero">
+        <div class="inner-hero-copy">
+          <p class="eyebrow">Global market guide</p>
+          <h1>Ten cities.<br>Ten different stories.</h1>
+          <p>
+            Move beyond one global average. Explore local listing volumes, ratings, and nightly-price
+            patterns before building an estimate.
+          </p>
+          <a class="primary-link" href="#market-directory">Browse all markets</a>
+        </div>
+        <figure class="inner-hero-image">
+          <img
+            src="assets/global-markets.webp"
+            alt="An editorial collage connecting architecture and homes from global cities"
+            width="1942"
+            height="809"
+          >
+          <figcaption>Coverage across Asia-Pacific, Europe, the Americas, and Africa.</figcaption>
+        </figure>
+      </header>
+
+      <section class="market-principles" aria-label="How to read the market data">
+        <article>
+          <span>01</span>
+          <h2>Keep currency local</h2>
+          <p>Prices stay in each city's source currency, so the figures are not a direct global ranking.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Use medians carefully</h2>
+          <p>The median gives context for a typical historical listing, not a guaranteed future price.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Return to the model</h2>
+          <p>Use a city card to carry that market directly into the estimator with one click.</p>
+        </article>
+      </section>
+
+      <section id="market-directory" class="market-directory section-block" aria-labelledby="directory-heading">
+        <div class="directory-heading-row">
+          <div class="section-intro">
+            <p class="section-label">Market directory</p>
+            <h2 id="directory-heading">Find the right city context</h2>
+            <p id="market-page-status" class="status-message" aria-live="polite">
+              Loading live summaries from Athena...
+            </p>
+          </div>
+          <label class="sort-control">
+            Sort by
+            <select id="market-page-sort">
+              <option value="city">City name</option>
+              <option value="listings">Listing count</option>
+              <option value="median">Median price</option>
+              <option value="rating">Average rating</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="region-filters" class="filter-pills" aria-label="Filter cities by region">
+          <button type="button" class="is-active" data-region="All">All regions</button>
+          <button type="button" data-region="Asia-Pacific">Asia-Pacific</button>
+          <button type="button" data-region="Europe">Europe</button>
+          <button type="button" data-region="Americas">Americas</button>
+          <button type="button" data-region="Africa">Africa</button>
+        </div>
+
+        <div id="market-page-grid" class="market-page-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="page-cta">
+        <div>
+          <p class="section-label">Ready to estimate?</p>
+          <h2>Turn market context into a listing-level prediction.</h2>
+        </div>
+        <a class="primary-link" href="index.html#estimator">Build an estimate</a>
+      </section>
+
+      <footer class="site-footer">
+        <p>EP2 &middot; Group G014 &middot; INF2006 Cloud Computing and Big Data</p>
+        <div class="footer-links">
+          <a href="index.html">Estimator</a>
+          <a href="markets.html">Markets</a>
+          <a href="project.html">Project</a>
+        </div>
+        <p>Historical context should support, not replace, local research.</p>
+      </footer>
+    </main>
+    <script src="config.js"></script>
+    <script src="markets.js" defer></script>
+  </body>
+</html>

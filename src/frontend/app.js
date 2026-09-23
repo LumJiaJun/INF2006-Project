@@ -269,6 +269,10 @@ async function loadModelOptions() {
   populateSelect(citySelect, modelOptions.cities.map((city) => city.name));
   populateSelect(propertyTypeSelect, modelOptions.property_types);
   populateSelect(roomTypeSelect, modelOptions.room_types);
+  const requestedCity = new URLSearchParams(window.location.search).get("city");
+  if (requestedCity && modelOptions.cities.some((city) => city.name === requestedCity)) {
+    citySelect.value = requestedCity;
+  }
   updateCityFields();
 }
 

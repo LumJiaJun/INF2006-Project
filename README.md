@@ -19,6 +19,12 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 | Leow Yi Hao Ignatius | 2501538 | |
 | Wong Zhen Ho Brendan | 2503427 | |
 
+## Live site
+
+- Estimator dashboard: `https://d1zd6v8ocgz2mi.cloudfront.net/`
+- City market guide: `https://d1zd6v8ocgz2mi.cloudfront.net/markets.html`
+- Project and architecture story: `https://d1zd6v8ocgz2mi.cloudfront.net/project.html`
+
 ## Quickstart commands
 
 ```bash

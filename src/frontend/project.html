@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+      name="description"
+      content="Learn how the Airbnb Market Intelligence serverless cloud platform works."
+    >
+    <title>Project Story | Airbnb Market Intelligence</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page-shell inner-page-shell">
+      <nav class="topbar" aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="Airbnb Market Intelligence home">
+          <span class="brand-mark" aria-hidden="true">AM</span>
+          <span>Market Intelligence</span>
+        </a>
+        <div class="nav-links">
+          <a href="index.html#estimator">Estimator</a>
+          <a href="markets.html">Markets</a>
+          <a href="project.html" aria-current="page">Project</a>
+        </div>
+        <a class="secondary-button compact-button" href="index.html#estimator">Open estimator</a>
+      </nav>
+
+      <header class="project-hero">
+        <div class="project-hero-copy">
+          <p class="eyebrow">Inside the platform</p>
+          <h1>Built for evidence, not just a demo.</h1>
+          <p>
+            A complete serverless workflow turns raw Airbnb data into governed analytics and real-time
+            predictions, with security and observability included from the start.
+          </p>
+        </div>
+        <div class="project-hero-stats" aria-label="Project highlights">
+          <div><strong>279K</strong><span>listings profiled</span></div>
+          <div><strong>10</strong><span>city markets</span></div>
+          <div><strong>0.850</strong><span>held-out log R<sup>2</sup></span></div>
+          <div><strong>100%</strong><span>Terraform managed</span></div>
+        </div>
+      </header>
+
+      <figure class="project-feature-image">
+        <img
+          src="assets/terrace-analytics.webp"
+          alt="A city-facing apartment terrace with a laptop used for market analysis"
+          width="1881"
+          height="836"
+        >
+        <figcaption>From an individual listing decision to a governed cloud data workflow.</figcaption>
+      </figure>
+
+      <section class="architecture-story section-block" aria-labelledby="architecture-heading">
+        <div class="section-intro narrow-intro">
+          <p class="section-label">Serverless architecture</p>
+          <h2 id="architecture-heading">One flow, from raw data to useful decisions</h2>
+          <p>Each managed service has a focused role, keeping the platform scalable and easier to operate.</p>
+        </div>
+        <div class="architecture-flow" aria-label="Platform data flow">
+          <article><span>01</span><strong>Source data</strong><p>Raw listing CSV enters a private, versioned S3 data lake.</p></article>
+          <i aria-hidden="true">&rarr;</i>
+          <article><span>02</span><strong>Transform</strong><p>AWS Glue cleans fields and writes city-partitioned Parquet.</p></article>
+          <i aria-hidden="true">&rarr;</i>
+          <article><span>03</span><strong>Understand</strong><p>Athena serves controlled city summaries through Lambda.</p></article>
+          <i aria-hidden="true">&rarr;</i>
+          <article><span>04</span><strong>Predict</strong><p>A container Lambda runs the trained scikit-learn pipeline.</p></article>
+          <i aria-hidden="true">&rarr;</i>
+          <article><span>05</span><strong>Remember</strong><p>Cognito and DynamoDB protect each user's prediction history.</p></article>
+        </div>
+      </section>
+
+      <section class="project-pillars" aria-label="Engineering priorities">
+        <article class="pillar-security">
+          <p class="section-label">Secure by default</p>
+          <h2>Private origins and least privilege.</h2>
+          <p>S3 public access stays blocked, CloudFront uses origin access control, and each Lambda receives a narrow IAM policy.</p>
+        </article>
+        <article class="pillar-observe">
+          <p class="section-label">Observable in production</p>
+          <h2>Metrics that show what matters.</h2>
+          <p>CloudWatch logs, alarms, and a shared operations dashboard track errors, throttles, traffic, and latency.</p>
+        </article>
+        <article class="pillar-responsible">
+          <p class="section-label">Responsible outputs</p>
+          <h2>Useful estimates with clear limits.</h2>
+          <p>Validation stays inside the model's known scope, city currencies remain explicit, and every result includes a disclaimer.</p>
+        </article>
+      </section>
+
+      <section class="build-stack section-block" aria-labelledby="stack-heading">
+        <div>
+          <p class="section-label">Technology stack</p>
+          <h2 id="stack-heading">Small pieces, clearly connected.</h2>
+        </div>
+        <div class="stack-list">
+          <span>CloudFront</span><span>S3</span><span>API Gateway</span><span>Lambda</span>
+          <span>Cognito</span><span>DynamoDB</span><span>Glue</span><span>Athena</span>
+          <span>ECR</span><span>CloudWatch</span><span>Terraform</span><span>Python</span>
+        </div>
+      </section>
+
+      <section class="page-cta">
+        <div>
+          <p class="section-label">Explore the result</p>
+          <h2>Use the live platform or inspect every city.</h2>
+        </div>
+        <div class="cta-links">
+          <a class="primary-link" href="index.html#estimator">Open estimator</a>
+          <a class="text-link" href="markets.html">View markets <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <p>EP2 &middot; Group G014 &middot; INF2006 Cloud Computing and Big Data</p>
+        <div class="footer-links">
+          <a href="index.html">Estimator</a>
+          <a href="markets.html">Markets</a>
+          <a href="project.html">Project</a>
+        </div>
+        <p>Built with managed AWS services and infrastructure as code.</p>
+      </footer>
+    </main>
+  </body>
+</html>
