@@ -1,6 +1,7 @@
 # Team Contributions
 
-Class: EP2  
+Class: EP2
+
 Group: G014
 
 This matrix records only contribution evidence visible in the repository. Members must confirm non-commit work, test ownership, and personal reflections before submission. Contributions are not inferred from names alone.
