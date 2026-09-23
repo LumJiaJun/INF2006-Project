@@ -1,3 +1,4 @@
+# Outputs expose deployment identifiers needed for testing and operations.
 output "frontend_bucket_name" {
   description = "Private S3 bucket containing the static frontend."
   value       = aws_s3_bucket.frontend.id

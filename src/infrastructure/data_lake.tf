@@ -1,3 +1,4 @@
+# The private data lake stores raw files, processed Parquet, and query results.
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "data_lake" {
@@ -68,6 +69,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
   }
 }
 
+# Terraform uploads the Glue script so the managed ETL job can run it.
 resource "aws_s3_object" "glue_transform" {
   bucket        = aws_s3_bucket.data_lake.id
   key           = "scripts/glue_transform.py"
@@ -143,6 +145,7 @@ resource "aws_iam_role_policy" "glue_transform" {
   policy = data.aws_iam_policy_document.glue_transform.json
 }
 
+# Glue cleans the source CSV and writes city-partitioned Parquet for analytics.
 resource "aws_glue_job" "listings_transform" {
   name              = "${local.name_prefix}-listings-transform"
   description       = "Cleans Airbnb listings and writes city-partitioned Parquet"
@@ -170,6 +173,7 @@ resource "aws_glue_job" "listings_transform" {
   depends_on = [aws_iam_role_policy.glue_transform]
 }
 
+# The Glue catalog and Athena workgroup provide controlled SQL access.
 resource "aws_glue_catalog_database" "analytics" {
   name        = replace("${local.name_prefix}-analytics", "-", "_")
   description = "Catalog for processed Airbnb market analytics"

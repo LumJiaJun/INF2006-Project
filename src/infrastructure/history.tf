@@ -1,3 +1,4 @@
+# The history Lambda returns records only for the authenticated Cognito user.
 data "archive_file" "history_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/../backend/history"
@@ -87,6 +88,7 @@ resource "aws_apigatewayv2_integration" "history" {
   timeout_milliseconds   = 5000
 }
 
+# Both history and saved predictions require a valid JWT.
 resource "aws_apigatewayv2_route" "history" {
   api_id             = aws_apigatewayv2_api.platform.id
   route_key          = "GET /history"

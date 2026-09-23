@@ -1,3 +1,4 @@
+# These inputs control the deployment region, naming, and environment.
 variable "aws_region" {
   description = "AWS region used for regional resources."
   type        = string

@@ -1,3 +1,4 @@
+# The lightweight health Lambda confirms that the public API is available.
 data "archive_file" "health_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/../backend/health"
@@ -67,6 +68,7 @@ resource "aws_lambda_function" "health" {
   ]
 }
 
+# One HTTP API connects the frontend to all serverless backend routes.
 resource "aws_apigatewayv2_api" "platform" {
   name          = "${local.name_prefix}-api"
   protocol_type = "HTTP"
@@ -114,6 +116,7 @@ resource "aws_lambda_permission" "api_gateway_health" {
   source_arn    = "${aws_apigatewayv2_api.platform.execution_arn}/*/GET/health"
 }
 
+# The generated browser config keeps the deployed API URL out of source code.
 resource "aws_s3_object" "runtime_config" {
   bucket = aws_s3_bucket.frontend.id
   key    = "config.js"

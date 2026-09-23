@@ -1,3 +1,4 @@
+# This Lambda queries the governed Athena workgroup for approved city summaries.
 data "archive_file" "analytics_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/../backend/analytics"
@@ -124,6 +125,7 @@ resource "aws_lambda_function" "analytics" {
   ]
 }
 
+# API Gateway exposes the read-only analytics route to the frontend.
 resource "aws_apigatewayv2_integration" "analytics" {
   api_id                 = aws_apigatewayv2_api.platform.id
   integration_type       = "AWS_PROXY"

@@ -1,3 +1,4 @@
+# The image tag selects the immutable model container deployed to Lambda.
 variable "prediction_image_tag" {
   description = "Immutable ECR image tag used by the prediction Lambda."
   type        = string
@@ -48,6 +49,7 @@ resource "aws_iam_role_policy" "prediction_lambda_logs" {
   policy = data.aws_iam_policy_document.prediction_lambda_logs.json
 }
 
+# The prediction Lambda validates inputs, runs the model, and can save history.
 resource "aws_lambda_function" "prediction" {
   function_name = "${local.name_prefix}-prediction"
   description   = "Validates listing details and returns an estimated nightly price"
@@ -84,6 +86,7 @@ resource "aws_apigatewayv2_integration" "prediction" {
   timeout_milliseconds   = 20000
 }
 
+# This public route supports estimates without requiring an account.
 resource "aws_apigatewayv2_route" "prediction" {
   api_id    = aws_apigatewayv2_api.platform.id
   route_key = "POST /predict"

@@ -1,3 +1,4 @@
+# ECR stores immutable container images used by the prediction Lambda.
 resource "aws_ecr_repository" "prediction" {
   name                 = "${local.name_prefix}-prediction"
   image_tag_mutability = "IMMUTABLE"

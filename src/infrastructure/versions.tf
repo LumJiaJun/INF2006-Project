@@ -1,3 +1,4 @@
+# Version constraints keep Terraform and provider behaviour reproducible.
 terraform {
   required_version = ">= 1.6.0"
 
@@ -17,6 +18,7 @@ terraform {
   }
 }
 
+# Default tags are applied automatically to supported AWS resources.
 provider "aws" {
   region = var.aws_region
 

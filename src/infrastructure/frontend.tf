@@ -1,3 +1,4 @@
+# A random suffix keeps the globally unique frontend bucket name reusable.
 resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
@@ -41,6 +42,7 @@ resource "aws_s3_bucket_versioning" "frontend" {
   }
 }
 
+# CloudFront serves the private S3 website over HTTPS with security headers.
 resource "aws_cloudfront_origin_access_control" "frontend" {
   name                              = "${local.name_prefix}-frontend-oac"
   description                       = "Access control for the private frontend bucket"
@@ -161,6 +163,7 @@ resource "aws_s3_bucket_policy" "frontend" {
   depends_on = [aws_s3_bucket_public_access_block.frontend]
 }
 
+# Frontend assets are uploaded with cache settings suited to each file type.
 resource "aws_s3_object" "index" {
   bucket        = aws_s3_bucket.frontend.id
   key           = "index.html"

@@ -1,3 +1,4 @@
+# Cognito provides email sign-in without storing passwords in the application.
 resource "aws_cognito_user_pool" "users" {
   name                     = "${local.name_prefix}-users"
   username_attributes      = ["email"]
@@ -60,6 +61,7 @@ resource "aws_cognito_user_pool_domain" "users" {
   user_pool_id = aws_cognito_user_pool.users.id
 }
 
+# API Gateway checks Cognito JWTs before allowing private routes.
 resource "aws_apigatewayv2_authorizer" "users" {
   api_id           = aws_apigatewayv2_api.platform.id
   authorizer_type  = "JWT"

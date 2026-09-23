@@ -1,3 +1,4 @@
+# Operational alerts use a dedicated KMS key before reaching SNS.
 data "aws_iam_policy_document" "operational_alerts_key" {
   statement {
     sid       = "EnableAccountKeyAdministration"
@@ -54,6 +55,7 @@ resource "aws_sns_topic" "operational_alerts" {
   kms_master_key_id = aws_kms_key.operational_alerts.arn
 }
 
+# CloudWatch alarms cover API failures and important Lambda errors.
 resource "aws_cloudwatch_metric_alarm" "api_server_errors" {
   alarm_name          = "${local.name_prefix}-api-server-errors"
   alarm_description   = "API Gateway returned one or more server errors in five minutes"
@@ -135,6 +137,7 @@ resource "aws_cloudwatch_metric_alarm" "health_throttles" {
   }
 }
 
+# The dashboard combines API traffic and Lambda health in one view.
 resource "aws_cloudwatch_dashboard" "operations" {
   dashboard_name = "${local.name_prefix}-operations"
   dashboard_body = jsonencode({

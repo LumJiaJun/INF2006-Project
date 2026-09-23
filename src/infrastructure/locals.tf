@@ -1,3 +1,4 @@
+# Shared names and tags keep every AWS resource easy to identify.
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
 

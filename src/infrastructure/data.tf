@@ -1,3 +1,4 @@
+# Prediction history is partitioned by user and ordered by creation time.
 resource "aws_dynamodb_table" "prediction_history" {
   name         = "${local.name_prefix}-prediction-history"
   billing_mode = "PAY_PER_REQUEST"
