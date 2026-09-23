@@ -24,6 +24,7 @@ architecture:
     - "Amazon S3 private frontend origin"
     - "Amazon API Gateway HTTP API"
     - "AWS Lambda"
+    - "Amazon Elastic Container Registry"
     - "Amazon CloudWatch Logs"
 
 evidence:
@@ -36,7 +37,7 @@ evidence:
 data_ai:
   dataset: "data/README.md"
   method: "City-stratified price regression with log target transformation and histogram gradient boosting selected against median and ridge baselines"
-  evaluation: "Held-out MAE 191.525, RMSE 629.238 and R-squared 0.644 in pooled local-currency units; log-price R-squared 0.850; see per-city metrics and limitations"
+  evaluation: "Held-out MAE 191.836, RMSE 629.762 and R-squared 0.644 in pooled local-currency units; log-price R-squared 0.850; see per-city metrics and limitations"
   reproducible_command: "python analytics/train_model.py --listings \"data/raw/Airbnb Data/Listings.csv\" --model-output analytics/artifacts/airbnb_price_model.joblib --metrics-output analytics/artifacts/model_evaluation.json"
 
 security:

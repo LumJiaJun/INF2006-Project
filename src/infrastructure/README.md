@@ -7,6 +7,7 @@ Terraform provisions the AWS resources for the serverless application. The initi
 - An API Gateway HTTP API
 - A Python Lambda health endpoint
 - A retained CloudWatch log group
+- An encrypted ECR repository for the prediction Lambda image
 
 ## Prerequisites
 
@@ -31,7 +32,29 @@ terraform plan
 terraform apply
 terraform output frontend_url
 terraform output health_url
+terraform output prediction_ecr_repository_url
 ```
+
+## Build prediction image
+
+Run from the repository root after recreating `analytics/artifacts/airbnb_price_model.joblib`:
+
+```powershell
+$imageTag = "1.0.1"
+$repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
+$registry = $repositoryUrl.Split('/')[0]
+
+docker build --platform linux/amd64 --provenance=false `
+  -f src/backend/predict/Dockerfile `
+  -t "airbnb-prediction:$imageTag" .
+
+aws ecr get-login-password --region ap-southeast-1 |
+  docker login --username AWS --password-stdin $registry
+docker tag "airbnb-prediction:$imageTag" "${repositoryUrl}:$imageTag"
+docker push "${repositoryUrl}:$imageTag"
+```
+
+Provenance is disabled because Lambda requires a single-architecture image manifest. ECR tags are immutable, so use a new tag whenever image content changes.
 
 ## Cleanup
 

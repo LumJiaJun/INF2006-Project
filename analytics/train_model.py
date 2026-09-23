@@ -12,7 +12,7 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
-from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, TargetEncoder
 
@@ -162,7 +162,9 @@ def build_models():
                 TargetEncoder(
                     target_type="continuous",
                     smooth="auto",
-                    cv=KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE),
+                    cv=5,
+                    shuffle=True,
+                    random_state=RANDOM_STATE,
                 ),
             ),
         ]
@@ -274,6 +276,23 @@ def training_metadata(frame, cleaning, scope, dataset_path):
         "observed_categories": {
             feature: sorted(frame[feature].dropna().astype(str).unique().tolist())
             for feature in CATEGORICAL_FEATURES
+        },
+        "city_neighbourhoods": {
+            city: sorted(rows["neighbourhood"].dropna().astype(str).unique().tolist())
+            for city, rows in frame.groupby("city")
+        },
+        "city_coordinate_ranges": {
+            city: {
+                "latitude": {
+                    "minimum": float(rows["latitude"].min()),
+                    "maximum": float(rows["latitude"].max()),
+                },
+                "longitude": {
+                    "minimum": float(rows["longitude"].min()),
+                    "maximum": float(rows["longitude"].max()),
+                },
+            }
+            for city, rows in frame.groupby("city")
         },
         "observed_numeric_ranges": {
             feature: {

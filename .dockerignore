@@ -1,0 +1,16 @@
+.git
+.gitignore
+.terraform
+**/.terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+data/raw
+data/processed
+evidence
+tests
+tmp
+__pycache__
+*.pyc
+analytics/artifacts/data_profile.json
+analytics/artifacts/model_evaluation*.json

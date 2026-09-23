@@ -26,6 +26,6 @@
     --metrics-output analytics/artifacts/model_evaluation.json
   ```
 - **Expected result:** Produce MAE, RMSE, and R-squared for every candidate, report per-city local-currency metrics, select the lowest median city-normalized MAE, and export the complete preprocessing and model pipeline.
-- **Actual result:** Histogram gradient boosting outperformed the median and ridge baselines. On the supported held-out scope it achieved pooled MAE 191.525, RMSE 629.238, R-squared 0.644, log-price R-squared 0.850, and median city-normalized MAE 0.591. These results are moderate and must not be represented as high accuracy.
+- **Actual result:** Histogram gradient boosting outperformed the median and ridge baselines. On the supported held-out scope it achieved pooled MAE 191.836, RMSE 629.762, R-squared 0.644, log-price R-squared 0.850, and median city-normalized MAE 0.592. These results are moderate and must not be represented as high accuracy.
 - **Date:** 2026-09-23
 - **Artefact path:** `analytics/artifacts/model_evaluation.json`, `analytics/artifacts/model_evaluation_scoped_base.json`, and `analytics/artifacts/model_evaluation_untrimmed.json`

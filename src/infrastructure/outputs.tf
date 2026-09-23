@@ -17,3 +17,8 @@ output "health_url" {
   description = "Public API health endpoint."
   value       = "${aws_apigatewayv2_api.platform.api_endpoint}/health"
 }
+
+output "prediction_ecr_repository_url" {
+  description = "ECR repository URL for the prediction Lambda image."
+  value       = aws_ecr_repository.prediction.repository_url
+}
