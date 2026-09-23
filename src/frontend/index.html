@@ -5,125 +5,228 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta
       name="description"
-      content="Airbnb nightly price estimates and market intelligence."
+      content="Explore Airbnb market patterns and estimate a supported nightly price."
     >
     <title>Airbnb Market Intelligence</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <main class="page-shell">
-      <nav class="account-bar" aria-label="Account">
-        <span id="account-label">Not signed in</span>
-        <button id="sign-in" class="secondary-button" type="button">Sign in or create account</button>
-        <button id="sign-out" class="secondary-button" type="button" hidden>Sign out</button>
+      <!-- The top navigation keeps the main dashboard sections easy to reach. -->
+      <nav class="topbar" aria-label="Primary navigation">
+        <a class="brand" href="#top" aria-label="Airbnb Market Intelligence home">
+          <span class="brand-mark" aria-hidden="true">AM</span>
+          <span>Market Intelligence</span>
+        </a>
+        <div class="nav-links">
+          <a href="#estimator">Estimator</a>
+          <a href="#analytics">Markets</a>
+          <a href="#history-section">History</a>
+        </div>
+        <div class="account-bar">
+          <span id="account-label">Not signed in</span>
+          <button id="sign-in" class="secondary-button compact-button" type="button">Sign in</button>
+          <button id="sign-out" class="secondary-button compact-button" type="button" hidden>Sign out</button>
+        </div>
       </nav>
 
-      <header class="hero">
-        <p class="eyebrow">INF2006 Cloud Computing and Big Data</p>
-        <h1>Understand the market before setting the nightly price.</h1>
-        <p class="hero-copy">
-          Compare Airbnb market patterns and generate an evidence-based price estimate from listing details.
-        </p>
+      <header id="top" class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">INF2006 Cloud Computing and Big Data</p>
+          <h1>Price with context, not guesswork.</h1>
+          <p class="hero-copy">
+            Explore ten Airbnb markets, compare typical listing patterns, and generate a model-backed
+            nightly price estimate in seconds.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#estimator">Build an estimate</a>
+            <a class="text-link" href="#analytics">Explore markets <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </div>
+
+        <aside class="hero-panel" aria-label="Platform overview">
+          <div class="hero-stat hero-stat-wide">
+            <span class="stat-kicker">Live market coverage</span>
+            <strong id="hero-city-count">10</strong>
+            <span>cities in local currencies</span>
+          </div>
+          <div class="hero-stat">
+            <strong>279K</strong>
+            <span>historical listings</span>
+          </div>
+          <div class="hero-stat">
+            <strong>0.850</strong>
+            <span>held-out log R<sup>2</sup></span>
+          </div>
+          <div class="status-card" aria-labelledby="platform-status-heading">
+            <span id="status-indicator" class="status-indicator status-indicator-pending" aria-hidden="true"></span>
+            <div>
+              <span class="stat-kicker">Platform status</span>
+              <h2 id="platform-status-heading">Checking services</h2>
+              <p id="status-message" class="status-message">Connecting to the serverless API.</p>
+            </div>
+          </div>
+        </aside>
       </header>
 
-      <section class="status-card" aria-labelledby="platform-status-heading">
-        <div>
-          <p class="section-label">Platform status</p>
-          <h2 id="platform-status-heading">Serverless foundation ready</h2>
-          <p id="status-message" class="status-message">
-            The secure static frontend is available through CloudFront.
-          </p>
-        </div>
-        <span id="status-indicator" class="status-indicator status-indicator-pending" aria-hidden="true"></span>
-      </section>
-
-      <section class="estimator" aria-labelledby="estimator-heading">
-        <div class="section-intro">
+      <!-- Presets provide quick starting points while every model input remains editable. -->
+      <section id="estimator" class="estimator section-block" aria-labelledby="estimator-heading">
+        <div class="estimator-guide">
           <p class="section-label">Price estimator</p>
-          <h2 id="estimator-heading">Describe the listing</h2>
-          <p>The model uses historical listings from the selected city. Fields marked optional may be left blank.</p>
+          <h2 id="estimator-heading">Shape the listing</h2>
+          <p>
+            Start with a quick profile or adjust every field. The form stays within categories and coordinate
+            ranges observed by the trained model.
+          </p>
+          <div class="preset-group" aria-label="Quick listing profiles">
+            <button class="preset-button is-active" type="button" data-preset="couple">
+              <strong>City break</strong>
+              <span>2 guests &middot; 1 bedroom</span>
+            </button>
+            <button class="preset-button" type="button" data-preset="family">
+              <strong>Family stay</strong>
+              <span>4 guests &middot; 2 bedrooms</span>
+            </button>
+            <button class="preset-button" type="button" data-preset="premium">
+              <strong>Premium host</strong>
+              <span>High rating &middot; more amenities</span>
+            </button>
+          </div>
+          <div class="estimate-note">
+            <span>Model scope</span>
+            <p>Typical listings up to each city's learned 99th-percentile price boundary.</p>
+          </div>
         </div>
 
-        <form id="prediction-form" class="prediction-form">
-          <label>
-            City
-            <select id="city" name="city" required></select>
-          </label>
-          <label>
-            Neighbourhood
-            <select id="neighbourhood" name="neighbourhood" required></select>
-          </label>
-          <label>
-            Property type
-            <select id="property-type" name="property_type" required></select>
-          </label>
-          <label>
-            Room type
-            <select id="room-type" name="room_type" required></select>
-          </label>
-          <label>
-            Latitude
-            <input id="latitude" name="latitude" type="number" step="0.00001" required>
-          </label>
-          <label>
-            Longitude
-            <input id="longitude" name="longitude" type="number" step="0.00001" required>
-          </label>
-          <label>
-            Guests
-            <input name="accommodates" type="number" min="1" max="16" value="2" required>
-          </label>
-          <label>
-            Bedrooms (optional)
-            <input name="bedrooms" type="number" min="0" max="50" value="1">
-          </label>
-          <label>
-            Minimum nights
-            <input name="minimum_nights" type="number" min="1" max="365" value="2" required>
-          </label>
-          <label>
-            Rating out of 100 (optional)
-            <input name="review_scores_rating" type="number" min="20" max="100" value="95">
-          </label>
-          <label>
-            Host listing count
-            <input name="host_total_listings_count" type="number" min="0" max="10000" value="1" required>
-          </label>
-          <label>
-            Number of amenities
-            <input name="amenities_count" type="number" min="0" max="200" value="8" required>
-          </label>
+        <div class="estimator-workspace">
+          <div class="form-progress" aria-hidden="true">
+            <span><b>1</b> Market</span>
+            <span><b>2</b> Listing</span>
+            <span><b>3</b> Host</span>
+          </div>
 
-          <fieldset class="boolean-fields">
-            <legend>Listing and host details</legend>
-            <label><input name="instant_bookable" type="checkbox"> Instant bookable</label>
-            <label><input name="host_is_superhost" type="checkbox"> Superhost</label>
-            <label><input name="host_identity_verified" type="checkbox" checked> Identity verified</label>
-          </fieldset>
+          <form id="prediction-form" class="prediction-form">
+            <fieldset class="form-section">
+              <legend>Market and location</legend>
+              <div class="form-grid">
+                <label>
+                  City
+                  <select id="city" name="city" required></select>
+                </label>
+                <label>
+                  Neighbourhood
+                  <select id="neighbourhood" name="neighbourhood" required></select>
+                </label>
+                <label>
+                  Property type
+                  <select id="property-type" name="property_type" required></select>
+                </label>
+                <label>
+                  Room type
+                  <select id="room-type" name="room_type" required></select>
+                </label>
+                <label>
+                  Latitude
+                  <input id="latitude" name="latitude" type="number" step="0.00001" required>
+                </label>
+                <label>
+                  Longitude
+                  <input id="longitude" name="longitude" type="number" step="0.00001" required>
+                </label>
+              </div>
+            </fieldset>
 
-          <button id="prediction-submit" type="submit">Estimate nightly price</button>
-        </form>
+            <fieldset class="form-section">
+              <legend>Listing details</legend>
+              <div class="form-grid">
+                <label>
+                  Guests
+                  <input name="accommodates" type="number" min="1" max="16" value="2" required>
+                </label>
+                <label>
+                  Bedrooms <span class="optional-label">Optional</span>
+                  <input name="bedrooms" type="number" min="0" max="50" value="1">
+                </label>
+                <label>
+                  Minimum nights
+                  <input name="minimum_nights" type="number" min="1" max="365" value="2" required>
+                </label>
+                <label>
+                  Rating out of 100 <span class="optional-label">Optional</span>
+                  <input name="review_scores_rating" type="number" min="20" max="100" value="95">
+                </label>
+                <label>
+                  Host listing count
+                  <input name="host_total_listings_count" type="number" min="0" max="10000" value="1" required>
+                </label>
+                <label>
+                  Number of amenities
+                  <input name="amenities_count" type="number" min="0" max="200" value="8" required>
+                </label>
+              </div>
+            </fieldset>
 
-        <div id="prediction-result" class="prediction-result" aria-live="polite" hidden></div>
+            <fieldset class="boolean-fields">
+              <legend>Host and booking signals</legend>
+              <label><input name="instant_bookable" type="checkbox"> <span>Instant bookable</span></label>
+              <label><input name="host_is_superhost" type="checkbox"> <span>Superhost</span></label>
+              <label><input name="host_identity_verified" type="checkbox" checked> <span>Identity verified</span></label>
+            </fieldset>
+
+            <button id="prediction-submit" class="prediction-submit" type="submit">
+              <span>Estimate nightly price</span>
+              <span aria-hidden="true">&rarr;</span>
+            </button>
+          </form>
+
+          <div id="prediction-result" class="prediction-result" aria-live="polite" hidden></div>
+        </div>
       </section>
 
-      <section class="analytics-section" aria-labelledby="analytics-heading">
-        <div class="section-intro">
-          <p class="section-label">Market analytics</p>
-          <h2 id="analytics-heading">Typical prices by city</h2>
-          <p>
-            Compare historical listing prices within each city's local currency. Values are not directly
-            comparable across currencies.
-          </p>
+      <!-- Market cards are populated from the processed Athena analytics endpoint. -->
+      <section id="analytics" class="analytics-section section-block" aria-labelledby="analytics-heading">
+        <div class="analytics-heading-row">
+          <div class="section-intro">
+            <p class="section-label">Market explorer</p>
+            <h2 id="analytics-heading">Ten cities, viewed in context</h2>
+            <p>
+              Select a city to inspect its typical nightly price, listing coverage, and rating. Prices remain
+              in local currency and should not be compared as a single global scale.
+            </p>
+          </div>
+          <label class="sort-control">
+            Arrange markets by
+            <select id="analytics-sort">
+              <option value="city">City name</option>
+              <option value="listings">Listing count</option>
+              <option value="median">Median price</option>
+              <option value="rating">Average rating</option>
+            </select>
+          </label>
         </div>
+
+        <div class="market-spotlight" aria-live="polite">
+          <div>
+            <span class="stat-kicker">Selected market</span>
+            <h3 id="spotlight-city">Loading markets</h3>
+            <p id="spotlight-description">Athena is preparing the city summary.</p>
+          </div>
+          <div class="spotlight-metrics">
+            <span><strong id="spotlight-median">Pending</strong> median night</span>
+            <span><strong id="spotlight-listings">Pending</strong> listings</span>
+            <span><strong id="spotlight-rating">Pending</strong> average rating</span>
+          </div>
+          <button id="use-market" class="secondary-button" type="button" disabled>Use in estimator</button>
+        </div>
+
         <p id="analytics-message" class="status-message">Loading processed market data...</p>
         <div id="analytics-grid" class="analytics-grid" aria-live="polite"></div>
       </section>
 
-      <section id="history-section" class="history-section" aria-labelledby="history-heading" hidden>
+      <section id="history-section" class="history-section section-block" aria-labelledby="history-heading" hidden>
         <div class="history-heading-row">
           <div>
-            <p class="section-label">Your account</p>
+            <p class="section-label">Private workspace</p>
             <h2 id="history-heading">Recent predictions</h2>
           </div>
           <button id="refresh-history" class="secondary-button" type="button">Refresh history</button>
@@ -132,27 +235,28 @@
         <div id="history-list" class="history-list"></div>
       </section>
 
-      <section class="feature-grid" aria-label="Platform capabilities">
+      <section class="feature-grid" aria-label="Platform architecture highlights">
         <article>
           <p class="feature-number">01</p>
-          <h2>Price estimate</h2>
-          <p>Estimate a nightly price from the final evaluated model inputs.</p>
+          <h2>Real model inference</h2>
+          <p>A versioned scikit-learn pipeline runs inside an ECR-backed Lambda container.</p>
         </article>
         <article>
           <p class="feature-number">02</p>
-          <h2>Market analytics</h2>
-          <p>Explore city summaries queried from partitioned Parquet through Athena.</p>
+          <h2>Serverless analytics</h2>
+          <p>Glue transforms raw CSV into Parquet before Athena returns approved market summaries.</p>
         </article>
         <article>
           <p class="feature-number">03</p>
-          <h2>Prediction history</h2>
-          <p>Review saved estimates securely after authentication.</p>
+          <h2>Private history</h2>
+          <p>Cognito and verified JWT claims keep saved predictions scoped to the signed-in user.</p>
         </article>
       </section>
 
-      <p class="disclaimer">
-        Predictions will be estimates and should not be treated as guaranteed market prices.
-      </p>
+      <footer class="site-footer">
+        <p>EP2 &middot; Group G014 &middot; INF2006 Cloud Computing and Big Data</p>
+        <p>Predictions are estimates, not guaranteed market prices.</p>
+      </footer>
     </main>
     <script src="config.js"></script>
     <script src="auth-config.js"></script>
