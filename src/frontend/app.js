@@ -428,9 +428,17 @@ signInButton.addEventListener("click", () => window.Auth.signIn());
 signOutButton.addEventListener("click", () => window.Auth.signOut());
 refreshHistoryButton.addEventListener("click", loadHistory);
 
-window.Auth.ready.then(updateAccountUi).catch((error) => {
-  accountLabel.textContent = error.message;
-});
+window.Auth.ready
+  .then(() => {
+    updateAccountUi();
+    const signInRequested = new URLSearchParams(window.location.search).get("signin") === "1";
+    if (signInRequested && !window.Auth.getUser()) {
+      window.Auth.signIn();
+    }
+  })
+  .catch((error) => {
+    accountLabel.textContent = error.message;
+  });
 
 loadModelOptions().catch((error) => {
   console.error("Model options failed to load", error);

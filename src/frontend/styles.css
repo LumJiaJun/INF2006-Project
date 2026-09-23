@@ -1698,3 +1698,363 @@ button:disabled {
     order: -1;
   }
 }
+
+/* The floating guide offers lightweight help without adding another backend service. */
+.guide-launcher {
+  position: fixed;
+  right: 1.4rem;
+  bottom: 1.4rem;
+  z-index: 61;
+  display: inline-flex;
+  min-height: 3.6rem;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1.15rem 0.7rem 0.95rem;
+  border: 1px solid rgb(255 255 255 / 36%);
+  border-radius: 999px;
+  color: white;
+  background: var(--forest);
+  box-shadow: 0 1rem 2.7rem rgb(15 56 47 / 28%);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.guide-launcher:hover,
+.guide-launcher.is-open {
+  background: var(--forest-dark);
+  box-shadow: 0 1.2rem 3rem rgb(15 56 47 / 36%);
+  transform: translateY(-2px);
+}
+
+.guide-launcher svg {
+  flex: 0 0 auto;
+}
+
+.guide-launcher i {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.market-guide {
+  position: fixed;
+  right: 1.4rem;
+  bottom: 6rem;
+  z-index: 60;
+  width: min(26rem, calc(100vw - 2rem));
+  overflow: hidden;
+  border: 1px solid rgb(216 225 220 / 90%);
+  border-radius: 1.5rem;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 1.7rem 5rem rgb(16 35 30 / 23%);
+  backdrop-filter: blur(20px);
+  animation: guide-enter 180ms ease-out;
+}
+
+@keyframes guide-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.guide-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.35rem 1.4rem 1.1rem;
+  color: white;
+  background:
+    radial-gradient(circle at 88% 15%, rgb(226 99 69 / 76%), transparent 28%),
+    var(--forest-dark);
+}
+
+.guide-header h2 {
+  margin: 0.25rem 0 0;
+  color: white;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.65rem;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+
+.guide-kicker {
+  color: #ffb29e;
+  font-size: 0.64rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.guide-close {
+  padding: 0.35rem 0;
+  border: 0;
+  color: rgb(255 255 255 / 72%);
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.guide-close:hover {
+  color: white;
+}
+
+.guide-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem;
+  padding: 0.55rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+
+.guide-tabs button {
+  padding: 0.65rem;
+  border: 0;
+  border-radius: 0.7rem;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.guide-tabs button.is-active {
+  color: var(--forest);
+  background: white;
+  box-shadow: 0 0.25rem 0.8rem rgb(16 35 30 / 8%);
+}
+
+.guide-view {
+  min-height: 24rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.guide-chat-view {
+  display: grid;
+  grid-template-rows: minmax(10rem, 1fr) auto auto;
+  max-height: min(31rem, calc(100vh - 14rem));
+}
+
+.guide-messages {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.2rem;
+  overflow-y: auto;
+  flex-direction: column;
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
+}
+
+.guide-message {
+  max-width: 88%;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.guide-message p {
+  margin: 0;
+}
+
+.guide-message-guide {
+  align-self: flex-start;
+  border-bottom-left-radius: 0.25rem;
+  color: var(--ink);
+  background: var(--mint);
+}
+
+.guide-message-user {
+  align-self: flex-end;
+  border-bottom-right-radius: 0.25rem;
+  color: white;
+  background: var(--forest);
+}
+
+.guide-message a {
+  display: inline-block;
+  margin-top: 0.65rem;
+  color: var(--forest-dark);
+  font-size: 0.76rem;
+  font-weight: 850;
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
+}
+
+.guide-quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0 1.2rem 1rem;
+}
+
+.guide-quick-replies button {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #bfd3ca;
+  border-radius: 999px;
+  color: var(--forest);
+  background: white;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.guide-quick-replies button:hover {
+  border-color: var(--forest);
+  background: var(--surface-soft);
+}
+
+.guide-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+  padding: 0.9rem;
+  border-top: 1px solid var(--line);
+  background: white;
+}
+
+.guide-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 0.65rem 0.8rem;
+  color: var(--ink);
+  background: var(--surface-soft);
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.guide-form input:focus {
+  border-color: var(--forest);
+  outline: 3px solid rgb(23 79 66 / 12%);
+}
+
+.guide-form button {
+  min-width: 4rem;
+  border: 0;
+  border-radius: 0.8rem;
+  color: white;
+  background: var(--coral);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.guide-form button:hover {
+  background: #c94e32;
+}
+
+.guide-navigation-view {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  align-content: start;
+}
+
+.guide-page-link {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  color: var(--ink);
+  background: var(--surface-soft);
+  text-decoration: none;
+  transition: border 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.guide-page-link:hover {
+  border-color: #9fbbb0;
+  background: white;
+  transform: translateY(-1px);
+}
+
+.guide-page-link > span {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  color: var(--coral);
+  background: var(--coral-soft);
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.guide-page-link strong,
+.guide-page-link small {
+  display: block;
+}
+
+.guide-page-link strong {
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.guide-page-link small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 600px) {
+  .guide-launcher {
+    right: 0.8rem;
+    bottom: 0.8rem;
+    width: 3.6rem;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .guide-launcher > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .market-guide {
+    right: 0.5rem;
+    bottom: 5rem;
+    width: calc(100vw - 1rem);
+    max-height: calc(100vh - 5.8rem);
+  }
+
+  .guide-chat-view {
+    max-height: calc(100vh - 14rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-guide {
+    animation: none;
+  }
+}

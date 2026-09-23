@@ -221,6 +221,15 @@ resource "aws_s3_object" "markets_application" {
   cache_control = "no-cache"
 }
 
+resource "aws_s3_object" "chat_application" {
+  bucket        = aws_s3_bucket.frontend.id
+  key           = "chat.js"
+  source        = "${path.module}/../frontend/chat.js"
+  etag          = filemd5("${path.module}/../frontend/chat.js")
+  content_type  = "application/javascript; charset=utf-8"
+  cache_control = "no-cache"
+}
+
 # Generated editorial images are cached because their filenames stay stable per version.
 resource "aws_s3_object" "site_images" {
   for_each = toset(["global-markets.webp", "terrace-analytics.webp"])
