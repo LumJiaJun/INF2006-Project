@@ -10,6 +10,8 @@ Map named threats to the controls that mitigate them, with evidence links.
 | Operational failures going unnoticed | CloudWatch alarms publish to an encrypted SNS topic, and a dashboard exposes API errors and Lambda duration/errors | `src/infrastructure/monitoring.tf`, `evidence/monitoring.md` |
 | Over-privileged compute identity | The health Lambda role can only write to its dedicated CloudWatch log group | `src/infrastructure/api.tf` |
 | Unauthorized prediction-history access | API Gateway validates Cognito JWTs, and handlers derive the DynamoDB partition key only from the verified `sub` claim | `src/infrastructure/auth.tf`, `src/backend/history/handler.py`, `evidence/test-security.md` |
+| Anonymous AI cost abuse or oversized prompts | API Gateway requires a Cognito JWT, the chat route has a one-request-per-second throttle, and the handler caps input and output | `src/infrastructure/chat.tf`, `src/backend/chat/handler.py`, `tests/test_chat.py` |
+| Sensitive prompt text entering application logs | The chat function logs request identifiers, page names, and token counts but not message or response text | `src/backend/chat/handler.py` |
 | OAuth authorization-code interception or request forgery | The browser uses PKCE with SHA-256 and validates a cryptographically random state value | `src/frontend/auth.js` |
 | Long-lived browser token exposure | ID tokens are held in `sessionStorage`, expire after the token lifetime, and are cleared at sign-out | `src/frontend/auth.js` |
 | Unapproved browser origins calling the API | API Gateway CORS allows only the deployed CloudFront origin | `src/infrastructure/api.tf`, `evidence/test-security.md` |

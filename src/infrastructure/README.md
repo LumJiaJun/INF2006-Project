@@ -11,6 +11,7 @@ Terraform provisions the AWS resources for the serverless application, identity,
 - A Cognito user pool and DynamoDB prediction-history table
 - A private encrypted S3 data lake, Glue transform, catalog table, and Athena workgroup
 - A fixed-query analytics Lambda and `GET /analytics` route
+- A separate Claude Haiku chat Lambda and Cognito-protected `POST /chat` route
 - CloudWatch alarms and dashboard with an encrypted SNS action topic
 
 ## Prerequisites
@@ -42,11 +43,12 @@ terraform output prediction_history_url
 terraform output data_lake_bucket_name
 terraform output glue_transform_job_name
 terraform output analytics_url
+terraform output chat_url
 terraform output operations_dashboard_name
 terraform output operational_alerts_topic_arn
 ```
 
-The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`.
+The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`. Signed-in users can call `/chat`; the separate AI Lambda uses the global Claude Haiku 4.5 inference profile, a 220-token output cap, and a tighter one-request-per-second API route limit.
 
 After changing frontend files, invalidate CloudFront so cached objects are refreshed:
 
@@ -72,7 +74,7 @@ The job is limited to two `G.1X` workers, a ten-minute timeout, and no retries. 
 
 ## Monitoring
 
-CloudWatch alarms track API 5xx responses and prediction/analytics Lambda errors. Their SNS topic uses a rotating customer-managed KMS key whose policy permits only this account's named CloudWatch alarms to publish. No subscription is committed because recipient addresses are personal deployment configuration. Add and confirm an operator endpoint separately before treating the topic as a complete notification channel.
+CloudWatch alarms track API 5xx responses, prediction/analytics/chat Lambda errors, and health throttles. The dashboard gives the chat Lambda its own duration and error series so AI latency can be reviewed independently. Their SNS topic uses a rotating customer-managed KMS key whose policy permits only this account's named CloudWatch alarms to publish. No subscription is committed because recipient addresses are personal deployment configuration. Add and confirm an operator endpoint separately before treating the topic as a complete notification channel.
 
 The development account has a Lambda concurrency quota of 10, so the API stage uses a conservative two-request burst and two-request-per-second limit. See `evidence/test-resilience.md` for passing expected-load results and the honestly recorded higher-concurrency failure.
 

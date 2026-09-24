@@ -21,9 +21,9 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 
 ## Live site
 
-- Estimator dashboard: `https://d1zd6v8ocgz2mi.cloudfront.net/`
-- City market guide: `https://d1zd6v8ocgz2mi.cloudfront.net/markets.html`
-- Project and architecture story: `https://d1zd6v8ocgz2mi.cloudfront.net/project.html`
+- Estimator dashboard: `https://d3elvmvxbz7fmt.cloudfront.net/`
+- City market guide: `https://d3elvmvxbz7fmt.cloudfront.net/markets.html`
+- Project and architecture story: `https://d3elvmvxbz7fmt.cloudfront.net/project.html`
 
 ## Quickstart commands
 
@@ -51,7 +51,7 @@ terraform output analytics_url
 
 ![Architecture diagram](evidence/architecture.png)
 
-CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions` and `GET /history`; authenticated predictions are stored under the token-derived user identifier in an encrypted DynamoDB table. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
+CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. Authenticated predictions are stored under the token-derived user identifier in encrypted DynamoDB. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
 
 ## Technology list
 
@@ -61,7 +61,7 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - Identity and data: branded Cognito Managed Login v2 and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
 - Operations: CloudWatch structured logs, metrics, dashboard and alarms with an encrypted SNS action topic
-- Analytics / AI-ML: reproducible scikit-learn price regression pipeline with held-out evaluation
+- Analytics / AI-ML: reproducible scikit-learn price regression pipeline plus a bounded Amazon Bedrock Claude Haiku 4.5 assistant
 - Application: HTML, CSS, JavaScript, and Python
 
 ## Known limitations
@@ -73,3 +73,4 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - The development AWS account has a concurrency quota of 10. A high-concurrency stress test caused Lambda throttles despite API Gateway rate limits; see `evidence/test-resilience.md`.
 - The SNS alert topic has no human subscription in source control and needs an operator-managed confirmed endpoint.
 - Cloud deployment requires an AWS account and may incur a small cost.
+- Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`.

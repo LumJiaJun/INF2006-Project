@@ -43,6 +43,7 @@ architecture:
     - "Amazon S3 data lake"
     - "AWS Glue ETL and Data Catalog"
     - "Amazon Athena"
+    - "Amazon Bedrock Claude Haiku 4.5"
     - "Amazon CloudWatch Logs"
     - "Amazon CloudWatch dashboard and alarms"
     - "Amazon SNS"
@@ -65,7 +66,7 @@ data_ai:
 security:
   threat_control_map: "evidence/threat-control-map.md"
   secrets_handling: "No credentials are stored in source or Terraform variables; deployment uses the standard AWS credential chain and Lambda IAM roles."
-  authentication: "Cognito authorization-code flow with PKCE; API Gateway JWT authorization derives history ownership from the verified subject claim."
+  authentication: "Cognito authorization-code flow with PKCE; API Gateway JWT authorization derives history ownership from the verified subject claim and protects AI access."
 
 run:
   prerequisites:

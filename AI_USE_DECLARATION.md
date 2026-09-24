@@ -8,6 +8,7 @@ verification the team performed, and any licences/attribution.
 | Tool | Where it was used | Purpose |
 |------|-------------------|---------|
 | OpenAI Codex | `AGENTS.md`, `.gitignore`, `README.md`, `src/`, `tests/`, `evidence/`, and `project_manifest.yaml` | Repository inspection, implementation support, Terraform configuration, tests, documentation, and deployment verification. |
+| Amazon Bedrock Claude Haiku 4.5 | Deployed `POST /chat` application feature | Answers authenticated, project-scoped user questions through a bounded prompt and response interface. |
 
 ## Sources and baselines
 
@@ -21,6 +22,7 @@ verification the team performed, and any licences/attribution.
 - Reviewed the Terraform plan before each apply and confirmed that it contained no destructive actions.
 - Ran `terraform fmt -check`, `terraform validate`, Python unit tests, and JavaScript syntax checking.
 - Verified the deployed CloudFront frontend, API workflows, CORS restriction, direct S3 denial, Cognito-protected routes, Glue output, Athena query, DynamoDB recovery setting, alarms, and CloudWatch log events.
+- Invoked the deployed chat Lambda with a project question and confirmed a bounded Haiku response; unauthenticated API access returned HTTP 401.
 - Compared generated documentation claims against dated command output in `evidence/` and retained failed stress-test findings.
 - The team remains responsible for reviewing future generated work and validating all final claims.
 

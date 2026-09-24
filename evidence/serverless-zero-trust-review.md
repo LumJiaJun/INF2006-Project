@@ -1,6 +1,6 @@
 # Serverless Applications Lens and Zero Trust review
 
-Date: 2026-09-23
+Date: 2026-09-24
 
 This review compares the deployed architecture with the supplied AWS Serverless Applications Lens and Zero Trust guidance. It records implemented decisions, evidence, and remaining gaps. It does not claim formal AWS Well-Architected certification.
 
@@ -8,11 +8,11 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 
 | Area | Implemented design | Evidence and remaining gap |
 |------|--------------------|----------------------------|
-| Compute | Four focused Lambda functions provide health, prediction, history, and analytics. Functions keep durable state in managed services. Warm-container globals cache only SDK clients or the read-only model bundle. | `src/backend/`; 18 unit tests. Strict idempotency is not implemented for repeated authenticated prediction submissions, so a retry after an uncertain response can create another history item. The browser disables duplicate submission while a request is active, but that is not a complete idempotency control. |
+| Compute | Five focused Lambda functions provide health, prediction, history, analytics, and protected AI. Functions keep durable state in managed services. Warm-container globals cache only SDK clients or the read-only model bundle. | `src/backend/`; 23 unit tests. Strict idempotency is not implemented for repeated authenticated prediction submissions, so a retry after an uncertain response can create another history item. The browser disables duplicate submission while a request is active, but that is not a complete idempotency control. |
 | Data | Static assets, application records, and analytical data use separate S3 and DynamoDB resources. DynamoDB uses on-demand capacity and a user/time access pattern. Glue writes city-partitioned Parquet queried through Athena. | `src/infrastructure/frontend.tf`, `data.tf`, `data_lake.tf`; `evidence/data-pipeline.md`. The prediction model is isolated in an immutable ECR image rather than the data-lake model prefix. |
-| Identity | Cognito handles application users. API Gateway validates JWTs. History ownership comes only from the verified `sub` claim. AWS services use separate IAM roles. | `src/infrastructure/auth.tf`; `tests/test_history.py`; `evidence/test-security.md`. MFA is disabled to keep the university sign-up flow simple; a higher-risk deployment should enable and test MFA. |
+| Identity | Cognito handles application users. API Gateway validates JWTs for history, saved predictions, and AI access. History ownership comes only from the verified `sub` claim. AWS services use separate IAM roles. | `src/infrastructure/auth.tf`; `tests/test_history.py`; `tests/test_chat.py`; `evidence/test-security.md`. MFA is disabled to keep the university sign-up flow simple; a higher-risk deployment should enable and test MFA. |
 | Edge | CloudFront is the frontend entry point and uses a private OAC S3 origin. The response policy adds CSP, HSTS, anti-framing, MIME-sniffing protection, and a strict referrer policy. | `src/infrastructure/frontend.tf`; live smoke security-header test. WAF is not added because no demonstrated threat justifies its cost and rule operations for this project. |
-| Monitoring | Structured logs, detailed API metrics, Lambda invocation/error/duration/throttle metrics, a dashboard, four alarms, and an encrypted SNS action topic are provisioned. | `src/infrastructure/monitoring.tf`; `evidence/monitoring.md`. The topic requires an operator-managed confirmed subscriber. |
+| Monitoring | Structured logs, detailed API metrics, Lambda invocation/error/duration/throttle metrics, a dashboard, five alarms, and an encrypted SNS action topic are provisioned. AI duration and errors have their own series. | `src/infrastructure/monitoring.tf`; `evidence/monitoring.md`. The topic requires an operator-managed confirmed subscriber. |
 | Deployment | Terraform controls cloud resources. Plans are reviewed before apply. ECR tags are immutable, S3 is versioned, and Git commits preserve tested stages. Raw-data upload and Glue execution are documented manual data operations. | `src/infrastructure/README.md`; Git history. Terraform state is local and should move to an encrypted remote backend with locking for team use. |
 | Release management | Immutable prediction images and Git/Terraform rollback provide basic release recovery. | `src/infrastructure/ecr.tf`. Lambda versions, aliases, and canary deployment are not added because the current single development environment has not demonstrated a need. |
 | Messaging | SNS is used only for operational notifications. Prediction remains a direct synchronous API-to-Lambda workflow. | `src/infrastructure/monitoring.tf`. SQS, EventBridge, and Step Functions are intentionally absent because there is no multi-step asynchronous workflow. |
@@ -23,6 +23,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 - The expected-load health test accepts successful `200` and controlled `429` responses. The stress test honestly records `503` responses caused by the account concurrency quota of 10.
 - Athena reads processed Parquet, not the raw CSV. The recorded aggregate scanned 566,077 bytes and completed in 697 ms.
 - DynamoDB uses on-demand billing because the workload is low and unpredictable. Glue runs with two `G.1X` workers, a ten-minute timeout, and no retries.
+- Bedrock runs through a separate Lambda and protected route. Prompts are limited to 500 characters, responses to 220 tokens, and route throughput to one request per second.
 - Malformed input, unsupported categories, missing claims, Athena failure, model failure, and DynamoDB failure return controlled responses without stack traces. Downstream failures are logged.
 - Automatic retries are not added to synchronous write paths because blind retries could create duplicate history records. A future idempotency-key design should precede any client retry policy.
 
@@ -36,6 +37,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 | API Gateway to Lambda | Per-route `aws_lambda_permission` source ARN |
 | Prediction Lambda to DynamoDB | Dedicated role with `dynamodb:PutItem` on one table |
 | History Lambda to DynamoDB | Dedicated role with `dynamodb:Query` on one table; no `Scan` |
+| Chat Lambda to Bedrock | Cognito-protected route and dedicated role restricted to the selected Haiku inference profile and foundation model |
 | Analytics Lambda to Athena, Glue, and S3 | Dedicated role restricted to one workgroup, catalog objects, processed prefix, and result prefix |
 | Glue to S3 | Dedicated role restricted to the script, raw listing prefix, and processed listing prefix |
 | CloudWatch alarms to SNS | Named alarms publish through a customer-managed KMS key scoped by source account and alarm ARN |
@@ -43,7 +45,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 ## Zero Trust test results
 
 - Anonymous frontend and data-lake S3 object requests returned HTTP 403.
-- Unauthenticated `GET /history` and `POST /predictions` returned HTTP 401.
+- Unauthenticated `GET /history`, `POST /predictions`, and `POST /chat` returned HTTP 401.
 - Unit tests confirmed the history partition key comes from verified JWT claims.
 - Malformed prediction JSON returned HTTP 400 with a safe error.
 - CloudFront responses included CSP, HSTS, `X-Content-Type-Options`, and `X-Frame-Options`.

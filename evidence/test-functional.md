@@ -35,7 +35,7 @@
 - **Setup:** Cognito hosted UI, public application client, PKCE browser client, API Gateway JWT authorizer, and DynamoDB history table.
 - **Command / steps:** Request the Cognito `/oauth2/authorize` URL and run `tests/smoke_api.ps1` against the deployed frontend and API.
 - **Expected result:** Cognito redirects to its login page, all frontend authentication assets load with their correct content types, and unauthenticated protected calls return HTTP 401.
-- **Actual result:** Passed. Cognito returned HTTP 302 to `/login`; the six frontend assets returned HTTP 200 with correct content types; both protected routes returned HTTP 401 without a token.
+- **Actual result:** Passed. Cognito returned HTTP 302 to `/login`; frontend assets returned HTTP 200 with correct content types; history, saved prediction, and AI chat routes returned HTTP 401 without a token.
 - **Date:** 2026-09-23
 - **Limitation:** Creating and verifying a real user was not automated because it requires an external email account. The authenticated save-and-read path is covered by handler unit tests but still needs a recorded manual browser test.
 - **Artefact path:** `src/frontend/auth.js`, `src/frontend/app.js`, `src/infrastructure/auth.tf`, and `tests/smoke_api.ps1`

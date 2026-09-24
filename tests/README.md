@@ -29,3 +29,15 @@ python tests/load_health.py --url <health-url> --requests 20 --concurrency 2
 ```
 
 The command passes only when every response is HTTP 200 or an explicit HTTP 429 throttle response and at least one request succeeds.
+
+Run the CloudFront browser journey with Apache JMeter 5.6.3 or newer:
+
+```powershell
+./tests/run_jmeter.ps1 `
+  -FrontendUrl <frontend-url> `
+  -Threads 10 `
+  -RampSeconds 10 `
+  -DurationSeconds 30
+```
+
+The plan repeatedly loads the home page, shared assets, market guide, and project page. Start with the bounded defaults and increase concurrency only after reviewing account quotas and prior results. Generated JTL and HTML reports are stored under ignored `tmp/` paths.
