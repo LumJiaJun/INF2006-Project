@@ -117,6 +117,26 @@ resource "aws_cloudwatch_metric_alarm" "analytics_errors" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "chat_errors" {
+  alarm_name          = "${local.name_prefix}-chat-errors"
+  alarm_description   = "Chat Lambda returned one or more unhandled errors in five minutes"
+  namespace           = "AWS/Lambda"
+  metric_name         = "Errors"
+  statistic           = "Sum"
+  period              = 300
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.operational_alerts.arn]
+  ok_actions          = [aws_sns_topic.operational_alerts.arn]
+
+  dimensions = {
+    FunctionName = aws_lambda_function.chat.function_name
+  }
+}
+
 resource "aws_cloudwatch_metric_alarm" "health_throttles" {
   alarm_name          = "${local.name_prefix}-health-throttles"
   alarm_description   = "Health Lambda was throttled one or more times in five minutes"
@@ -172,6 +192,8 @@ resource "aws_cloudwatch_dashboard" "operations" {
             [".", "Errors", ".", ".", { stat = "Sum", yAxis = "right" }],
             [".", "Invocations", ".", ".", { stat = "Sum", yAxis = "right" }],
             ["AWS/Lambda", "Duration", "FunctionName", aws_lambda_function.analytics.function_name, { stat = "p95" }],
+            [".", "Errors", ".", ".", { stat = "Sum", yAxis = "right" }],
+            ["AWS/Lambda", "Duration", "FunctionName", aws_lambda_function.chat.function_name, { stat = "p95" }],
             [".", "Errors", ".", ".", { stat = "Sum", yAxis = "right" }],
             ["AWS/Lambda", "Throttles", "FunctionName", aws_lambda_function.health.function_name, { stat = "Sum", yAxis = "right" }],
           ]

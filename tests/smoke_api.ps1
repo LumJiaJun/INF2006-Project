@@ -12,6 +12,7 @@ $expectedAssets = @{
     'index.html' = 'text/html'
     'styles.css' = 'text/css'
     'app.js' = 'application/javascript'
+    'chat.js' = 'application/javascript'
     'auth.js' = 'application/javascript'
     'auth-config.js' = 'application/javascript'
     'model-options.json' = 'application/json'
@@ -92,7 +93,8 @@ if ($analyticsResponse.StatusCode -ne 200 -or $analyticsBody.count -ne 10) {
 
 foreach ($protectedRoute in @(
     @{ Method = 'GET'; Path = 'history'; Body = $null },
-    @{ Method = 'POST'; Path = 'predictions'; Body = $predictionPayload }
+    @{ Method = 'POST'; Path = 'predictions'; Body = $predictionPayload },
+    @{ Method = 'POST'; Path = 'chat'; Body = '{"message":"How does the estimator work?","page":"index.html"}' }
 )) {
     try {
         $parameters = @{

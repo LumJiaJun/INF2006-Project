@@ -106,6 +106,14 @@ resource "aws_apigatewayv2_stage" "default" {
     throttling_burst_limit   = 2
     throttling_rate_limit    = 2
   }
+
+  # AI requests have a tighter token bucket than the core application routes.
+  route_settings {
+    route_key                = "POST /chat"
+    detailed_metrics_enabled = true
+    throttling_burst_limit   = 1
+    throttling_rate_limit    = 1
+  }
 }
 
 resource "aws_lambda_permission" "api_gateway_health" {

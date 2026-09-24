@@ -74,6 +74,11 @@ output "analytics_url" {
   value       = "${aws_apigatewayv2_api.platform.api_endpoint}/analytics"
 }
 
+output "chat_url" {
+  description = "Cognito-protected AI assistant endpoint backed by Claude Haiku."
+  value       = "${aws_apigatewayv2_api.platform.api_endpoint}/chat"
+}
+
 output "operational_alerts_topic_arn" {
   description = "Encrypted SNS topic used by CloudWatch operational alarms."
   value       = aws_sns_topic.operational_alerts.arn

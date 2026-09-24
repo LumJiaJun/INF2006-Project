@@ -119,7 +119,12 @@ function buildGuide() {
   const sendButton = createElement("button", null, "Send");
   sendButton.type = "submit";
   form.append(input, sendButton);
-  chatView.append(messages, quickReplies, form);
+  const note = createElement(
+    "p",
+    "guide-note",
+    "Sign in for AI answers. Responses may be inaccurate, so verify important details.",
+  );
+  chatView.append(messages, quickReplies, form, note);
 
   const navigationView = createElement("nav", "guide-view guide-navigation-view");
   navigationView.hidden = true;
@@ -141,7 +146,20 @@ function buildGuide() {
 
   panel.append(header, tabs, chatView, navigationView);
   document.body.append(panel, launcher);
-  return { launcher, panel, closeButton, chatTab, navigateTab, chatView, navigationView, messages, quickReplies, form, input };
+  return {
+    launcher,
+    panel,
+    closeButton,
+    chatTab,
+    navigateTab,
+    chatView,
+    navigationView,
+    messages,
+    quickReplies,
+    form,
+    input,
+    sendButton,
+  };
 }
 
 const guide = buildGuide();
@@ -156,31 +174,74 @@ function addMessage(text, sender, action) {
   }
   guide.messages.append(wrapper);
   guide.messages.scrollTop = guide.messages.scrollHeight;
+  return wrapper;
 }
 
-function answerQuestion(question) {
+function localAnswer(question) {
   const normalized = question.toLowerCase();
-  const answer = guideAnswers.find((item) => item.patterns.some((pattern) => normalized.includes(pattern)));
-  window.setTimeout(() => {
-    if (answer) {
-      addMessage(answer.response, "guide", answer.action);
-    } else {
-      addMessage(
-        "I am a lightweight site guide for now. Try asking about estimates, city markets, sign-up, architecture, or security.",
-        "guide",
-      );
-    }
-  }, 280);
+  return guideAnswers.find((item) => item.patterns.some((pattern) => normalized.includes(pattern)));
 }
 
-function submitQuestion(question) {
+let sending = false;
+
+async function answerQuestion(question) {
+  const fallback = localAnswer(question);
+  await window.Auth?.ready;
+  const token = window.Auth?.getIdToken();
+  if (!token) {
+    window.setTimeout(() => {
+      addMessage(
+        fallback?.response || "Sign in to ask the AI guide a custom question about the platform.",
+        "guide",
+        fallback?.action || { label: "Sign in for AI answers", href: "index.html?signin=1" },
+      );
+    }, 220);
+    return;
+  }
+
+  const pending = addMessage("Thinking...", "guide");
+  pending.classList.add("guide-message-pending");
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 18_000);
+  try {
+    const response = await fetch(`${window.APP_CONFIG.apiBaseUrl}/chat`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ message: question, page: currentPage }),
+      signal: controller.signal,
+    });
+    const result = await response.json();
+    if (!response.ok || !result.reply) {
+      throw new Error(result.error?.message || "The AI guide is unavailable.");
+    }
+    pending.querySelector("p").textContent = result.reply;
+  } catch {
+    pending.querySelector("p").textContent =
+      fallback?.response || "The AI guide is temporarily unavailable. Please try again shortly.";
+  } finally {
+    window.clearTimeout(timeout);
+    pending.classList.remove("guide-message-pending");
+  }
+}
+
+async function submitQuestion(question) {
   const trimmed = question.trim();
-  if (!trimmed) {
+  if (!trimmed || sending) {
     return;
   }
   addMessage(trimmed, "user");
   guide.quickReplies.hidden = true;
-  answerQuestion(trimmed);
+  sending = true;
+  guide.input.disabled = true;
+  guide.sendButton.disabled = true;
+  await answerQuestion(trimmed);
+  sending = false;
+  guide.input.disabled = false;
+  guide.sendButton.disabled = false;
+  guide.input.focus();
 }
 
 function setGuideOpen(open) {
@@ -209,14 +270,15 @@ guide.launcher.addEventListener("click", () => setGuideOpen(guide.panel.hidden))
 guide.closeButton.addEventListener("click", () => setGuideOpen(false));
 guide.chatTab.addEventListener("click", () => switchView(true));
 guide.navigateTab.addEventListener("click", () => switchView(false));
-guide.form.addEventListener("submit", (event) => {
+guide.form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  submitQuestion(guide.input.value);
+  const question = guide.input.value;
   guide.input.value = "";
+  await submitQuestion(question);
 });
-guide.quickReplies.addEventListener("click", (event) => {
+guide.quickReplies.addEventListener("click", async (event) => {
   if (event.target.matches("button")) {
-    submitQuestion(event.target.textContent);
+    await submitQuestion(event.target.textContent);
   }
 });
 document.addEventListener("keydown", (event) => {

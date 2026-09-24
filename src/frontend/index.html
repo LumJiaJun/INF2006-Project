@@ -22,7 +22,7 @@
           <a href="#estimator">Estimator</a>
           <a href="markets.html">Markets</a>
           <a href="project.html">Project</a>
-          <a href="#history-section">History</a>
+          <a href="#history-section">Private workspace</a>
         </div>
         <div class="account-bar">
           <span id="account-label">Not signed in</span>
@@ -253,8 +253,18 @@
           </div>
           <button id="refresh-history" class="secondary-button" type="button">Refresh history</button>
         </div>
-        <p id="history-message" class="status-message">Sign in to save and review predictions.</p>
-        <div id="history-list" class="history-list"></div>
+        <div class="private-workspace-grid">
+          <div>
+            <p id="history-message" class="status-message">Sign in to save and review predictions.</p>
+            <div id="history-list" class="history-list"></div>
+          </div>
+          <aside class="private-ai-card">
+            <span>Protected AI access</span>
+            <h3>Ask beyond the presets.</h3>
+            <p>Your Cognito session unlocks the separate Claude Haiku assistant route. Prompts are bounded and are not written to application logs.</p>
+            <a class="secondary-button" href="?guide=open#history-section">Open private AI guide</a>
+          </aside>
+        </div>
       </section>
 
       <section class="feature-grid" aria-label="Platform architecture highlights">
