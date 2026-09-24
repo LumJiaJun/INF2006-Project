@@ -42,6 +42,7 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(body["reply"], "Use the estimator form.")
         self.assertEqual(fake.request["modelId"], chat_handler.MODEL_ID)
         self.assertEqual(fake.request["inferenceConfig"]["maxTokens"], 220)
+        self.assertIn("does not contain profile", fake.request["system"][0]["text"])
 
     def test_rejects_empty_message(self):
         result = chat_handler.lambda_handler({"body": '{"message":"  "}'}, None)
