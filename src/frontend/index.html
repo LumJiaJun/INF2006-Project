@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StaySphere</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .toast { animation: fadein 0.2s ease-in; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(-8px);} to { opacity: 1; transform: translateY(0);} }
+  .pill-search { border-radius: 999px; }
+  .heart-btn:hover { transform: scale(1.15); }
+  .card-img { background: linear-gradient(135deg,#fecdd3,#e0e7ff); }
+</style>
+</head>
+<body class="bg-white text-slate-800 min-h-screen">
+
+<nav class="bg-white border-b border-slate-200 sticky top-0 z-20">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <button onclick="showView('home')" class="text-xl font-extrabold text-rose-600 shrink-0 flex items-center gap-1">
+      <span>🏠</span> StaySphere
+    </button>
+
+    <!-- Airbnb-style pill search bar (own branding/colours, no proprietary assets) -->
+    <div class="hidden md:flex items-center pill-search border border-slate-300 shadow-sm hover:shadow-md transition divide-x divide-slate-200 flex-1 max-w-xl">
+      <input id="f-city" placeholder="Where to?" class="px-4 py-2 text-sm rounded-l-full outline-none w-full" />
+      <input id="f-checkin" type="date" class="px-3 py-2 text-xs outline-none text-slate-500 w-32" />
+      <input id="f-checkout" type="date" class="px-3 py-2 text-xs outline-none text-slate-500 w-32" />
+      <button onclick="searchListings(1)" class="bg-rose-600 hover:bg-rose-700 text-white rounded-full m-1 px-4 py-1.5 text-sm font-medium">Search</button>
+    </div>
+
+    <div class="flex items-center gap-2 text-sm shrink-0">
+      <button onclick="showView('recommend')" class="hidden lg:inline px-3 py-1.5 rounded-full hover:bg-slate-100">Find your match</button>
+      <button onclick="showView('chatbot')" class="hidden lg:inline px-3 py-1.5 rounded-full hover:bg-slate-100">🤖 Ask StaySphere</button>
+      <button onclick="showView('trips')" class="px-3 py-1.5 rounded-full hover:bg-slate-100" id="nav-trips" style="display:none">My Trips</button>
+      <button onclick="showView('admin')" class="px-3 py-1.5 rounded-full hover:bg-slate-100" id="nav-admin" style="display:none">Admin Dashboard</button>
+      <span id="nav-guest">
+        <button onclick="showView('login')" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Log in</button>
+        <button onclick="showView('register')" class="px-3 py-1.5 rounded-full bg-rose-600 text-white hover:bg-rose-700">Sign up</button>
+      </span>
+      <span id="nav-user" style="display:none" class="flex items-center gap-2">
+        <span id="nav-user-name" class="text-slate-600 hidden sm:inline"></span>
+        <button onclick="logout()" class="px-3 py-1.5 rounded-full hover:bg-slate-100">Log out</button>
+      </span>
+    </div>
+  </div>
+  <!-- Mobile search row -->
+  <div class="md:hidden px-4 pb-3 flex gap-2">
+    <input id="f-city-mobile" placeholder="Where to?" class="flex-1 border border-slate-300 rounded-full px-4 py-2 text-sm" />
+    <button onclick="document.getElementById('f-city').value=document.getElementById('f-city-mobile').value; searchListings(1)" class="bg-rose-600 text-white rounded-full px-4 py-2 text-sm">Search</button>
+  </div>
+</nav>
+
+<div id="toast-container" class="fixed top-16 right-4 z-50 flex flex-col gap-2"></div>
+
+<div id="modal-overlay" class="fixed inset-0 bg-black/50 z-40" style="display:none" onclick="if(event.target===this) closeModal()">
+  <div class="min-h-full flex items-start justify-center p-4 py-10">
+    <div id="modal-content" class="bg-white rounded-2xl shadow-xl max-w-3xl w-full p-6 relative max-h-[85vh] overflow-y-auto">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl leading-none">&times;</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+  <!-- HOME / SEARCH -->
+  <section id="view-home">
+    <div class="flex flex-wrap items-center gap-3 mb-3 text-sm">
+      <select id="f-room-type" class="border border-slate-300 rounded-full px-4 py-2">
+        <option value="">Any room type</option>
+        <option>Entire home/apt</option>
+        <option>Private room</option>
+        <option>Shared room</option>
+      </select>
+      <input id="f-guests" type="number" min="1" placeholder="Guests" class="border border-slate-300 rounded-full px-4 py-2 w-24" />
+      <input id="f-min-price" type="number" placeholder="Min price" class="border border-slate-300 rounded-full px-4 py-2 w-28" />
+      <input id="f-max-price" type="number" placeholder="Max price" class="border border-slate-300 rounded-full px-4 py-2 w-28" />
+      <select id="f-sort" class="border border-slate-300 rounded-full px-4 py-2">
+        <option value="recommended">Recommended</option>
+        <option value="price_asc">Price: low to high</option>
+        <option value="price_desc">Price: high to low</option>
+        <option value="rating">Top rated</option>
+      </select>
+      <button onclick="searchListings(1)" class="text-rose-600 underline">Search now</button>
+    </div>
+
+    <div id="ai-price-banner" class="mb-4"></div>
+
+    <div id="city-chips" class="flex flex-wrap gap-2 mb-4"></div>
+
+    <div id="stats-bar" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-sm"></div>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+      <div class="flex-1 min-w-0">
+        <div id="listings-loading" class="text-slate-400 text-sm" style="display:none">Loading listings...</div>
+        <div id="listings-empty" class="text-slate-400 text-sm" style="display:none">No listings match your filters.</div>
+        <div id="listings-grid" class="grid grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6"></div>
+        <div id="pagination" class="flex justify-center gap-2 mt-8 text-sm"></div>
+      </div>
+      <div class="hidden lg:block w-[380px] shrink-0 sticky top-20 self-start">
+        <div id="listings-map" class="w-full h-[560px] rounded-2xl border border-slate-200 overflow-hidden"></div>
+        <p class="text-xs text-slate-400 mt-2">Map shows listings on the current results page.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LISTING DETAIL -->
+  <section id="view-listing" style="display:none"></section>
+
+  <!-- LOGIN -->
+  <section id="view-login" style="display:none" class="max-w-sm mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mt-8">
+    <h2 class="text-xl font-bold mb-4">Log in</h2>
+    <input id="login-email" type="email" placeholder="Email" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" />
+    <input id="login-password" type="password" placeholder="Password" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+    <button onclick="login()" class="w-full bg-rose-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-rose-700">Log in</button>
+    <p class="text-xs text-slate-500 mt-3">No account? <button class="text-rose-600 underline" onclick="showView('register')">Sign up</button></p>
+
+    <div class="mt-5 pt-4 border-t border-slate-200">
+      <p class="text-xs text-slate-400 mb-2">Demo accounts (for grading/testing)</p>
+      <div class="flex gap-2">
+        <button onclick="demoLogin('guest')" class="flex-1 border border-slate-300 rounded-lg py-1.5 text-xs hover:bg-slate-50">Guest demo</button>
+        <button onclick="demoLogin('admin')" class="flex-1 border border-slate-300 rounded-lg py-1.5 text-xs hover:bg-slate-50">Admin demo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTER -->
+  <section id="view-register" style="display:none" class="max-w-sm mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mt-8">
+    <h2 class="text-xl font-bold mb-4">Create your account</h2>
+    <input id="reg-name" placeholder="Full name" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" />
+    <input id="reg-email" type="email" placeholder="Email" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" />
+    <input id="reg-password" type="password" placeholder="Password (min 8 characters)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+    <button onclick="register()" class="w-full bg-rose-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-rose-700">Sign up</button>
+    <p class="text-xs text-slate-500 mt-3">Already have an account? <button class="text-rose-600 underline" onclick="showView('login')">Log in</button></p>
+  </section>
+
+  <!-- MY TRIPS -->
+  <section id="view-trips" style="display:none">
+    <h2 class="text-xl font-bold mb-4">My Trips</h2>
+    <div id="trips-empty" class="text-slate-400 text-sm" style="display:none">No bookings yet. Go search for a place to stay.</div>
+    <div id="trips-list" class="flex flex-col gap-3"></div>
+  </section>
+
+  <!-- FIND YOUR MATCH (recommendations) -->
+  <section id="view-recommend" style="display:none">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mt-4">
+      <h2 class="text-xl font-bold mb-1">Find your match</h2>
+      <p class="text-xs text-slate-500 mb-4">Tell us your budget and needs — we'll rank the listings that fit best, using a trained pricing model to flag good deals. Not a guarantee, just a helpful ranking.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <input id="rec-budget-min" type="number" placeholder="Min budget/night" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <input id="rec-budget-max" type="number" placeholder="Max budget/night" value="200" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <input id="rec-guests" type="number" value="2" placeholder="Guests" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <input id="rec-city" placeholder="City (optional)" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+      <button onclick="getRecommendations()" class="w-full bg-rose-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-rose-700">Show me matches</button>
+    </div>
+    <div id="recommend-results" class="grid grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6 mt-6"></div>
+  </section>
+
+  <!-- CHATBOT -->
+  <section id="view-chatbot" style="display:none">
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col h-[70vh]">
+        <div class="px-4 py-3 border-b border-slate-100">
+          <div class="font-semibold text-sm">🤖 Ask StaySphere</div>
+          <p class="text-xs text-slate-400">Tell me your budget, city, guests or room type — I'll find matching rooms and re-rank as you change your mind. Uses simple keyword understanding + the same trained pricing model as the rest of the site, not a general AI chatbot.</p>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3"></div>
+        <div class="border-t border-slate-100 p-3 flex gap-2">
+          <input id="chat-input" placeholder="e.g. Singapore, 2 guests, under $150" class="flex-1 border border-slate-300 rounded-full px-4 py-2 text-sm" onkeydown="if(event.key==='Enter') sendChatMessage()" />
+          <button onclick="sendChatMessage()" class="bg-rose-600 text-white px-4 py-2 rounded-full text-sm hover:bg-rose-700">Send</button>
+        </div>
+      </div>
+      <button onclick="resetChat()" class="text-xs text-slate-400 underline mt-2">Start over</button>
+    </div>
+  </section>
+
+  <!-- PRICE ESTIMATOR (secondary — for hosts sanity-checking a price) -->
+  <section id="view-estimator" style="display:none" class="max-w-lg mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mt-8">
+    <h2 class="text-xl font-bold mb-1">Host Price Estimator</h2>
+    <p class="text-xs text-slate-500 mb-4">For hosts sanity-checking a nightly price. Academic estimate from a machine learning model trained on the project dataset — not a real pricing tool.</p>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <input id="est-city" placeholder="City" value="Singapore" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+      <select id="est-property-type" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+        <option>Apartment</option><option>Condominium</option><option>House</option><option>Loft</option><option>Serviced apartment</option>
+      </select>
+      <select id="est-room-type" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+        <option>Entire home/apt</option><option>Private room</option><option>Shared room</option>
+      </select>
+      <input id="est-accommodates" type="number" value="2" placeholder="Guests" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+      <input id="est-bedrooms" type="number" value="1" placeholder="Bedrooms" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+      <input id="est-min-nights" type="number" value="2" placeholder="Minimum nights" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+    </div>
+    <button onclick="estimatePrice()" class="w-full bg-rose-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-rose-700">Estimate price</button>
+    <div id="estimate-result" class="mt-4"></div>
+  </section>
+
+  <!-- ADMIN DASHBOARD -->
+  <section id="view-admin" style="display:none">
+    <h2 class="text-xl font-bold mb-4">Admin Dashboard</h2>
+    <div id="admin-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-sm"></div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 mb-6">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="font-semibold">Demand &amp; pricing by location</h3>
+        <div class="flex gap-1 text-xs">
+          <button id="heatmap-layer-city" onclick="setHeatmapLayer('city')" class="px-3 py-1 rounded-full bg-rose-600 text-white">By city</button>
+          <button id="heatmap-layer-neighbourhood" onclick="setHeatmapLayer('neighbourhood')" class="px-3 py-1 rounded-full border border-slate-300">By neighbourhood</button>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">Circle size = number of listings, colour = relative average price (deeper = pricier). Click a circle to see and edit every room there. "Demand" = bookings made in this dataset relative to the busiest location — an illustrative signal, not real market data.</p>
+      <div class="flex flex-col lg:flex-row gap-4">
+        <div id="pricing-heatmap-map" class="w-full lg:w-1/2 h-72 rounded-xl border border-slate-200 overflow-hidden"></div>
+        <div id="pricing-heatmap" class="flex-1 flex flex-col justify-center gap-2"></div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 mb-6">
+      <h3 class="font-semibold mb-3">Add a listing</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mb-3">
+        <input id="al-name" placeholder="Name" class="border border-slate-300 rounded-lg px-3 py-2" />
+        <input id="al-city" placeholder="City" class="border border-slate-300 rounded-lg px-3 py-2" />
+        <input id="al-neighbourhood" placeholder="Neighbourhood" class="border border-slate-300 rounded-lg px-3 py-2" />
+        <select id="al-property-type" class="border border-slate-300 rounded-lg px-3 py-2">
+          <option>Apartment</option><option>Condominium</option><option>House</option><option>Loft</option>
+        </select>
+        <select id="al-room-type" class="border border-slate-300 rounded-lg px-3 py-2">
+          <option>Entire home/apt</option><option>Private room</option><option>Shared room</option>
+        </select>
+        <input id="al-accommodates" type="number" value="2" placeholder="Accommodates" class="border border-slate-300 rounded-lg px-3 py-2" />
+        <input id="al-bedrooms" type="number" value="1" placeholder="Bedrooms" class="border border-slate-300 rounded-lg px-3 py-2" />
+        <div class="col-span-2 md:col-span-1 flex gap-2">
+          <input id="al-price" type="number" placeholder="Price/night" class="border border-slate-300 rounded-lg px-3 py-2 flex-1" />
+          <button type="button" onclick="suggestAdminPrice()" class="text-xs border border-slate-300 rounded-lg px-2 whitespace-nowrap hover:bg-slate-50">Suggest price</button>
+        </div>
+      </div>
+      <div id="al-suggested-price" class="text-xs text-slate-500 mb-3"></div>
+      <button onclick="adminCreateListing()" class="bg-rose-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-rose-700">Add listing</button>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-6">
+      <div class="px-4 py-3 border-b border-slate-100 font-semibold text-sm">Listings &amp; suggested pricing</div>
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+          <tr><th class="px-4 py-2">ID</th><th class="px-4 py-2">Name</th><th class="px-4 py-2">City</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Suggested</th><th class="px-4 py-2">Rating</th><th class="px-4 py-2"></th></tr>
+        </thead>
+        <tbody id="admin-listings-table"></tbody>
+      </table>
+    </div>
+    <div id="admin-pagination" class="flex justify-center gap-2 mt-4 text-sm mb-8"></div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-100 font-semibold text-sm">Recent bookings (all guests)</div>
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+          <tr><th class="px-4 py-2">Booking</th><th class="px-4 py-2">Guest</th><th class="px-4 py-2">Listing</th><th class="px-4 py-2">Dates</th><th class="px-4 py-2">Total</th><th class="px-4 py-2">Status</th></tr>
+        </thead>
+        <tbody id="admin-bookings-table"></tbody>
+      </table>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden mt-6">
+      <div class="px-4 py-3 border-b border-slate-100 font-semibold text-sm">Guest reviews</div>
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+          <tr><th class="px-4 py-2">Guest</th><th class="px-4 py-2">Listing</th><th class="px-4 py-2">Rating</th><th class="px-4 py-2">Comment</th><th class="px-4 py-2">Date</th><th class="px-4 py-2"></th></tr>
+        </thead>
+        <tbody id="admin-reviews-table"></tbody>
+      </table>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden mt-6">
+      <div class="px-4 py-3 border-b border-slate-100 font-semibold text-sm">Users</div>
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+          <tr><th class="px-4 py-2">Name</th><th class="px-4 py-2">Email</th><th class="px-4 py-2">Role</th><th class="px-4 py-2">Bookings</th><th class="px-4 py-2"></th></tr>
+        </thead>
+        <tbody id="admin-users-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

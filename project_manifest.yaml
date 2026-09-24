@@ -1,25 +1,28 @@
-# INF2006 Team Project - machine-readable manifest (Appendix A schema).
-# Teams may add fields but must NOT rename or remove the fields below.
-# All paths are relative to the ZIP root and must point to real artefacts.
-
 project:
   group_id: "Gxxx"
-  title: ""
-  problem_statement: ""
-  cloud_provider: "AWS | Azure | GCP | other"
-  repository_commit: "optional commit hash"
+  title: "StaySphere — A Secure, Scalable and Data-Driven Cloud Accommodation Platform"
+  problem_statement: "Guests need a way to search, evaluate and simulate booking short-term accommodation, and hosts/analysts need data-driven pricing guidance, without relying on a real commercial booking platform. StaySphere provides a working guest booking workflow backed by a persistent cloud database and an ML-based nightly price estimator, built and evaluated as an academic simulation."
+  cloud_provider: "AWS"
+  repository_commit: "TBD — fill in after first commit to your team repository"
 
 team:
   members:
-    - name: ""
-      student_id: ""
-      role: ""
+    - name: "TBD"
+      student_id: "TBD"
+      role: "TBD"
 
 architecture:
   diagram: "evidence/architecture.png"
-  service_model: ""
-  deployment_model: ""
-  components: []
+  service_model: "PaaS-leaning (ECS Fargate for compute, RDS for managed database); see docs/ARCHITECTURE.md"
+  deployment_model: "Container service (AWS ECS Fargate) behind an Application Load Balancer, static frontend on S3"
+  components:
+    - "Frontend: static HTML/JS (src/frontend/), guest search/booking UI with Leaflet map + role-gated Admin Dashboard"
+    - "Recommendation engine: budget/requirement-based listing ranking (/api/recommendations), reuses the trained price model to flag good-value listings"
+    - "Backend API: FastAPI on ECS Fargate (src/backend/), including role-based /api/admin/* routes"
+    - "Database: Amazon RDS PostgreSQL (SQLite for local dev)"
+    - "ML model: scikit-learn price estimator, trained offline (analytics/), served via /api/ml/price-estimate"
+    - "Load balancing: AWS Application Load Balancer with health check on /api/health"
+    - "Monitoring: CloudWatch Logs via ECS awslogs driver"
 
 evidence:
   functional_test: "evidence/test-functional.md"
@@ -30,17 +33,25 @@ evidence:
 
 data_ai:
   dataset: "data/README.md"
-  method: ""
-  evaluation: ""
-  reproducible_command: ""
+  method: "Random Forest Regressor (vs Linear Regression baseline) predicting nightly price from city, property_type, room_type, accommodates, bedrooms, minimum_nights and review_scores_rating. Exposed both as a direct estimator (/api/ml/price-estimate) and inside a budget-based recommendation ranking (/api/recommendations) that flags below-model-estimate listings as good value. See analytics/README.md."
+  evaluation: "80/20 train/test split; Linear Regression selected this run: MAE=18.07, RMSE=21.67, R2=0.868 (Random Forest close behind: MAE=18.17, RMSE=21.90, R2=0.865) on synthetic sample data (n_test=120) — see evidence/test-data-ai.md and analytics/figures/metrics.json. NOTE: real Kaggle dataset not yet downloaded; these metrics are on synthetic sample data matching the documented schema, and will shift once retrained on real data."
+  reproducible_command: "cd analytics && pip install -r requirements.txt && python3 train_price_model.py"
 
 security:
   threat_control_map: "evidence/threat-control-map.md"
-  secrets_handling: ""
+  secrets_handling: "JWT_SECRET and DATABASE_URL read from environment variables only, never hardcoded; .env is git-ignored, .env.example has placeholders only. AWS deployment stores real values in AWS Secrets Manager, injected into the ECS task at runtime (MANUAL USER ACTION REQUIRED — see docs/DEPLOYMENT.md Step 4)."
 
 run:
-  prerequisites: []
-  commands: []
+  prerequisites:
+    - "Docker and Docker Compose"
+    - "Python 3.12+ (only if running the backend without Docker)"
+  commands:
+    - "cp .env.example .env"
+    - "docker compose up -d"
+    - "docker compose exec backend python -m app.seed"
+    - "log in with demo accounts: guest@staysphere.demo / admin@staysphere.demo (password: Demo1234!)"
+    - "open http://localhost:8080 (frontend) and http://localhost:8000/docs (API docs)"
+    - "cd tests && pytest -v"
 
 declarations:
   ai_use: "AI_USE_DECLARATION.md"
