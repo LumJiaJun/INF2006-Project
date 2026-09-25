@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: staysphere
+      POSTGRES_PASSWORD: staysphere_dev_only
+      POSTGRES_DB: staysphere
+    volumes:
+      - staysphere_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U staysphere"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build: ./src/backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://staysphere:staysphere_dev_only@db:5432/staysphere
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-before-deploying}
+      ALLOWED_ORIGINS: http://localhost:8080
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data:ro
+
+  frontend:
+    image: python:3.12-slim
+    working_dir: /site
+    volumes:
+      - ./src/frontend:/site:ro
+    command: ["python3", "-m", "http.server", "8080"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+volumes:
+  staysphere_db_data:

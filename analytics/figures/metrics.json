@@ -1,0 +1,25 @@
+{
+  "selected_model": "LinearRegression",
+  "baseline_linear_regression": {
+    "mae": 18.072262552061034,
+    "rmse": 21.671996220237425,
+    "r2": 0.8680373218854256
+  },
+  "random_forest": {
+    "mae": 18.17444146748697,
+    "rmse": 21.895102292077638,
+    "r2": 0.8653063117264093
+  },
+  "n_train": 480,
+  "n_test": 120,
+  "features": [
+    "city",
+    "property_type",
+    "room_type",
+    "accommodates",
+    "bedrooms",
+    "minimum_nights",
+    "review_scores_rating"
+  ],
+  "target": "price"
+}
