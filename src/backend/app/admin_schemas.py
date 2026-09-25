@@ -35,6 +35,7 @@ class ListingCreate(BaseModel):
     review_scores_location: float = 4.5
     review_scores_value: float = 4.5
     instant_bookable: bool = True
+    photo_url: Optional[str] = None
 
 
 class ListingUpdate(BaseModel):
@@ -52,6 +53,7 @@ class ListingUpdate(BaseModel):
     minimum_nights: Optional[int] = None
     maximum_nights: Optional[int] = None
     instant_bookable: Optional[bool] = None
+    photo_url: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     host_is_superhost: Optional[bool] = None
@@ -137,6 +139,7 @@ class AdminListingOut(BaseModel):
     review_scores_rating: Optional[float]
     suggested_price: Optional[float] = None
     price_gap_pct: Optional[float] = None  # (price - suggested_price) / suggested_price * 100
+    photo_url: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

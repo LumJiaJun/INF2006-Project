@@ -23,10 +23,137 @@ function ensureMap() {
 }
 
 function placeholderImage(listingId, w = 400, h = 300) {
-  // Generic royalty-free placeholder photo, deterministic per listing
-  // (same listing always shows the same image). NOT a real property
-  // photo — see docs/RESPONSIBLE_AI.md "Images" note.
-  return `https://picsum.photos/seed/staysphere${listingId}/${w}/${h}`;
+  const accommodationPhotos = [
+    "https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg",
+    "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg",
+    "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg",
+    "https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg",
+    "https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg",
+    "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg",
+    "https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg",
+    "https://images.pexels.com/photos/261388/pexels-photo-261388.jpeg",
+  ];
+  const photo = accommodationPhotos[Math.abs(Number(listingId)) % accommodationPhotos.length];
+  return `${photo}?auto=compress&cs=tinysrgb&w=${w}&h=${h}&fit=crop`;
+}
+
+function listingImageUrl(l, w = 400, h = 300) {
+  // Prefer an admin-supplied photo_url if one has been set on the
+  // listing; otherwise fall back to the deterministic placeholder.
+  return (l.photo_url && l.photo_url.trim()) ? l.photo_url : placeholderImage(l.listing_id, w, h);
+}
+
+// ---- Interactive booking calendar (guest listing detail) ----
+// Click a day to set check-in, click a later day to set check-out.
+// The price total updates instantly — no separate "apply" step.
+
+let calState = { checkin: null, checkout: null, booked: new Set(), pricePerNight: 0 };
+
+function dateKey(d) { return d.toISOString().split("T")[0]; }
+
+function renderBookingCalendar(bookedRanges, pricePerNight, monthsToShow = 2) {
+  const bookedSet = new Set();
+  bookedRanges.forEach(r => {
+    let d = new Date(r.check_in.split("T")[0] + "T00:00:00");
+    const end = new Date(r.check_out.split("T")[0] + "T00:00:00");
+    while (d < end) {
+      bookedSet.add(dateKey(d));
+      d.setDate(d.getDate() + 1);
+    }
+  });
+  calState = { checkin: null, checkout: null, booked: bookedSet, pricePerNight };
+  return buildCalendarHTML(monthsToShow);
+}
+
+function buildCalendarHTML(monthsToShow) {
+  const today = new Date();
+  let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">';
+  for (let m = 0; m < monthsToShow; m++) {
+    const monthDate = new Date(today.getFullYear(), today.getMonth() + m, 1);
+    const monthLabel = monthDate.toLocaleString("default", { month: "long", year: "numeric" });
+    const daysInMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate();
+    const startOffset = monthDate.getDay();
+
+    html += `<div><div class="text-sm font-semibold mb-2 text-center">${monthLabel}</div>`;
+    html += `<div class="grid grid-cols-7 gap-1 text-[10px] text-center text-slate-400 mb-1">${["S","M","T","W","T","F","S"].map(d => `<div>${d}</div>`).join("")}</div>`;
+    html += `<div class="grid grid-cols-7 gap-1">`;
+    for (let i = 0; i < startOffset; i++) html += `<div></div>`;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
+      const key = dateKey(d);
+      const isBooked = calState.booked.has(key);
+      const isPast = d < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const isCheckin = key === calState.checkin;
+      const isCheckout = key === calState.checkout;
+      const inRange = calState.checkin && calState.checkout && key > calState.checkin && key < calState.checkout;
+      let cls, clickable = !isBooked && !isPast;
+      if (isBooked) cls = "bg-red-100 text-red-500 cursor-not-allowed";
+      else if (isPast) cls = "bg-slate-50 text-slate-300 cursor-not-allowed";
+      else if (isCheckin || isCheckout) cls = "bg-rose-600 text-white cursor-pointer font-semibold";
+      else if (inRange) cls = "bg-rose-100 text-rose-700 cursor-pointer";
+      else cls = "bg-white text-slate-700 border border-slate-200 cursor-pointer hover:border-rose-400";
+      html += `<div ${clickable ? `onclick="onCalendarDayClick('${key}')"` : ""} class="aspect-square flex items-center justify-center rounded text-[11px] ${cls}" title="${isBooked ? "Booked" : ""}">${day}</div>`;
+    }
+    html += `</div></div>`;
+  }
+  html += "</div>";
+  html += `<div class="flex gap-4 text-[11px] text-slate-500 mt-3"><span><span class="inline-block w-3 h-3 bg-red-100 rounded mr-1 align-middle"></span>Booked</span><span><span class="inline-block w-3 h-3 bg-rose-600 rounded mr-1 align-middle"></span>Selected</span><span><span class="inline-block w-3 h-3 border border-slate-200 rounded mr-1 align-middle"></span>Available</span></div>`;
+  return html;
+}
+
+function onCalendarDayClick(key) {
+  if (!calState.checkin || calState.checkout) {
+    calState.checkin = key;
+    calState.checkout = null;
+  } else if (key <= calState.checkin) {
+    calState.checkin = key;
+    calState.checkout = null;
+  } else {
+    let d = new Date(calState.checkin + "T00:00:00");
+    const end = new Date(key + "T00:00:00");
+    d.setDate(d.getDate() + 1);
+    let blocked = false;
+    while (d < end) {
+      if (calState.booked.has(dateKey(d))) { blocked = true; break; }
+      d.setDate(d.getDate() + 1);
+    }
+    if (blocked) {
+      toast("That range includes an already-booked date — pick a different check-out", true);
+      calState.checkin = key;
+      calState.checkout = null;
+    } else {
+      calState.checkout = key;
+    }
+  }
+  const calEl = document.getElementById("booking-calendar");
+  if (calEl) calEl.innerHTML = buildCalendarHTML(2);
+  updateLiveTotal();
+}
+
+function updateLiveTotal() {
+  const checkinEl = document.getElementById("bk-checkin");
+  const checkoutEl = document.getElementById("bk-checkout");
+  const totalEl = document.getElementById("bk-live-total");
+  const btn = document.getElementById("bk-continue-btn");
+  if (!checkinEl || !totalEl || !btn) return;
+  checkinEl.value = calState.checkin || "";
+  checkoutEl.value = calState.checkout || "";
+
+  if (calState.checkin && calState.checkout) {
+    const nights = Math.round((new Date(calState.checkout) - new Date(calState.checkin)) / 86400000);
+    const total = nights * calState.pricePerNight;
+    totalEl.innerHTML = `<span class="text-rose-600 font-semibold">${nights} night${nights > 1 ? "s" : ""}</span> · $${calState.pricePerNight} &times; ${nights} = <span class="font-bold">$${total.toFixed(2)}</span>`;
+    btn.disabled = false;
+    btn.className = "bg-rose-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-rose-700";
+  } else if (calState.checkin) {
+    totalEl.textContent = "Now click a check-out date.";
+    btn.disabled = true;
+    btn.className = "bg-slate-200 text-slate-400 px-5 py-2 rounded-lg text-sm font-medium cursor-not-allowed";
+  } else {
+    totalEl.textContent = "Select a check-in and check-out date on the calendar above.";
+    btn.disabled = true;
+    btn.className = "bg-slate-200 text-slate-400 px-5 py-2 rounded-lg text-sm font-medium cursor-not-allowed";
+  }
 }
 
 function renderCalendarGrid(ranges, monthsToShow = 2) {
@@ -216,13 +343,6 @@ async function login() {
   }
 }
 
-async function demoLogin(role) {
-  const email = role === "admin" ? "admin@staysphere.demo" : "guest@staysphere.demo";
-  document.getElementById("login-email").value = email;
-  document.getElementById("login-password").value = "Demo1234!";
-  await login();
-}
-
 function logout() {
   token = null;
   currentUser = null;
@@ -313,7 +433,7 @@ function listingCard(l) {
   return `
     <div class="cursor-pointer group" onclick="viewListing(${l.listing_id})">
       <div class="relative aspect-square rounded-2xl overflow-hidden mb-2">
-        <img src="${placeholderImage(l.listing_id)}" loading="lazy" class="w-full h-full object-cover" alt="${l.property_type}" />
+        <img src="${listingImageUrl(l)}" loading="lazy" class="w-full h-full object-cover" alt="${l.property_type}" />
         <button onclick="event.stopPropagation(); toggleWishlist(${l.listing_id}, this)" class="heart-btn absolute top-2 right-2 text-lg transition">🤍</button>
         ${l.host_is_superhost ? '<span class="absolute top-2 left-2 bg-white/90 text-[10px] font-semibold px-2 py-0.5 rounded-full">Superhost</span>' : ""}
       </div>
@@ -372,7 +492,7 @@ async function viewListing(id) {
     section.innerHTML = `
       <button onclick="showView('home')" class="text-sm text-slate-500 mb-4">&larr; Back to search</button>
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <img src="${placeholderImage(l.listing_id, 800, 400)}" class="w-full h-64 object-cover" alt="Placeholder photo — not a real listing photo" />
+        <img src="${listingImageUrl(l, 800, 400)}" class="w-full h-64 object-cover" alt="Listing photo" />
         <div class="p-6">
         <h2 class="text-2xl font-bold">${l.name}</h2>
         <p class="text-slate-500 text-sm mb-4">${l.neighbourhood}, ${l.district}, ${l.city}</p>
@@ -398,19 +518,20 @@ async function viewListing(id) {
         </div>
         <div class="mb-4"><span class="text-slate-500 text-sm">Amenities:</span> <span class="text-sm">${l.amenities.split("|").join(", ")}</span></div>
 
-        <div class="border-t border-slate-200 pt-4">
-          <div class="font-semibold text-sm mb-2">Availability</div>
-          ${renderCalendarGrid(availability.booked_ranges.map(r => ({ check_in: r.check_in, check_out: r.check_out, label: "Booked" })), 2)}
-        </div>
-
         <div class="border-t border-slate-200 pt-4 mt-4">
           <div class="text-xl font-bold mb-3">$${l.price}<span class="text-sm font-normal text-slate-500">/night</span></div>
-          <div class="grid grid-cols-3 gap-3 mb-3">
-            <input type="date" id="bk-checkin" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-            <input type="date" id="bk-checkout" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-            <input type="number" id="bk-guests" value="1" min="1" max="${l.accommodates}" class="border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+          <div class="font-semibold text-sm mb-2">Select your dates</div>
+          <div id="booking-calendar">
+            ${renderBookingCalendar(availability.booked_ranges, l.price)}
           </div>
-          <button id="bk-continue-btn" onclick="showPaymentStep(${l.listing_id}, ${l.price})" class="bg-rose-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-rose-700">Continue to payment</button>
+          <input type="hidden" id="bk-checkin" />
+          <input type="hidden" id="bk-checkout" />
+          <div class="flex items-center gap-3 mt-3 mb-3">
+            <label class="text-sm text-slate-500">Guests</label>
+            <input type="number" id="bk-guests" value="1" min="1" max="${l.accommodates}" class="border border-slate-300 rounded-lg px-3 py-2 text-sm w-20" />
+          </div>
+          <div id="bk-live-total" class="text-sm font-medium mb-3">Select a check-in and check-out date on the calendar above.</div>
+          <button id="bk-continue-btn" onclick="showPaymentStep(${l.listing_id}, ${l.price})" disabled class="bg-slate-200 text-slate-400 px-5 py-2 rounded-lg text-sm font-medium cursor-not-allowed">Continue to payment</button>
 
           <div id="bk-payment-step" style="display:none" class="mt-4 border border-slate-200 rounded-xl p-4 bg-slate-50">
             <div class="text-sm font-semibold mb-1">Simulated payment</div>
@@ -570,41 +691,13 @@ async function cancelBooking(id) {
   }
 }
 
-// ---- Find your match (recommendations) ----
-
-async function getRecommendations() {
-  const budgetMin = parseFloat(document.getElementById("rec-budget-min").value) || 0;
-  const budgetMax = parseFloat(document.getElementById("rec-budget-max").value);
-  const guests = parseInt(document.getElementById("rec-guests").value, 10) || 1;
-  const city = document.getElementById("rec-city").value.trim();
-
-  if (!budgetMax || budgetMax <= 0) {
-    toast("Please enter a max budget", true);
-    return;
-  }
-
-  const resultsEl = document.getElementById("recommend-results");
-  resultsEl.innerHTML = `<div class="text-slate-400 text-sm col-span-full">Finding your best matches...</div>`;
-
-  try {
-    const payload = { budget_min: budgetMin, budget_max: budgetMax, guests };
-    if (city) payload.city = city;
-    const data = await api("/api/recommendations", { method: "POST", body: JSON.stringify(payload) });
-    if (data.results.length === 0) {
-      resultsEl.innerHTML = `<div class="text-slate-400 text-sm col-span-full">No listings matched — try widening your budget.</div>`;
-      return;
-    }
-    resultsEl.innerHTML = data.results.map(recommendationCard).join("");
-  } catch (e) {
-    resultsEl.innerHTML = `<div class="text-red-600 text-sm col-span-full">${e.message}</div>`;
-  }
-}
+// ---- recommendationCard is used by the chatbot to render results ----
 
 function recommendationCard(l) {
   return `
     <div class="cursor-pointer group" onclick="viewListing(${l.listing_id})">
       <div class="relative aspect-square rounded-2xl overflow-hidden mb-2">
-        <img src="${placeholderImage(l.listing_id)}" loading="lazy" class="w-full h-full object-cover" alt="${l.property_type}" />
+        <img src="${listingImageUrl(l)}" loading="lazy" class="w-full h-full object-cover" alt="${l.property_type}" />
         ${l.is_great_value ? '<span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Great value</span>' : ""}
       </div>
       <div class="flex justify-between items-start text-sm">
@@ -621,9 +714,9 @@ function recommendationCard(l) {
     </div>`;
 }
 
-// ---- Chatbot ----
+// ---- Chatbot (button-only — no typing) ----
 
-let chatState = { budget_min: null, budget_max: null, guests: null, city: null, room_type: null };
+let chatState = { budget_min: null, budget_max: null, guests: null, city: null, room_type: null, city_skip: false, room_type_skip: false };
 let chatStarted = false;
 
 function chatBubble(text, fromUser) {
@@ -635,19 +728,17 @@ function chatBubble(text, fromUser) {
 function ensureChatGreeting() {
   if (chatStarted) return;
   chatStarted = true;
-  document.getElementById("chat-messages").innerHTML = chatBubble(
-    "Hi! Tell me your budget, city, guest count or room type and I'll find matching rooms \u2014 e.g. \u201cSingapore, 2 guests, under $150\u201d.", false
-  );
+  document.getElementById("chat-messages").innerHTML = "";
+  sendChatChoice("hi");
 }
 
-async function sendChatMessage() {
-  const input = document.getElementById("chat-input");
-  const message = input.value.trim();
-  if (!message) return;
-  ensureChatGreeting();
+async function sendChatChoice(value, label) {
   const messagesEl = document.getElementById("chat-messages");
-  messagesEl.insertAdjacentHTML("beforeend", chatBubble(message, true));
-  input.value = "";
+  const repliesEl = document.getElementById("chat-quick-replies");
+  if (label) {
+    messagesEl.insertAdjacentHTML("beforeend", chatBubble(label, true));
+  }
+  repliesEl.innerHTML = "";
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   const thinkingId = `thinking-${Date.now()}`;
@@ -655,7 +746,7 @@ async function sendChatMessage() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
-    const data = await api("/api/chatbot/message", { method: "POST", body: JSON.stringify({ message, state: chatState }) });
+    const data = await api("/api/chatbot/message", { method: "POST", body: JSON.stringify({ message: value, state: chatState }) });
     chatState = data.state;
     document.getElementById(thinkingId).remove();
     messagesEl.insertAdjacentHTML("beforeend", chatBubble(data.reply, false));
@@ -663,6 +754,7 @@ async function sendChatMessage() {
       const cardsHtml = `<div class="grid grid-cols-2 gap-3 mt-1">${data.recommendations.slice(0, 4).map(recommendationCard).join("")}</div>`;
       messagesEl.insertAdjacentHTML("beforeend", cardsHtml);
     }
+    renderQuickReplies(data.quick_replies || []);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   } catch (e) {
     document.getElementById(thinkingId).remove();
@@ -670,10 +762,18 @@ async function sendChatMessage() {
   }
 }
 
+function renderQuickReplies(replies) {
+  const repliesEl = document.getElementById("chat-quick-replies");
+  repliesEl.innerHTML = replies.map(r => `
+    <button onclick="sendChatChoice('${r.value.replace(/'/g, "\\'")}', '${r.label.replace(/'/g, "\\'")}')" class="border border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-full px-4 py-1.5 text-sm">${r.label}</button>
+  `).join("");
+}
+
 function resetChat() {
-  chatState = { budget_min: null, budget_max: null, guests: null, city: null, room_type: null };
+  chatState = { budget_min: null, budget_max: null, guests: null, city: null, room_type: null, city_skip: false, room_type_skip: false };
   chatStarted = false;
   document.getElementById("chat-messages").innerHTML = "";
+  document.getElementById("chat-quick-replies").innerHTML = "";
   ensureChatGreeting();
 }
 
@@ -722,7 +822,6 @@ async function loadAdminStats() {
 }
 
 let adminCurrentPage = 1;
-let adminCurrentCityFilter = null;
 const ADMIN_PAGE_SIZE = 15;
 
 let adminHeatmapMap = null;
@@ -800,18 +899,68 @@ function renderHeatmap(data) {
   }
 }
 
+function buildAdminListingQuery() {
+  const params = new URLSearchParams();
+  const keyword = document.getElementById("admin-search-keyword")?.value.trim();
+  const city = document.getElementById("admin-search-city")?.value.trim();
+  const roomType = document.getElementById("admin-search-room-type")?.value;
+  const minPrice = document.getElementById("admin-search-min-price")?.value;
+  const maxPrice = document.getElementById("admin-search-max-price")?.value;
+  if (keyword) params.set("keyword", keyword);
+  if (city) params.set("city", city);
+  if (roomType) params.set("room_type", roomType);
+  if (minPrice) params.set("min_price", minPrice);
+  if (maxPrice) params.set("max_price", maxPrice);
+  return params.toString();
+}
+
+function clearAdminListingFilters() {
+  ["admin-search-keyword", "admin-search-city", "admin-search-min-price", "admin-search-max-price"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  const rt = document.getElementById("admin-search-room-type");
+  if (rt) rt.value = "";
+  loadAdminListings(1);
+}
+
+let adminFilterDebounceTimer = null;
+function attachAdminListingFilters() {
+  const textInputs = ["admin-search-keyword", "admin-search-city", "admin-search-min-price", "admin-search-max-price"];
+  textInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.wired) {
+      el.dataset.wired = "1";
+      el.addEventListener("input", () => {
+        clearTimeout(adminFilterDebounceTimer);
+        adminFilterDebounceTimer = setTimeout(() => loadAdminListings(1), 350);
+      });
+    }
+  });
+  const rt = document.getElementById("admin-search-room-type");
+  if (rt && !rt.dataset.wired) {
+    rt.dataset.wired = "1";
+    rt.addEventListener("change", () => loadAdminListings(1));
+  }
+}
+
 async function loadAdminListings(page = 1) {
   adminCurrentPage = page;
+  attachAdminListingFilters();
   try {
-    const cityQuery = adminCurrentCityFilter ? `&city=${encodeURIComponent(adminCurrentCityFilter)}` : "";
-    const listings = await api(`/api/admin/listings-pricing?page=${page}&page_size=${ADMIN_PAGE_SIZE}${cityQuery}`);
-    const totalData = await api(`/api/admin/listings?page=${page}&page_size=${ADMIN_PAGE_SIZE}${cityQuery}`);
+    const filterQuery = buildAdminListingQuery();
+    const extra = filterQuery ? `&${filterQuery}` : "";
+    const listings = await api(`/api/admin/listings-pricing?page=${page}&page_size=${ADMIN_PAGE_SIZE}${extra}`);
+    const totalData = await api(`/api/admin/listings?page=${page}&page_size=${ADMIN_PAGE_SIZE}${extra}`);
     document.getElementById("admin-listings-table").innerHTML = listings.map(l => {
       let gapLabel = "-";
       if (l.suggested_price != null) {
-        const color = l.price_gap_pct > 5 ? "text-red-600" : (l.price_gap_pct < -5 ? "text-amber-600" : "text-slate-500");
-        const sign = l.price_gap_pct > 0 ? "+" : "";
-        gapLabel = `<span class="${color}">$${l.suggested_price} (${sign}${l.price_gap_pct}%)</span>`;
+        const priceIsGoingDown = l.price_gap_pct > 0;
+        const priceIsGoingUp = l.price_gap_pct < 0;
+        const color = priceIsGoingDown ? "text-green-600" : (priceIsGoingUp ? "text-red-600" : "text-slate-500");
+        const arrow = priceIsGoingDown ? "↓" : (priceIsGoingUp ? "↑" : "");
+        const change = Math.abs(l.price_gap_pct ?? 0);
+        gapLabel = `<span class="${color} whitespace-nowrap inline-block">$${l.suggested_price} ${arrow} ${change}%</span>`;
       }
       return `
       <tr class="border-t border-slate-100">
@@ -819,7 +968,7 @@ async function loadAdminListings(page = 1) {
         <td class="px-4 py-2">${l.name}</td>
         <td class="px-4 py-2">${l.city}</td>
         <td class="px-4 py-2">$${l.price}</td>
-        <td class="px-4 py-2">${gapLabel}</td>
+        <td class="px-4 py-2 whitespace-nowrap">${gapLabel}</td>
         <td class="px-4 py-2">${l.review_scores_rating ?? "-"}</td>
         <td class="px-4 py-2 text-right whitespace-nowrap">
           <button onclick="openEditListingModal(${l.listing_id})" class="text-xs text-slate-600 underline mr-2">Edit</button>
@@ -900,7 +1049,7 @@ async function loadAdminUsers() {
         <td class="px-4 py-2">${u.email}</td>
         <td class="px-4 py-2">
           <select onchange="adminChangeUserRole(${u.user_id}, this.value)" class="border border-slate-200 rounded px-1 py-0.5 text-xs">
-            ${["guest", "host", "admin"].map(r => `<option value="${r}" ${r === u.role ? "selected" : ""}>${r}</option>`).join("")}
+            ${(["guest", "admin"].includes(u.role) ? ["guest", "admin"] : [u.role, "guest", "admin"]).map(r => `<option value="${r}" ${r === u.role ? "selected" : ""}>${r}</option>`).join("")}
           </select>
         </td>
         <td class="px-4 py-2">${u.booking_count}</td>
@@ -943,6 +1092,7 @@ async function adminCreateListing() {
     accommodates: parseInt(document.getElementById("al-accommodates").value, 10),
     bedrooms: parseInt(document.getElementById("al-bedrooms").value, 10),
     price: parseFloat(document.getElementById("al-price").value),
+    photo_url: document.getElementById("al-photo-url").value.trim() || null,
   };
   if (!payload.name || !payload.city || !payload.neighbourhood || !payload.price) {
     toast("Please fill in name, city, neighbourhood and price", true);
@@ -951,6 +1101,8 @@ async function adminCreateListing() {
   try {
     await api("/api/admin/listings", { method: "POST", body: JSON.stringify(payload) });
     toast("Listing added");
+    document.getElementById("al-photo-url").value = "";
+    document.getElementById("al-suggested-price").innerHTML = "";
     loadAdminStats();
     loadAdminListings(1);
   } catch (e) {
@@ -995,7 +1147,7 @@ function closeModal() {
 // ---- Admin: full listing edit ----
 
 const EDITABLE_LISTING_FIELDS = [
-  ["name", "Name", "text"], ["city", "City", "text"], ["neighbourhood", "Neighbourhood", "text"],
+  ["name", "Name", "text"], ["photo_url", "Photo URL", "text"], ["city", "City", "text"], ["neighbourhood", "Neighbourhood", "text"],
   ["district", "District", "text"], ["property_type", "Property type", "text"], ["room_type", "Room type", "text"],
   ["accommodates", "Accommodates", "number"], ["bedrooms", "Bedrooms", "number"],
   ["price", "Price/night", "number"], ["minimum_nights", "Minimum nights", "number"],

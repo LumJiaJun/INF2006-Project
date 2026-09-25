@@ -62,6 +62,7 @@ class ListingOut(BaseModel):
     host_response_rate: Optional[int]
     host_acceptance_rate: Optional[int]
     instant_bookable: bool
+    photo_url: Optional[str] = None
     latitude: Optional[float]
     longitude: Optional[float]
 
@@ -217,6 +218,13 @@ class ChatState(BaseModel):
     guests: Optional[int] = None
     city: Optional[str] = None
     room_type: Optional[str] = None
+    city_skip: bool = False
+    room_type_skip: bool = False
+
+
+class QuickReply(BaseModel):
+    label: str
+    value: str
 
 
 class ChatRequest(BaseModel):
@@ -228,5 +236,6 @@ class ChatResponse(BaseModel):
     reply: str
     state: ChatState
     recommendations: List[RecommendedListing] = Field(default_factory=list)
+    quick_replies: List[QuickReply] = Field(default_factory=list)
     ready: bool
     disclaimer: str

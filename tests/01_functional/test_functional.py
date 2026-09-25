@@ -118,20 +118,53 @@ def test_availability_endpoint_reflects_existing_booking(client, registered_user
     assert any(rg["check_in"].startswith("2027-04-01") for rg in ranges)
 
 
-def test_chatbot_asks_for_missing_slots_then_returns_recommendations(client):
-    r1 = client.post("/api/chatbot/message", json={"message": "I want a place in Singapore for 2 guests"})
+def test_chatbot_walks_through_full_staged_flow(client):
+    r1 = client.post("/api/chatbot/message", json={"message": "hi"})
     assert r1.status_code == 200
     body1 = r1.json()
     assert body1["ready"] is False
-    assert body1["state"]["city"] == "Singapore"
-    assert body1["state"]["guests"] == 2
+    assert any("budget" in q["value"].lower() or "$" in q["value"] for q in body1["quick_replies"])
 
-    r2 = client.post("/api/chatbot/message", json={"message": "under 200 dollars", "state": body1["state"]})
-    assert r2.status_code == 200
+    r2 = client.post("/api/chatbot/message", json={"message": "$150 to $250", "state": body1["state"]})
     body2 = r2.json()
-    assert body2["ready"] is True
-    assert body2["state"]["budget_max"] == 200
-    assert len(body2["recommendations"]) > 0
+    assert body2["state"]["budget_min"] == 150
+    assert body2["state"]["budget_max"] == 250
+    assert body2["ready"] is False
+    assert any("guest" in q["value"].lower() for q in body2["quick_replies"])
+
+    r3 = client.post("/api/chatbot/message", json={"message": "2 guests", "state": body2["state"]})
+    body3 = r3.json()
+    assert body3["state"]["guests"] == 2
+    assert body3["ready"] is False
+    city_values = [q["value"] for q in body3["quick_replies"]]
+    assert "Singapore" in city_values
+    assert "any city" in city_values
+
+    r4 = client.post("/api/chatbot/message", json={"message": "Singapore", "state": body3["state"]})
+    body4 = r4.json()
+    assert body4["state"]["city"] == "Singapore"
+    assert body4["ready"] is False
+    assert "any room type" in [q["value"] for q in body4["quick_replies"]]
+
+    r5 = client.post("/api/chatbot/message", json={"message": "any room type", "state": body4["state"]})
+    body5 = r5.json()
+    assert body5["ready"] is True
+    assert len(body5["recommendations"]) > 0
+    assert any("change" in q["value"] for q in body5["quick_replies"])
+
+
+def test_chatbot_change_command_resets_only_that_slot(client):
+    ready_state = {
+        "budget_min": 150, "budget_max": 250, "guests": 2, "city": "Singapore",
+        "room_type": None, "city_skip": False, "room_type_skip": True,
+    }
+    r = client.post("/api/chatbot/message", json={"message": "change city", "state": ready_state})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["state"]["city"] is None
+    assert body["state"]["budget_max"] == 250  # untouched
+    assert body["state"]["guests"] == 2         # untouched
+    assert body["ready"] is False
 
 
 def test_chatbot_reset_clears_state(client):

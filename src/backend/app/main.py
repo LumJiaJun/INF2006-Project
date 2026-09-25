@@ -28,7 +28,10 @@ app = FastAPI(
 
 # CORS: restricted to explicit origins from env, not "*", so any deployed
 # frontend origin must be allow-listed deliberately (least privilege).
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:8080").split(",")
+allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://localhost:8080,http://127.0.0.1:8080",
+).split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

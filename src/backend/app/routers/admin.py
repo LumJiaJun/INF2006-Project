@@ -18,12 +18,24 @@ def admin_list_listings(
     page: int = 1,
     page_size: int = 20,
     city: str | None = None,
+    room_type: str | None = None,
+    min_price: float | None = None,
+    max_price: float | None = None,
+    keyword: str | None = None,
     db: Session = Depends(get_db),
     admin: models.User = Depends(require_admin),
 ):
     query = db.query(models.Listing).order_by(models.Listing.listing_id.asc())
     if city:
         query = query.filter(models.Listing.city == city)
+    if room_type:
+        query = query.filter(models.Listing.room_type == room_type)
+    if min_price is not None:
+        query = query.filter(models.Listing.price >= min_price)
+    if max_price is not None:
+        query = query.filter(models.Listing.price <= max_price)
+    if keyword:
+        query = query.filter(models.Listing.name.ilike(f"%{keyword}%"))
     total = query.count()
     results = query.offset((page - 1) * page_size).limit(page_size).all()
     return schemas.ListingSearchResult(total=total, page=page, page_size=page_size, results=results)
@@ -34,6 +46,10 @@ def admin_listings_pricing(
     page: int = 1,
     page_size: int = 20,
     city: str | None = None,
+    room_type: str | None = None,
+    min_price: float | None = None,
+    max_price: float | None = None,
+    keyword: str | None = None,
     db: Session = Depends(get_db),
     admin: models.User = Depends(require_admin),
 ):
@@ -47,6 +63,14 @@ def admin_listings_pricing(
     query = db.query(models.Listing).order_by(models.Listing.listing_id.asc())
     if city:
         query = query.filter(models.Listing.city == city)
+    if room_type:
+        query = query.filter(models.Listing.room_type == room_type)
+    if min_price is not None:
+        query = query.filter(models.Listing.price >= min_price)
+    if max_price is not None:
+        query = query.filter(models.Listing.price <= max_price)
+    if keyword:
+        query = query.filter(models.Listing.name.ilike(f"%{keyword}%"))
     rows = query.offset((page - 1) * page_size).limit(page_size).all()
 
     out = []

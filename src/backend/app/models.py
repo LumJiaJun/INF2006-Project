@@ -72,6 +72,7 @@ class Listing(Base):
     review_scores_location = Column(Float)
     review_scores_value = Column(Float)
     instant_bookable = Column(Boolean, default=False)
+    photo_url = Column(String, nullable=True)  # admin-supplied override; falls back to a placeholder image client-side if empty
 
     bookings = relationship("Booking", back_populates="listing")
 
