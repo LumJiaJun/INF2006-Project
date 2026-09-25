@@ -22,10 +22,36 @@ Terraform provisions the AWS resources for the serverless application, identity,
 
 Do not place AWS access keys in Terraform variables or files.
 
+## Shared state
+
+Terraform state is stored in the private, encrypted, versioned S3 bucket
+`airbnb-market-intelligence-tfstate-574816782582` at
+`airbnb-market-intelligence/dev/terraform.tfstate`. S3 lockfiles prevent two
+team members from changing the state concurrently. State and plan files remain
+excluded from Git because they can contain sensitive infrastructure values.
+
+If the main deployment computer still has the original local
+`terraform.tfstate`, migrate it once from `src/infrastructure`:
+
+```bash
+aws sts get-caller-identity
+terraform init -migrate-state
+terraform state list
+terraform plan
+```
+
+Confirm that the AWS account is `574816782582` and accept the state migration
+prompt. Preserve a private backup of the original state until `terraform state
+list` shows the expected resources and `terraform plan` shows no unexpected
+creation or replacement. Never commit that backup.
+
+If no original state exists, stop after `terraform init`. Do not run `apply` or
+`destroy`: the deployed resources must first be imported into state.
+
 ## Validate
 
 ```bash
-terraform init -backend=false
+terraform init
 terraform fmt -check
 terraform validate
 terraform plan
