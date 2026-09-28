@@ -5,7 +5,7 @@ resource "aws_cognito_user_pool" "users" {
   auto_verified_attributes = ["email"]
   deletion_protection      = "INACTIVE"
   # Managed Login guides every password user through authenticator-app MFA setup.
-  mfa_configuration        = "ON"
+  mfa_configuration = "ON"
 
   software_token_mfa_configuration {
     enabled = true
