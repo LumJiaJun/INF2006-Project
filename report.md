@@ -6,7 +6,7 @@ Class: EP2, Group G014
 
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
-Evidence date: 23 September 2026
+Evidence date: 28 September 2026
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 
@@ -28,7 +28,7 @@ Five focused Lambda functions separate health, prediction, analytics, history, a
 
 The analytical data path uses a separate private S3 data lake. The uploaded raw listing CSV remains under `raw/listings/`. An AWS Glue 5.0 Spark job selects documented fields, rejects invalid required values, applies the same typical-market boundary used by modelling, and writes city-partitioned Parquet under `processed/listings/`. A Glue Catalog table uses partition projection for the ten observed cities. Athena runs in an enforced workgroup with encrypted output, CloudWatch metrics, a 1 GiB scan cutoff, and seven-day query-result expiry.
 
-The architecture has two explicit trust areas: the public browser and the AWS account. HTTPS protects data in transit. IAM execution roles constrain each Lambda and the Glue job to required resources and operations. CloudWatch receives logs and metrics; API and function alarms target an encrypted SNS topic. DynamoDB point-in-time recovery provides a managed application-record recovery mechanism. The full labelled diagram is stored at `evidence/architecture.png`.
+The architecture has two explicit trust areas: the public browser and the AWS account. HTTPS protects data in transit. IAM execution roles constrain each Lambda and the Glue job to required resources and operations. CloudWatch receives logs and metrics; API and function alarms target an encrypted SNS topic. DynamoDB point-in-time recovery provides a managed application-record recovery mechanism. Authenticated prediction writes require a caller-generated idempotency key, which is stored with a request fingerprint and response for safe retries. The current labelled diagram is stored at `evidence/architecture-current.png`.
 
 ## 3. Cloud service/deployment choices and trade-offs
 
@@ -76,15 +76,15 @@ Limitations include historical staleness, missing values, absent demand and book
 
 ## 6. Testing, scalability/resilience and monitoring results
 
-The repository contains 23 passing Python unit tests covering health responses, prediction validation and response shape, authenticated persistence, history isolation, analytics parsing, bounded AI requests and safe failures, data profiling, and training behavior. JavaScript files pass Node syntax checks. Terraform formatting and validation pass. The deployed smoke script verifies frontend assets and MIME types, health, real prediction, ten-city analytics, malformed-input rejection, and unauthenticated `401` responses for all three protected capabilities.
+The repository contains 29 passing Python unit tests covering health responses, prediction validation and response shape, authenticated persistence, idempotent retries, history isolation, analytics parsing, bounded AI requests and safe failures, data profiling, and training behavior. JavaScript files pass Node syntax checks. Terraform formatting and validation pass. The deployed smoke script verifies frontend assets and MIME types, health, real prediction, ten-city analytics, malformed-input rejection, and unauthenticated `401` responses for all three protected capabilities.
 
 A JMeter 5.6.3 browser journey ran 25 visitors over 45 seconds against the three public pages and shared assets. All 929 requests passed at 20.3 requests per second, with 666.9 ms mean and 1,508 ms maximum response time. This bounded result verifies the tested CloudFront profile, not an unlimited scaling claim.
 
-Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR image scanning for deployed prediction image `1.0.3` completed with zero findings at scan time. Unit tests confirm history queries use only the verified JWT subject.
+Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR scan-on-push is enabled, but a later manual scan was blocked by the per-image scan quota; this is not evidence of a clean image scan. Unit tests confirm history queries use only the verified JWT subject.
 
 IAM policy simulation added a service-to-service authorization check. Required prediction writes, history queries, and Glue raw-listing reads returned `allowed`. Prediction reads of raw S3 data, history table scans, and Glue reads of the unused raw-review prefix returned `implicitDeny`. This verifies selected blast-radius boundaries without treating same-account services as implicitly trusted.
 
-The bounded live test sent 20 health requests at concurrency two. Eighteen returned `200` and two returned controlled `429` responses in the recorded evidence run, with 86.58 ms median and 163.60 ms maximum latency. A later validation run returned 19 `200` and one `429`. The test passes only for `200` or `429` and fails for any backend error.
+The bounded live test sent 20 health requests at concurrency two. The recorded validation run returned 15 `200` and five controlled `429` responses, with 231.26 ms median and 674.34 ms maximum latency. Earlier runs returned 18 `200` and two `429`, and 19 `200` and one `429`. The test passes only for `200` or `429` and fails for any backend error.
 
 The higher-concurrency finding is intentionally retained. A 50-request, concurrency-25 stress run returned 26 `200`, 13 `429`, and 11 `503` responses. CloudWatch showed the account reaching its concurrency quota of 10. Lowering the API token bucket improved controlled rejection but could not guarantee it because API Gateway throttling is best-effort. The system should not be described as high-scale ready in this account. A higher quota and repeated test are required before increasing expected load.
 
