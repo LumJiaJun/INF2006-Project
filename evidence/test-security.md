@@ -65,3 +65,13 @@
 - **Actual result:** Passed. All four headers were present after CloudFront propagation and invalidation.
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/frontend.tf` and `tests/smoke_api.ps1`
+
+## Automated SAST and DAST
+
+- **Objective:** Detect source-level security defects continuously and perform passive dynamic checks against an explicitly approved deployment.
+- **Setup:** CodeQL security-extended queries for Python and JavaScript plus an OWASP ZAP baseline workflow protected by the GitHub `development` environment.
+- **Command / steps:** Push or open a pull request to run `.github/workflows/codeql.yml`. After deployment, configure `DAST_TARGET_URL` and the exact `DAST_ALLOWED_HOST`, then run `.github/workflows/dast.yml` manually or allow the successful deployment workflow to trigger it.
+- **Expected result:** CodeQL uploads security analysis for both languages. ZAP accepts only an allowlisted HTTPS host, performs passive scanning, uploads HTML, JSON, and Markdown reports, and fails the workflow on warnings, failures, or scanner errors.
+- **Actual result:** CodeQL passed for both languages on 2026-09-28. The DAST workflow is configured but not executed because the evidence deployment is offline; no dynamic-scan result is claimed.
+- **Date:** 2026-09-28
+- **Artefact path:** `.github/workflows/codeql.yml`, `.github/workflows/dast.yml`, and `evidence/ci-cd.md`

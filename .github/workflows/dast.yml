@@ -1,0 +1,88 @@
+name: DAST - OWASP ZAP
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy development"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dast-development
+  cancel-in-progress: false
+
+jobs:
+  baseline:
+    name: DAST baseline scan
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: development
+    env:
+      DAST_TARGET_URL: ${{ vars.DAST_TARGET_URL }}
+      DAST_ALLOWED_HOST: ${{ vars.DAST_ALLOWED_HOST }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate approved target
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from urllib.parse import urlparse
+
+          target = os.environ.get("DAST_TARGET_URL", "").strip()
+          allowed_host = os.environ.get("DAST_ALLOWED_HOST", "").strip().lower()
+          parsed = urlparse(target)
+          if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+              raise SystemExit("DAST_TARGET_URL must be an HTTPS URL without embedded credentials.")
+          if not allowed_host or parsed.hostname.lower() != allowed_host:
+              raise SystemExit("DAST target hostname does not match DAST_ALLOWED_HOST.")
+          if parsed.port not in (None, 443):
+              raise SystemExit("DAST target must use the standard HTTPS port.")
+          print(f"Approved DAST target host: {parsed.hostname}")
+          PY
+
+      - name: Confirm deployment is reachable
+        shell: bash
+        run: curl --fail --silent --show-error --location --max-time 20 "$DAST_TARGET_URL" > /dev/null
+
+      - name: Prepare report directory
+        run: mkdir -p zap-output && chmod 777 zap-output
+
+      - name: Run passive ZAP baseline
+        id: zap
+        continue-on-error: true
+        shell: bash
+        run: |
+          docker run --rm \
+            --volume "$PWD/zap-output:/zap/wrk/:rw" \
+            --workdir /zap/wrk \
+            ghcr.io/zaproxy/zaproxy:stable@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa \
+            zap-baseline.py \
+            -t "$DAST_TARGET_URL" \
+            -m 3 \
+            -r report.html \
+            -J report.json \
+            -w report.md
+
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: zap-baseline-${{ github.run_id }}
+          path: zap-output/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce DAST result
+        if: steps.zap.outcome != 'success'
+        run: |
+          echo "OWASP ZAP reported warnings, failures, or a scan error. Review the uploaded report." >&2
+          exit 1

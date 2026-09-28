@@ -7,9 +7,22 @@
 ## GitHub Actions results
 
 - CI completed successfully: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36377882219
-- CodeQL completed successfully for Python and JavaScript/TypeScript: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36377882314
+- CodeQL SAST completed successfully for Python and JavaScript/TypeScript: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36377882314
 - The CI run executed 25 unit tests, Python compilation, frontend JavaScript syntax checks, AWS identifier checks, Terraform formatting, and validation of both Terraform roots.
 - Actions are pinned to full commit hashes. Workflow permissions are read-only by default; only the manual deployment workflow can request an OIDC token.
+
+## Dynamic application security testing
+
+`.github/workflows/dast.yml` defines a passive OWASP ZAP baseline scan using a
+container pinned by digest. It runs after a successful development deployment
+or by manual dispatch, accepts only an HTTPS URL whose hostname exactly matches
+`DAST_ALLOWED_HOST`, uploads reports even when findings occur, and then fails
+closed on ZAP warning, failure, or scan-error exit codes.
+
+DAST has not been executed because the evidence deployment is currently
+offline. `DAST_TARGET_URL` and `DAST_ALLOWED_HOST` must be configured in the
+protected GitHub `development` environment after recreation. This records the
+control without fabricating a scan result.
 
 The first CI run exposed that `boto3` was available on the deployment computer
 but missing from a clean runner. `tests/requirements.txt` now declares it

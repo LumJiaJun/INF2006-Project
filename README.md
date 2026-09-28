@@ -62,7 +62,7 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - Identity and data: branded Cognito Managed Login v2 and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
 - Operations: CloudWatch structured logs, metrics, dashboard and alarms with an encrypted SNS action topic
-- Delivery: GitHub Actions CI, CodeQL, Dependabot, and a manually approved OIDC deployment workflow
+- Delivery: GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, Dependabot, and a manually approved OIDC deployment workflow
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline plus a bounded Amazon Bedrock Claude Haiku 4.5 assistant
 - Application: HTML, CSS, JavaScript, and Python
 
@@ -70,11 +70,17 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 
 Pull requests and pushes to `main` or `nixon` run unit tests, Python compilation,
 frontend syntax checks, secret-pattern checks, Terraform formatting and
-validation, and CodeQL. Deployment is manual, requires typing `DEPLOY`, and is
-gated by the GitHub `development` environment. It uses GitHub OIDC rather than
-stored AWS access keys. Configure `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`,
-`TF_STATE_KMS_KEY_ARN`, and `MODEL_ARTIFACT_S3_URI` as environment variables in
-GitHub before using it.
+validation, and CodeQL SAST for Python and JavaScript. Deployment is manual,
+requires typing `DEPLOY`, and is gated by the GitHub `development` environment.
+It uses GitHub OIDC rather than stored AWS access keys.
+
+After a successful deployment, OWASP ZAP DAST performs a passive baseline scan.
+It can also be started manually. The scan accepts only HTTPS and requires the
+target hostname to exactly match the allowlisted host, uploads HTML, JSON, and
+Markdown reports, and fails on any ZAP warning, failure, or scanner error.
+Configure `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`, `TF_STATE_KMS_KEY_ARN`,
+`MODEL_ARTIFACT_S3_URI`, `DAST_TARGET_URL`, and `DAST_ALLOWED_HOST` in the
+protected GitHub environment before using deployment or DAST.
 
 The state bootstrap under `src/infrastructure/bootstrap` manages a private,
 versioned S3 bucket encrypted with a rotating customer-managed KMS key. S3

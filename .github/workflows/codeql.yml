@@ -1,4 +1,4 @@
-name: CodeQL
+name: SAST - CodeQL
 
 on:
   push:
@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   analyze:
-    name: Analyze ${{ matrix.language }}
+    name: SAST ${{ matrix.language }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
