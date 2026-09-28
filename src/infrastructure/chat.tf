@@ -2,6 +2,7 @@
 data "archive_file" "chat_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/../backend/chat"
+  excludes    = ["**/__pycache__/**", "**/*.pyc"]
   output_path = "${path.module}/chat.zip"
 }
 

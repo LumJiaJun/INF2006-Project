@@ -2,6 +2,7 @@
 data "archive_file" "health_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/../backend/health"
+  excludes    = ["**/__pycache__/**", "**/*.pyc"]
   output_path = "${path.module}/health.zip"
 }
 
