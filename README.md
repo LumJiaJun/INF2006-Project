@@ -111,6 +111,7 @@ provisioned for the current scope.
 ## Known limitations
 
 - A consented single-account browser journey covering sign-up, verification, TOTP MFA, prediction save, history retrieval, and protected chat is recorded in `evidence/test-functional.md`; a separate multi-user browser isolation test remains future work.
+- Analytics now reports an average-to-median market-shape ratio so users can compare within-city price skew without pretending local-currency prices are globally comparable. User-currency conversion is intentionally not enabled because the dataset has no timestamped exchange-rate source.
 - The city analytics use different local currencies and must not be compared as if they shared one currency.
 - The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation and descriptive market analytics, not future-price forecasting or condition monitoring.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.

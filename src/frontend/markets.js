@@ -57,6 +57,7 @@ function marketCard(item) {
     [`${item.currency} ${item.median_nightly_price.toLocaleString()}`, "median night"],
     [item.listing_count.toLocaleString(), "listings"],
     [item.average_rating === null ? "N/A" : item.average_rating.toFixed(1), "rating / 100"],
+    [item.average_to_median_ratio === null ? "N/A" : `${item.average_to_median_ratio.toFixed(2)}x`, "average / median"],
   ];
   metricValues.forEach(([value, label]) => {
     const metric = document.createElement("span");

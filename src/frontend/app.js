@@ -152,7 +152,10 @@ function analyticsItem(item) {
   medianLabel.textContent = "median nightly price";
   const details = document.createElement("p");
   const rating = item.average_rating === null ? "not available" : item.average_rating.toFixed(1);
-  details.textContent = `${item.listing_count.toLocaleString()} listings, average rating ${rating}/100`;
+  const shape = item.average_to_median_ratio === null
+    ? "not available"
+    : `${item.average_to_median_ratio.toFixed(2)}x`;
+  details.textContent = `${item.listing_count.toLocaleString()} listings, average rating ${rating}/100, average-to-median ${shape}`;
   card.append(city, median, medianLabel, details);
   card.addEventListener("click", () => selectMarket(item));
   return card;

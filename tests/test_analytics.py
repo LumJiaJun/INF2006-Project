@@ -67,6 +67,7 @@ class AnalyticsHandlerTests(unittest.TestCase):
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual(body["items"][0]["listing_count"], 100)
         self.assertEqual(body["items"][0]["average_nightly_price"], 110.25)
+        self.assertEqual(body["items"][0]["average_to_median_ratio"], 1.23)
         self.assertEqual(body["items"][0]["currency"], "EUR")
         self.assertIn("GROUP BY city", fake.query["QueryString"])
         self.assertEqual(fake.query["QueryExecutionContext"]["Database"], "database")

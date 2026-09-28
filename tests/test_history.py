@@ -57,6 +57,20 @@ class HistoryHandlerTests(unittest.TestCase):
         expression = self.table.key_expression.get_expression()
         self.assertEqual(expression["values"][1], "authenticated-user")
 
+    def test_ignores_caller_supplied_user_id(self):
+        event = {
+            "queryStringParameters": {"user_id": "another-user"},
+            "requestContext": {
+                "authorizer": {"jwt": {"claims": {"sub": "authenticated-user"}}},
+            },
+        }
+
+        response = history_handler.lambda_handler(event, None)
+
+        self.assertEqual(response["statusCode"], 200)
+        expression = self.table.key_expression.get_expression()
+        self.assertEqual(expression["values"][1], "authenticated-user")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -81,13 +81,16 @@ def parse_rows(result):
     for row in rows[1:]:
         values = [item.get("VarCharValue") for item in row.get("Data", [])]
         record = dict(zip(columns, values, strict=False))
+        average_price = float(record["average_nightly_price"])
+        median_price = float(record["median_nightly_price"])
         parsed.append(
             {
                 "city": record["city"],
                 "currency": CURRENCY_BY_CITY[record["city"]],
                 "listing_count": int(record["listing_count"]),
-                "average_nightly_price": float(record["average_nightly_price"]),
-                "median_nightly_price": float(record["median_nightly_price"]),
+                "average_nightly_price": average_price,
+                "median_nightly_price": median_price,
+                "average_to_median_ratio": round(average_price / median_price, 2) if median_price > 0 else None,
                 "average_rating": (
                     float(record["average_rating"]) if record.get("average_rating") is not None else None
                 ),

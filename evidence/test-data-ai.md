@@ -37,5 +37,6 @@
 - **Command / steps:** Follow `src/infrastructure/README.md` to upload `Listings.csv`, run Glue, and invoke `GET /analytics`.
 - **Expected result:** Ten city partitions and ten summary records using each city's local currency and the documented supported-price scope.
 - **Actual result:** Passed. Glue succeeded in 90 seconds, produced ten Parquet objects, and Athena returned ten summaries while scanning 566,077 bytes.
+- **Interpretation:** The frontend also reports each city's average-to-median price ratio. This is a currency-neutral within-city shape indicator, not an exchange-rate conversion or cross-city price ranking.
 - **Date:** 2026-09-23
 - **Artefact path:** `evidence/data-pipeline.md`

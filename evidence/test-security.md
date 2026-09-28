@@ -33,6 +33,7 @@
 - **Command / steps:** Run `python -m unittest discover -s tests -p "test_*.py" -v` and `./tests/smoke_api.ps1 -FrontendUrl $frontendUrl -ApiBaseUrl $apiBaseUrl`.
 - **Expected result:** Unauthenticated `POST /predictions` and `GET /history` requests return HTTP 401. The history function queries only the subject from API Gateway's verified claims.
 - **Actual result:** Passed. Both deployed routes returned HTTP 401 without a token, and the handler test confirmed the query key comes from `requestContext.authorizer.jwt.claims.sub`.
+- **Additional isolation result:** The handler test also passes when a caller supplies a different `user_id` query parameter; the verified JWT subject remains the only DynamoDB partition key.
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/auth.tf`, `src/infrastructure/history.tf`, `src/backend/history/handler.py`, and `tests/test_history.py`
 
