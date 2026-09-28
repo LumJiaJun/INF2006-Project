@@ -14,7 +14,7 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 | Name | Student ID | Role |
 |------|-----------|------|
 | Lum Jia Jun | 2500022 | |
-| Nixon Lee Disheng | 2500594 | |
+| Nixon Lee Disheng | 2500594 | Infrastructure and Cloud Deployment Lead |
 | Madugula Adheesh | 2500670 | |
 | Leow Yi Hao Ignatius | 2501538 | |
 | Wong Zhen Ho Brendan | 2503427 | |
@@ -28,6 +28,9 @@ See `evidence/live-deployment-test-2026-09-28.md` for redacted deployment and
 test results.
 
 ## Quickstart commands
+
+For the full team handoff, shared Terraform workflow, cleanup safety, and
+remaining workstreams, see `TEAM_WORK_GUIDE.md`.
 
 ```bash
 # 1. Run offline unit tests

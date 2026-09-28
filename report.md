@@ -104,7 +104,7 @@ Before a public or longer-lived deployment, the team should request an appropria
 
 ## 8. Team contribution, ethical considerations and reflection
 
-The EP2 Group G014 roster is Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427). Role, contribution, test-ownership, and reflection fields are intentionally left blank in `TEAM_CONTRIBUTIONS.md` for the team to complete together.
+The EP2 Group G014 roster is Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427). Nixon is recorded as Infrastructure and Cloud Deployment Lead. The remaining contribution, test-ownership, and reflection fields are left for each teammate to complete with genuine work evidence in `TEAM_CONTRIBUTIONS.md`.
 
 The project uses OpenAI Codex for repository inspection, implementation support, Terraform, tests, documentation, and deployment verification. AI-assisted output was not accepted as evidence by itself. Claims were checked with unit tests, live HTTP requests, Terraform plans, AWS CLI output, CloudWatch metrics, and source review. The use and verification process is declared in `AI_USE_DECLARATION.md`.
 
