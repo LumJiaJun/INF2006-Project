@@ -19,11 +19,12 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 | Leow Yi Hao Ignatius | 2501538 | |
 | Wong Zhen Ho Brendan | 2503427 | |
 
-## Live site
+## Deployment status
 
-- Estimator dashboard: `https://d3elvmvxbz7fmt.cloudfront.net/`
-- City market guide: `https://d3elvmvxbz7fmt.cloudfront.net/markets.html`
-- Project and architecture story: `https://d3elvmvxbz7fmt.cloudfront.net/project.html`
+The evidence deployment was intentionally destroyed after testing to stop
+ongoing charges. The main page remains the estimator and market dashboard, with
+separate market and project pages, and can be recreated from Terraform after
+the prediction model artifact is available.
 
 ## Quickstart commands
 
@@ -51,7 +52,7 @@ terraform output analytics_url
 
 ![Architecture diagram](evidence/architecture.png)
 
-CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. Authenticated predictions are stored under the token-derived user identifier in encrypted DynamoDB. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
+CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. The assistant can query only the signed-in user's ten latest DynamoDB prediction records and supplies those records as bounded context; DynamoDB is not treated as a general knowledge base. Authenticated predictions are stored under the token-derived user identifier. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
 
 ## Technology list
 
@@ -61,13 +62,36 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 - Identity and data: branded Cognito Managed Login v2 and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
 - Operations: CloudWatch structured logs, metrics, dashboard and alarms with an encrypted SNS action topic
+- Delivery: GitHub Actions CI, CodeQL, Dependabot, and a manually approved OIDC deployment workflow
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline plus a bounded Amazon Bedrock Claude Haiku 4.5 assistant
 - Application: HTML, CSS, JavaScript, and Python
+
+## CI/CD and shared state
+
+Pull requests and pushes to `main` or `nixon` run unit tests, Python compilation,
+frontend syntax checks, secret-pattern checks, Terraform formatting and
+validation, and CodeQL. Deployment is manual, requires typing `DEPLOY`, and is
+gated by the GitHub `development` environment. It uses GitHub OIDC rather than
+stored AWS access keys. Configure `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`,
+`TF_STATE_KMS_KEY_ARN`, and `MODEL_ARTIFACT_S3_URI` as environment variables in
+GitHub before using it.
+
+The state bootstrap under `src/infrastructure/bootstrap` manages a private,
+versioned S3 bucket encrypted with a rotating customer-managed KMS key. S3
+lockfiles provide concurrency control. Terraform state is not stored in KMS or
+Secrets Manager and no state, account ID, key ARN, or backend file is committed.
+
+CloudFront already provides HTTPS on its generated domain using an AWS-managed
+certificate. ACM becomes useful only after the team owns a custom domain and
+can complete DNS validation, so no custom certificate or Route 53 zone is
+provisioned for the current scope.
 
 ## Known limitations
 
 - Full sign-up, email verification, prediction save, and history retrieval require a manual browser test with a real email account.
+- The evidence deployment is currently offline and must be recreated before browser testing.
 - The city analytics use different local currencies and must not be compared as if they shared one currency.
+- The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation and descriptive market analytics, not future-price forecasting or condition monitoring.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
 - The development AWS account has a concurrency quota of 10. A high-concurrency stress test caused Lambda throttles despite API Gateway rate limits; see `evidence/test-resilience.md`.

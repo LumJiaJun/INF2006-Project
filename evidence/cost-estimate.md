@@ -22,13 +22,13 @@
 | Component | Monthly estimate | Basis |
 |---|---:|---|
 | Claude Haiku 4.5 | $0.88 | 0.3M input tokens at $1.10/M plus 0.1M output tokens at $5.50/M |
-| KMS customer-managed key | $1.00 | One operational-alert key |
+| KMS customer-managed keys | $2.00 | One operational-alert key and one shared-state key |
 | Glue ETL | $0.02 | Two DPUs for about 1.5 minutes at $0.44/DPU-hour |
 | CloudFront, S3 and ECR | $0.75 | Small static site, about 5 GB delivery, and one prediction image |
 | API Gateway, Lambda, DynamoDB, Athena, Cognito and CloudWatch | $1.25 | Low request, compute, scan and log volume with a contingency allowance |
-| **Estimated total** | **about $3.90/month** | Reasonable range: **$3 to $6/month** at these assumptions |
+| **Estimated total** | **about $4.90/month** | Reasonable range: **$4 to $7/month** at these assumptions |
 
-At 10,000 AI questions with the same token shape, Bedrock rises from about $0.88 to about $8.80, producing an estimated serverless total near $12/month. The application therefore requires Cognito on `/chat`, limits messages to 500 characters, caps responses at 220 tokens, and throttles this route to one request per second.
+At 10,000 AI questions with the same token shape, Bedrock rises from about $0.88 to about $8.80, producing an estimated serverless total near $13/month. The application therefore requires Cognito on `/chat`, limits messages to 500 characters, caps responses at 220 tokens, and throttles this route to one request per second.
 
 ## Comparable EC2 baselines
 

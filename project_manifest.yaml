@@ -7,7 +7,7 @@ project:
   title: "Airbnb Pricing and Market Intelligence Platform"
   problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
   cloud_provider: "AWS"
-  repository_commit: "c013c01"
+  repository_commit: "fdc4a73"
 
 team:
   members:
@@ -48,6 +48,7 @@ architecture:
     - "Amazon CloudWatch dashboard and alarms"
     - "Amazon SNS"
     - "AWS Key Management Service"
+    - "GitHub Actions CI/CD"
 
 evidence:
   functional_test: "evidence/test-functional.md"
@@ -71,7 +72,7 @@ security:
 run:
   prerequisites:
     - "Python 3.11 or newer"
-    - "Terraform 1.6 or newer"
+    - "Terraform 1.10 or newer"
     - "AWS credentials with permission to provision the declared resources"
   commands:
     - "python -m unittest discover -s tests -p test_*.py -v"

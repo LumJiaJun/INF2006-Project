@@ -1,6 +1,3 @@
-# Video link (optional)
+Optional presentation link only. Not primary assessment evidence.
 
-Not primary assessment evidence per the project brief. Add a link here
-if the team records a presentation walkthrough.
-
-Link: TBD
+<paste presentation URL here or leave blank>
