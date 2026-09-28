@@ -41,6 +41,33 @@ resource "aws_s3_bucket_versioning" "data_lake" {
   }
 }
 
+data "aws_iam_policy_document" "data_lake_bucket" {
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = [aws_s3_bucket.data_lake.arn, "${aws_s3_bucket.data_lake.arn}/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "data_lake" {
+  bucket = aws_s3_bucket.data_lake.id
+  policy = data.aws_iam_policy_document.data_lake_bucket.json
+
+  depends_on = [aws_s3_bucket_public_access_block.data_lake]
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
   bucket = aws_s3_bucket.data_lake.id
 
@@ -65,6 +92,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
 
     noncurrent_version_expiration {
       noncurrent_days = 30
+    }
+  }
+
+  rule {
+    id     = "abort-incomplete-multipart-uploads"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }

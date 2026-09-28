@@ -96,10 +96,27 @@ resource "aws_apigatewayv2_route" "health" {
   target    = "integrations/${aws_apigatewayv2_integration.health.id}"
 }
 
+# Structured access logs provide request-level evidence without recording bodies or identities.
+resource "aws_cloudwatch_log_group" "api_access" {
+  name              = "/aws/apigateway/${local.name_prefix}"
+  retention_in_days = 14
+}
+
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.platform.id
   name        = "$default"
   auto_deploy = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_access.arn
+    format = jsonencode({
+      integrationError = "$context.integrationErrorMessage"
+      requestId        = "$context.requestId"
+      responseLength   = "$context.responseLength"
+      routeKey         = "$context.routeKey"
+      status           = "$context.status"
+    })
+  }
 
   default_route_settings {
     detailed_metrics_enabled = true
