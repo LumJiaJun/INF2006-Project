@@ -1,9 +1,11 @@
 import argparse
 import concurrent.futures
+import ipaddress
 import json
 import statistics
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 
@@ -21,9 +23,33 @@ def request(url):
 def main():
     parser = argparse.ArgumentParser(description="Run a bounded concurrent health-endpoint check.")
     parser.add_argument("--url", required=True)
-    parser.add_argument("--requests", type=int, default=50)
-    parser.add_argument("--concurrency", type=int, default=25)
+    parser.add_argument("--requests", type=int, default=20)
+    parser.add_argument("--concurrency", type=int, default=2)
+    parser.add_argument("--allowed-host")
+    parser.add_argument("--confirm-authorized-target", action="store_true")
     args = parser.parse_args()
+
+    if not 1 <= args.requests <= 100:
+        parser.error("--requests must be between 1 and 100")
+    if not 1 <= args.concurrency <= 10:
+        parser.error("--concurrency must be between 1 and 10")
+
+    parsed_url = urllib.parse.urlparse(args.url)
+    if not parsed_url.hostname or parsed_url.scheme not in {"http", "https"}:
+        parser.error("--url must be an absolute HTTP or HTTPS URL")
+
+    try:
+        loopback = ipaddress.ip_address(parsed_url.hostname).is_loopback
+    except ValueError:
+        loopback = parsed_url.hostname.lower() == "localhost"
+
+    if not loopback:
+        if parsed_url.scheme != "https":
+            parser.error("non-loopback load-test targets must use HTTPS")
+        if not args.confirm_authorized_target:
+            parser.error("use --confirm-authorized-target only for a target you are authorized to test")
+        if args.allowed_host != parsed_url.hostname:
+            parser.error("--allowed-host must exactly match the target hostname")
 
     started = time.perf_counter()
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as executor:

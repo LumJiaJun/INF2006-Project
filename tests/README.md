@@ -25,7 +25,12 @@ $apiBaseUrl = (terraform -chdir=src/infrastructure output -raw health_url) -repl
 Run the bounded live health check only against an environment you own:
 
 ```powershell
-python tests/load_health.py --url <health-url> --requests 20 --concurrency 2
+python tests/load_health.py `
+  --url <health-url> `
+  --requests 20 `
+  --concurrency 2 `
+  --allowed-host <api-hostname> `
+  --confirm-authorized-target
 ```
 
 The command passes only when every response is HTTP 200 or an explicit HTTP 429 throttle response and at least one request succeeds.
@@ -37,7 +42,9 @@ Run the CloudFront browser journey with Apache JMeter 5.6.3 or newer:
   -FrontendUrl <frontend-url> `
   -Threads 10 `
   -RampSeconds 10 `
-  -DurationSeconds 30
+  -DurationSeconds 30 `
+  -AllowedHost <cloudfront-hostname> `
+  -IConfirmAuthorizedTarget
 ```
 
-The plan repeatedly loads the home page, shared assets, market guide, and project page. Start with the bounded defaults and increase concurrency only after reviewing account quotas and prior results. Generated JTL and HTML reports are stored under ignored `tmp/` paths.
+The plan repeatedly loads the home page, shared assets, market guide, and project page. The wrappers reject non-HTTPS remote targets, require an exact hostname allowlist and authorization confirmation, and cap concurrency and duration. These are load and overload-rejection checks, not DDoS tests. Generated JTL and HTML reports are stored under ignored `tmp/` paths.

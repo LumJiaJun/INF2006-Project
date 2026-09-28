@@ -49,6 +49,7 @@ models/
 
 # Local test and deployment output
 tmp/
+jmeter.log
 dist/
 src/infrastructure/*.zip
 coverage/

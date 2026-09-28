@@ -29,6 +29,7 @@
           </elementProp>
           <stringProp name="HTTPSampler.domain">${__P(host)}</stringProp>
           <stringProp name="HTTPSampler.protocol">${__P(protocol,https)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(port,)}</stringProp>
           <stringProp name="HTTPSampler.connect_timeout">5000</stringProp>
           <stringProp name="HTTPSampler.response_timeout">10000</stringProp>
         </ConfigTestElement>

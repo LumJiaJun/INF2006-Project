@@ -2,20 +2,38 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$FrontendUrl,
 
-    [ValidateRange(1, 100)]
+    [ValidateRange(1, 50)]
     [int]$Threads = 10,
 
     [ValidateRange(1, 300)]
     [int]$RampSeconds = 10,
 
-    [ValidateRange(5, 600)]
+    [ValidateRange(5, 120)]
     [int]$DurationSeconds = 30,
 
-    [string]$JMeterCommand = 'jmeter'
+    [string]$JMeterCommand = 'jmeter',
+
+    [string]$AllowedHost,
+
+    [switch]$IConfirmAuthorizedTarget
 )
 
 $ErrorActionPreference = 'Stop'
 $uri = [Uri]$FrontendUrl
+if (-not $uri.IsAbsoluteUri) {
+    throw 'FrontendUrl must be an absolute URL.'
+}
+if (-not $uri.IsLoopback) {
+    if ($uri.Scheme -ne 'https') {
+        throw 'Non-loopback load-test targets must use HTTPS.'
+    }
+    if (-not $IConfirmAuthorizedTarget) {
+        throw 'Use -IConfirmAuthorizedTarget only after confirming that you own or are authorized to test the target.'
+    }
+    if (-not $AllowedHost -or $AllowedHost -ne $uri.Host) {
+        throw 'AllowedHost must exactly match the non-loopback target hostname.'
+    }
+}
 $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $outputDirectory = Join-Path $PSScriptRoot "../tmp/jmeter-$timestamp"
 $resultFile = Join-Path $outputDirectory 'results.jtl'
@@ -29,6 +47,7 @@ New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
     -t $testPlan `
     "-Jprotocol=$($uri.Scheme)" `
     "-Jhost=$($uri.Host)" `
+    "-Jport=$($uri.Port)" `
     "-Jthreads=$Threads" `
     "-Jramp_seconds=$RampSeconds" `
     "-Jduration_seconds=$DurationSeconds" `
