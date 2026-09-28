@@ -1,11 +1,5 @@
-# Store shared Terraform state outside Git. The bucket is private, encrypted,
-# versioned, and scoped to the project AWS account.
+# Backend values are supplied from an ignored backend.hcl file so account-specific
+# identifiers never enter Git. See backend.hcl.example and bootstrap/README.md.
 terraform {
-  backend "s3" {
-    bucket       = "airbnb-market-intelligence-tfstate-574816782582"
-    key          = "airbnb-market-intelligence/dev/terraform.tfstate"
-    region       = "ap-southeast-1"
-    encrypt      = true
-    use_lockfile = true
-  }
+  backend "s3" {}
 }

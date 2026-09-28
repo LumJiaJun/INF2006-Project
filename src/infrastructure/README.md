@@ -16,7 +16,7 @@ Terraform provisions the AWS resources for the serverless application, identity,
 
 ## Prerequisites
 
-- Terraform 1.6 or newer
+- Terraform 1.10 or newer
 - AWS credentials available through the standard AWS credential chain
 - Permission to create the resources declared in this directory
 
@@ -24,34 +24,33 @@ Do not place AWS access keys in Terraform variables or files.
 
 ## Shared state
 
-Terraform state is stored in the private, encrypted, versioned S3 bucket
-`airbnb-market-intelligence-tfstate-574816782582` at
-`airbnb-market-intelligence/dev/terraform.tfstate`. S3 lockfiles prevent two
-team members from changing the state concurrently. State and plan files remain
-excluded from Git because they can contain sensitive infrastructure values.
+The `bootstrap` Terraform root defines a private, versioned S3 state bucket,
+customer-managed KMS encryption, public-access blocking, and TLS-only access.
+The bucket stores state while KMS only supplies encryption keys. Secrets
+Manager is not appropriate for Terraform state. S3 lockfiles prevent two team
+members from changing the state concurrently.
 
-If the main deployment computer still has the original local
-`terraform.tfstate`, migrate it once from `src/infrastructure`:
+Create an ignored `backend.hcl` from `backend.hcl.example` using the bootstrap
+outputs, then initialize from `src/infrastructure`:
 
 ```bash
 aws sts get-caller-identity
-terraform init -migrate-state
+terraform init -backend-config=backend.hcl
 terraform state list
 terraform plan
 ```
 
-Confirm that the AWS account is `574816782582` and accept the state migration
-prompt. Preserve a private backup of the original state until `terraform state
-list` shows the expected resources and `terraform plan` shows no unexpected
-creation or replacement. Never commit that backup.
-
-If no original state exists, stop after `terraform init`. Do not run `apply` or
-`destroy`: the deployed resources must first be imported into state.
+The application stack was intentionally removed after its evidence run, so a
+fresh environment should initially have an empty application state and a plan
+that creates the declared resources. Never apply if AWS contains an existing
+stack that is absent from `terraform state list`; import those resources first.
+State, plan, backend configuration, account IDs, and credentials remain outside
+Git because state and plans can contain sensitive infrastructure values.
 
 ## Validate
 
 ```bash
-terraform init
+terraform init -backend-config=backend.hcl
 terraform fmt -check
 terraform validate
 terraform plan
