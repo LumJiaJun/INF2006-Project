@@ -17,9 +17,62 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify:
+    name: Pre-deployment verification
+    if: inputs.confirmation == 'DEPLOY' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/nixon')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out reviewed revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
+
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r tests/requirements.txt
+
+      - name: Run application verification
+        run: |
+          python -m unittest discover -s tests -p "test_*.py" -v
+          python -m compileall -q analytics src/backend
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Check frontend JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r file; do
+            node --check "$file"
+          done < <(find src/frontend -type f -name '*.js' -print)
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9 # v4.0.1
+        with:
+          terraform_version: "1.14.6"
+          terraform_wrapper: false
+
+      - name: Validate Terraform without remote credentials
+        working-directory: src/infrastructure
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+
   deploy:
     name: Terraform apply
-    if: inputs.confirmation == 'DEPLOY'
+    needs: verify
+    if: inputs.confirmation == 'DEPLOY' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/nixon')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: development

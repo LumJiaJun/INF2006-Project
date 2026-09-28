@@ -73,6 +73,9 @@ Pull requests and pushes to `main` or `nixon` run unit tests, Python compilation
 frontend syntax checks, secret-pattern checks, Terraform formatting and
 validation, and CodeQL SAST for Python and JavaScript. Deployment is manual,
 requires typing `DEPLOY`, and is gated by the GitHub `development` environment.
+The `Deploy development` workflow accepts only `main` or `nixon`, repeats the
+application and Terraform validation before assuming AWS access, then requires
+the protected `development` environment before it can apply the reviewed plan.
 It uses GitHub OIDC rather than stored AWS access keys.
 
 After a successful deployment, OWASP ZAP DAST performs a passive baseline scan.
@@ -82,6 +85,12 @@ Markdown reports, and fails on any ZAP warning, failure, or scanner error.
 Configure `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`, `TF_STATE_KMS_KEY_ARN`,
 `MODEL_ARTIFACT_S3_URI`, `DAST_TARGET_URL`, and `DAST_ALLOWED_HOST` in the
 protected GitHub environment before using deployment or DAST.
+
+To deploy, open GitHub Actions, select `Deploy development`, choose `nixon` or
+`main`, and type `DEPLOY`. Configure required reviewers in the `development`
+environment first so GitHub pauses before the AWS apply step. The OIDC role
+trust policy must allow only this repository and the `development` environment;
+do not replace this with long-lived AWS access keys.
 
 The state bootstrap under `src/infrastructure/bootstrap` manages a private,
 versioned S3 bucket encrypted with a rotating customer-managed KMS key. S3
