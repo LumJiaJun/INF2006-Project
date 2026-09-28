@@ -36,6 +36,15 @@
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/auth.tf`, `src/infrastructure/history.tf`, `src/backend/history/handler.py`, and `tests/test_history.py`
 
+## AI chat history isolation
+
+- **Objective:** Verify that the AI route requires a verified Cognito subject and supplies only that subject's recent prediction records to the model.
+- **Setup:** API Gateway JWT authorizer, a dedicated chat Lambda role with `dynamodb:Query` only, and a DynamoDB table partitioned by `user_id`.
+- **Command / steps:** Run `python tests/test_chat.py -v` and the deployed `tests/smoke_api.ps1` check without an authorization token.
+- **Expected result:** Missing claims return HTTP 401. For an authenticated event, the Lambda queries the `user_id` partition using the validated JWT `sub`, projects only required prediction fields, requests at most ten rows, and uses a strongly consistent read so a newly saved prediction is available to the chat context without eventual-consistency delay.
+- **Actual result:** Passed in focused handler tests on 2026-09-28. The test verified the bounded Bedrock request, injected prediction context, ten-row limit, and `ConsistentRead=True`; the deployed route rejected unauthenticated requests. A full Cognito browser journey that saves a real prediction and asks the live assistant remains outstanding because it requires a consented test mailbox.
+- **Artefact path:** `src/backend/chat/handler.py`, `src/infrastructure/chat.tf`, `tests/test_chat.py`, and `tests/smoke_api.ps1`
+
 ## Data-lake access control
 
 - **Objective:** Verify that raw and processed analytical data are encrypted and unavailable through anonymous S3 requests.

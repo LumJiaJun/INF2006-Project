@@ -14,8 +14,9 @@ SPEC.loader.exec_module(chat_handler)
 
 
 class FakeBedrock:
-    def __init__(self, fail=False):
+    def __init__(self, fail=False, reply="Use the estimator form."):
         self.fail = fail
+        self.reply = reply
         self.request = None
 
     def converse(self, **kwargs):
@@ -23,7 +24,7 @@ class FakeBedrock:
         if self.fail:
             raise RuntimeError("bedrock unavailable")
         return {
-            "output": {"message": {"content": [{"text": "Use the estimator form."}]}},
+            "output": {"message": {"content": [{"text": self.reply}]}},
             "usage": {"inputTokens": 20, "outputTokens": 6},
         }
 
@@ -74,9 +75,20 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(body["reply"], "Use the estimator form.")
         self.assertEqual(fake.request["modelId"], chat_handler.MODEL_ID)
         self.assertEqual(fake.request["inferenceConfig"]["maxTokens"], 220)
-        self.assertIn("does not contain profile", fake.request["system"][0]["text"])
+        self.assertIn("untrusted data", fake.request["system"][0]["text"])
+        self.assertIn("no more than 120 words", fake.request["system"][0]["text"])
         self.assertIn('"city":"Singapore"', fake.request["messages"][0]["content"][0]["text"])
         self.assertEqual(chat_handler._history_table.request["Limit"], 10)
+        self.assertTrue(chat_handler._history_table.request["ConsistentRead"])
+
+    def test_truncates_model_reply_to_safe_word_limit(self):
+        chat_handler._bedrock = FakeBedrock(reply="word " * 140)
+
+        result = chat_handler.lambda_handler(self.event({"message": "Summarise my history"}), None)
+        body = json.loads(result["body"])
+
+        self.assertEqual(result["statusCode"], 200)
+        self.assertEqual(len(body["reply"].split()), chat_handler.MAX_REPLY_WORDS)
 
     def test_rejects_empty_message(self):
         result = chat_handler.lambda_handler(self.event({"message": "  "}), None)
@@ -123,7 +135,7 @@ class ChatHandlerTests(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 200)
         self.assertIn(
-            "Recent saved predictions: unavailable",
+            '"recent_saved_predictions":"unavailable"',
             fake.request["messages"][0]["content"][0]["text"],
         )
 
