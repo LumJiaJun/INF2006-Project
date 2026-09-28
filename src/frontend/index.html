@@ -139,10 +139,21 @@
         </div>
 
         <div class="estimator-workspace">
-          <div class="form-progress" aria-hidden="true">
-            <span><b>1</b> Market</span>
-            <span><b>2</b> Listing</span>
-            <span><b>3</b> Host</span>
+          <div class="form-progress" aria-label="Estimator steps">
+            <span data-step="market"><b>1</b> Market</span>
+            <span data-step="listing"><b>2</b> Listing</span>
+            <span data-step="host"><b>3</b> Host</span>
+          </div>
+
+          <div class="estimator-readiness" aria-live="polite">
+            <div class="readiness-heading">
+              <span>Estimator readiness</span>
+              <strong id="readiness-label">Preparing fields</strong>
+            </div>
+            <div class="readiness-track" aria-hidden="true">
+              <span id="readiness-bar"></span>
+            </div>
+            <p id="readiness-detail">Complete the market, listing, and host signals to estimate.</p>
           </div>
 
           <form id="prediction-form" class="prediction-form">

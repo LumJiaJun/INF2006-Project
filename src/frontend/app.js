@@ -38,6 +38,9 @@ const snapshotLocation = document.querySelector("#snapshot-location");
 const snapshotStay = document.querySelector("#snapshot-stay");
 const snapshotSpace = document.querySelector("#snapshot-space");
 const snapshotSignals = document.querySelector("#snapshot-signals");
+const readinessLabel = document.querySelector("#readiness-label");
+const readinessBar = document.querySelector("#readiness-bar");
+const readinessDetail = document.querySelector("#readiness-detail");
 let analyticsItems = [];
 let selectedMarket = null;
 
@@ -264,6 +267,7 @@ function updateCityFields() {
     2
   ).toFixed(5);
   updateListingSnapshot();
+  updateEstimatorReadiness();
 }
 
 // Keep a concise listing summary visible while the user adjusts model inputs.
@@ -289,6 +293,37 @@ function updateListingSnapshot() {
   snapshotStay.textContent = `${guests} guest${guests === 1 ? "" : "s"}, ${bedrooms} bedroom${bedrooms === 1 ? "" : "s"}`;
   snapshotSpace.textContent = formData.get("room_type") || "Select a room type";
   snapshotSignals.textContent = signals.length ? signals.join(" + ") : "No host signals selected";
+}
+
+// Show which estimator sections are complete before the user requests a model estimate.
+function updateEstimatorReadiness() {
+  const sections = {
+    market: ["city", "neighbourhood", "property_type", "room_type", "latitude", "longitude"],
+    listing: [
+      "accommodates",
+      "minimum_nights",
+      "host_total_listings_count",
+      "amenities_count",
+    ],
+    host: ["host_identity_verified", "host_is_superhost", "instant_bookable"],
+  };
+  const completedSections = Object.entries(sections).filter(([section, fields]) => {
+    if (section === "host") {
+      return fields.some((fieldName) => predictionForm.elements.namedItem(fieldName).checked);
+    }
+    return fields.every((fieldName) => predictionForm.elements.namedItem(fieldName).checkValidity());
+  });
+  const completedCount = completedSections.length;
+
+  document.querySelectorAll(".form-progress [data-step]").forEach((step) => {
+    step.classList.toggle("is-complete", completedSections.some(([name]) => name === step.dataset.step));
+  });
+  readinessBar.style.width = `${(completedCount / 3) * 100}%`;
+  readinessLabel.textContent = completedCount === 3 ? "Ready to estimate" : `${completedCount} of 3 sections ready`;
+  readinessDetail.textContent =
+    completedCount === 3
+      ? "All required inputs are complete. You can request a model estimate."
+      : "Complete the highlighted sections to prepare a complete estimate.";
 }
 
 async function loadModelOptions() {
@@ -346,6 +381,8 @@ function showPredictionResult(content, isError = false) {
 citySelect.addEventListener("change", updateCityFields);
 predictionForm.addEventListener("input", updateListingSnapshot);
 predictionForm.addEventListener("change", updateListingSnapshot);
+predictionForm.addEventListener("input", updateEstimatorReadiness);
+predictionForm.addEventListener("change", updateEstimatorReadiness);
 
 predictionForm.addEventListener("submit", async (event) => {
   event.preventDefault();

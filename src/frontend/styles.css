@@ -517,6 +517,67 @@ h3 {
   background: var(--mint);
 }
 
+.form-progress .is-complete {
+  color: var(--forest);
+}
+
+.form-progress .is-complete b {
+  color: #fff;
+  background: var(--success);
+}
+
+/* The readiness panel gives the estimator form a live dashboard-style checkpoint. */
+.estimator-readiness {
+  display: grid;
+  gap: 0.55rem;
+  margin: -0.65rem 0 1.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface-soft);
+}
+
+.readiness-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.readiness-heading strong {
+  color: var(--forest);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.readiness-track {
+  height: 0.38rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--mint);
+}
+
+.readiness-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--forest), var(--success));
+  transition: width 220ms ease;
+}
+
+.estimator-readiness p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
 .prediction-form {
   display: grid;
   gap: 1.4rem;

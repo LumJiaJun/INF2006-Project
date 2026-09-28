@@ -48,3 +48,16 @@ Run the CloudFront browser journey with Apache JMeter 5.6.3 or newer:
 ```
 
 The plan repeatedly loads the home page, shared assets, market guide, and project page. The wrappers reject non-HTTPS remote targets, require an exact hostname allowlist and authorization confirmation, and cap concurrency and duration. These are load and overload-rejection checks, not DDoS tests. Generated JTL and HTML reports are stored under ignored `tmp/` paths.
+
+Run the paced Lambda-backed health profile with JMeter:
+
+```powershell
+$healthUrl = terraform -chdir=src/infrastructure output -raw health_url
+$apiHost = ([Uri]$healthUrl).Host
+./tests/run_jmeter_health.ps1 `
+  -HealthUrl $healthUrl `
+  -AllowedHost $apiHost `
+  -IConfirmAuthorizedTarget
+```
+
+This profile uses one paced visitor at about 1.4 requests per second, below the deployed two-request-per-second API Gateway limit. It asserts HTTP 200 and the expected health JSON, so any Lambda, API Gateway, or response failure fails the run.
