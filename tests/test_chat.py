@@ -2,6 +2,7 @@ import importlib.util
 import json
 import sys
 import unittest
+from decimal import Decimal
 from pathlib import Path
 
 
@@ -27,14 +28,45 @@ class FakeBedrock:
         }
 
 
+class FakeHistoryTable:
+    def __init__(self, fail=False):
+        self.fail = fail
+        self.request = None
+
+    def query(self, **kwargs):
+        self.request = kwargs
+        if self.fail:
+            raise RuntimeError("history unavailable")
+        return {
+            "Items": [
+                {
+                    "city": "Singapore",
+                    "predicted_price": Decimal("125.50"),
+                    "currency": "SGD",
+                }
+            ]
+        }
+
+
 class ChatHandlerTests(unittest.TestCase):
+    def setUp(self):
+        chat_handler._history_table = FakeHistoryTable()
+
+    @staticmethod
+    def event(payload):
+        return {
+            "body": json.dumps(payload),
+            "requestContext": {
+                "authorizer": {"jwt": {"claims": {"sub": "authenticated-user"}}}
+            },
+        }
+
     def test_returns_bounded_model_reply(self):
         fake = FakeBedrock()
         chat_handler._bedrock = fake
 
         result = chat_handler.lambda_handler(
-            {"body": json.dumps({"message": "How do I estimate a price?", "page": "index.html"})},
-            None,
+            self.event({"message": "How do I estimate a price?", "page": "index.html"}), None
         )
         body = json.loads(result["body"])
 
@@ -43,21 +75,23 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(fake.request["modelId"], chat_handler.MODEL_ID)
         self.assertEqual(fake.request["inferenceConfig"]["maxTokens"], 220)
         self.assertIn("does not contain profile", fake.request["system"][0]["text"])
+        self.assertIn('"city":"Singapore"', fake.request["messages"][0]["content"][0]["text"])
+        self.assertEqual(chat_handler._history_table.request["Limit"], 10)
 
     def test_rejects_empty_message(self):
-        result = chat_handler.lambda_handler({"body": '{"message":"  "}'}, None)
+        result = chat_handler.lambda_handler(self.event({"message": "  "}), None)
         self.assertEqual(result["statusCode"], 400)
 
     def test_rejects_oversized_message(self):
         result = chat_handler.lambda_handler(
-            {"body": json.dumps({"message": "x" * 501})},
+            self.event({"message": "x" * 501}),
             None,
         )
         self.assertEqual(result["statusCode"], 400)
 
     def test_rejects_unknown_fields(self):
         result = chat_handler.lambda_handler(
-            {"body": json.dumps({"message": "hello", "admin": True})},
+            self.event({"message": "hello", "admin": True}),
             None,
         )
         self.assertEqual(result["statusCode"], 400)
@@ -65,7 +99,7 @@ class ChatHandlerTests(unittest.TestCase):
     def test_returns_safe_error_when_bedrock_fails(self):
         chat_handler._bedrock = FakeBedrock(fail=True)
         result = chat_handler.lambda_handler(
-            {"body": json.dumps({"message": "hello"})},
+            self.event({"message": "hello"}),
             None,
         )
         body = json.loads(result["body"])
@@ -73,6 +107,25 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(result["statusCode"], 503)
         self.assertEqual(body["error"]["code"], "assistant_unavailable")
         self.assertNotIn("bedrock", body["error"]["message"].lower())
+
+    def test_rejects_direct_invocation_without_verified_claims(self):
+        result = chat_handler.lambda_handler(
+            {"body": json.dumps({"message": "Show my history"})}, None
+        )
+        self.assertEqual(result["statusCode"], 401)
+
+    def test_continues_without_history_when_dynamodb_is_unavailable(self):
+        fake = FakeBedrock()
+        chat_handler._bedrock = fake
+        chat_handler._history_table = FakeHistoryTable(fail=True)
+
+        result = chat_handler.lambda_handler(self.event({"message": "How does this work?"}), None)
+
+        self.assertEqual(result["statusCode"], 200)
+        self.assertIn(
+            "Recent saved predictions: unavailable",
+            fake.request["messages"][0]["content"][0]["text"],
+        )
 
 
 if __name__ == "__main__":

@@ -37,6 +37,12 @@ data "aws_iam_policy_document" "chat_lambda_access" {
   }
 
   statement {
+    sid       = "ReadOwnPredictionHistory"
+    actions   = ["dynamodb:Query"]
+    resources = [aws_dynamodb_table.prediction_history.arn]
+  }
+
+  statement {
     sid = "WriteChatFunctionLogs"
     actions = [
       "logs:CreateLogStream",
@@ -67,7 +73,8 @@ resource "aws_lambda_function" "chat" {
 
   environment {
     variables = {
-      BEDROCK_MODEL_ID = "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+      BEDROCK_MODEL_ID   = "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+      HISTORY_TABLE_NAME = aws_dynamodb_table.prediction_history.name
     }
   }
 
