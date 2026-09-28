@@ -1,7 +1,6 @@
 # Team Work Guide
 
-Class: EP2  
-Group: G014
+Class: EP2, Group: G014
 
 This guide explains how to work on the current Airbnb Pricing and Market
 Intelligence Platform without overwriting another person's deployment or
