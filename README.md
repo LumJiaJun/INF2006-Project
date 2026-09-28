@@ -21,10 +21,11 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 
 ## Deployment status
 
-The evidence deployment was intentionally destroyed after testing to stop
-ongoing charges. The main page remains the estimator and market dashboard, with
-separate market and project pages, and can be recreated from Terraform after
-the prediction model artifact is available.
+The development stack was recreated and tested on 2026-09-28 using the
+evaluated model artifact and the supplied listings dataset. The main page is
+the estimator and market dashboard, with separate market and project pages.
+See `evidence/live-deployment-test-2026-09-28.md` for redacted deployment and
+test results.
 
 ## Quickstart commands
 
@@ -95,7 +96,7 @@ provisioned for the current scope.
 ## Known limitations
 
 - Full sign-up, email verification, prediction save, and history retrieval require a manual browser test with a real email account.
-- The evidence deployment is currently offline and must be recreated before browser testing.
+- Full sign-up, email verification, prediction save, and history retrieval still need a dedicated browser journey with a consented test mailbox.
 - The city analytics use different local currencies and must not be compared as if they shared one currency.
 - The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation and descriptive market analytics, not future-price forecasting or condition monitoring.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.

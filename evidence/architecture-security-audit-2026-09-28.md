@@ -64,7 +64,7 @@ The remaining Checkov failures are not all exploitable vulnerabilities. They inc
 
 ## Residual Risks and Follow-Up
 
-- The application stack is intentionally offline, so DAST has not run against a live target. The gated ZAP workflow is ready for the next approved deployment.
+- A local passive ZAP baseline ran against the live deployment on 2026-09-28. The GitHub-gated DAST workflow still needs its protected environment variables before it can run from CI.
 - GitHub deployment requires the repository OIDC role and protected environment variables to be configured outside source control.
 - CloudFront access logging is not enabled. API and Lambda logs cover application requests, while CloudFront logging should be reconsidered if edge-level investigation becomes a requirement.
 - Fourteen-day log retention is a cost-conscious academic setting, not a long-term compliance retention policy.

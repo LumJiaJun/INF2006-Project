@@ -40,12 +40,11 @@ terraform state list
 terraform plan
 ```
 
-The application stack was intentionally removed after its evidence run, so a
-fresh environment should initially have an empty application state and a plan
-that creates the declared resources. Never apply if AWS contains an existing
-stack that is absent from `terraform state list`; import those resources first.
-State, plan, backend configuration, account IDs, and credentials remain outside
-Git because state and plans can contain sensitive infrastructure values.
+Before applying, compare `terraform state list` with the AWS account. Never
+apply if AWS contains an existing application stack that is absent from state;
+import those resources first. State, plan, backend configuration, account IDs,
+and credentials remain outside Git because state and plans can contain
+sensitive infrastructure values.
 
 ## Validate
 

@@ -107,6 +107,16 @@ resource "aws_apigatewayv2_stage" "default" {
   name        = "$default"
   auto_deploy = true
 
+  # Route-specific throttling requires every referenced route to exist before the stage.
+  depends_on = [
+    aws_apigatewayv2_route.analytics,
+    aws_apigatewayv2_route.authenticated_prediction,
+    aws_apigatewayv2_route.chat,
+    aws_apigatewayv2_route.health,
+    aws_apigatewayv2_route.history,
+    aws_apigatewayv2_route.prediction,
+  ]
+
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_access.arn
     format = jsonencode({

@@ -56,7 +56,7 @@ resource "aws_cloudfront_response_headers_policy" "frontend_security" {
 
   security_headers_config {
     content_security_policy {
-      content_security_policy = "default-src 'self'; connect-src 'self' https://*.execute-api.${var.aws_region}.amazonaws.com https://${aws_cognito_user_pool_domain.users.domain}.auth.${var.aws_region}.amazoncognito.com; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; script-src 'self'; style-src 'self'"
+      content_security_policy = "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; frame-src 'none'; worker-src 'none'; manifest-src 'self'; connect-src 'self' https://*.execute-api.${var.aws_region}.amazonaws.com https://${aws_cognito_user_pool_domain.users.domain}.auth.${var.aws_region}.amazoncognito.com; img-src 'self' data:; script-src 'self'; style-src 'self'; font-src 'self'"
       override                = true
     }
 
@@ -79,6 +79,27 @@ resource "aws_cloudfront_response_headers_policy" "frontend_security" {
       include_subdomains         = true
       override                   = true
       preload                    = false
+    }
+  }
+
+  # Browser capability and opener policies reduce exposure without changing app behavior.
+  custom_headers_config {
+    items {
+      header   = "Permissions-Policy"
+      override = true
+      value    = "accelerometer=(), camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+    }
+
+    items {
+      header   = "Cross-Origin-Opener-Policy"
+      override = true
+      value    = "same-origin"
+    }
+
+    items {
+      header   = "Cross-Origin-Resource-Policy"
+      override = true
+      value    = "same-origin"
     }
   }
 }

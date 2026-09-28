@@ -33,7 +33,10 @@ foreach ($header in @(
     'Content-Security-Policy',
     'Strict-Transport-Security',
     'X-Content-Type-Options',
-    'X-Frame-Options'
+    'X-Frame-Options',
+    'Permissions-Policy',
+    'Cross-Origin-Opener-Policy',
+    'Cross-Origin-Resource-Policy'
 )) {
     if (-not $frontendResponse.Headers[$header]) {
         throw "The frontend response is missing security header $header."
