@@ -53,6 +53,14 @@
 - **Actual result:** Passed on 2026-09-28. Claude Haiku returned an answer describing the synthetic Paris/Louvre prediction at EUR 123.45; CloudWatch recorded one retrieved history row; cleanup completed. This direct Lambda test proves model-plus-DynamoDB integration, while the separate anonymous API test proves the protected route rejects missing JWTs.
 - **Artefact path:** `tests/run_chat_integration.ps1`, `src/backend/chat/handler.py`, and `src/infrastructure/outputs.tf`
 
+## Authenticated browser journey
+
+- **Objective:** Verify the real Cognito-to-API-to-DynamoDB-to-Bedrock journey from the website.
+- **Steps:** A signed-in tester created a Cognito account, submitted a Bangkok estimate for a barn/entire-place listing with 2 guests, 1 bedroom, and 2 minimum nights, then asked the guide for the latest saved prediction.
+- **Actual result:** Passed on 2026-09-28. The website displayed the saved `714.56 THB` Bangkok prediction in private history, and the chatbot returned the same Bangkok listing details and model version from DynamoDB context. No credentials, verification codes, or tokens were recorded.
+- **Security result:** The chat response was user-scoped and the test used the temporary no-MFA window only. Required TOTP MFA is being restored immediately after this journey.
+- **Known limitation:** The response is model-generated and must remain an estimate; this test proves retrieval and context flow, not universal factual accuracy for every question.
+
 ## Data-lake access control
 
 - **Objective:** Verify that raw and processed analytical data are encrypted and unavailable through anonymous S3 requests.
