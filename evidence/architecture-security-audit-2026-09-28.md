@@ -71,6 +71,16 @@ The remaining Checkov failures are not all exploitable vulnerabilities. They inc
 - The CloudFront default certificate provides HTTPS but cannot enforce a custom TLS minimum policy without a custom domain and ACM certificate.
 - Static analysis reduces risk but does not replace authorization tests, DAST, load tests, dependency monitoring, or review after each architecture change.
 
+## Official AWS pattern cross-check
+
+The AWS reference comparison is recorded in
+`evidence/aws-serverless-reference-review-2026-09-28.md`. It confirms that the
+current Cognito, API Gateway, focused Lambda, DynamoDB, CloudFront, and S3
+pattern is aligned with the reviewed AWS serverless samples. It also confirms
+that a VPC is not a mandatory component of this Lambda/API Gateway/DynamoDB
+pattern; it becomes justified when a function must reach a private-subnet
+dependency or controlled private egress.
+
 ## Adheesh Branch Decision
 
 The `origin/adheesh` branch was reviewed separately. Its StaySphere booking brand, FastAPI/RDS/container runtime, and synthetic application behavior do not match the approved serverless pricing platform or its dataset-backed claims. Those components were not merged. Only the general interaction idea of summarizing a configured listing was adapted into the existing estimator, using the current project brand and real model inputs.
