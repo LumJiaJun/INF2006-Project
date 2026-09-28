@@ -26,6 +26,8 @@ const refreshHistoryButton = document.querySelector("#refresh-history");
 const analyticsMessage = document.querySelector("#analytics-message");
 const analyticsGrid = document.querySelector("#analytics-grid");
 const analyticsSort = document.querySelector("#analytics-sort");
+const analyticsSearch = document.querySelector("#analytics-search");
+const marketResultCount = document.querySelector("#market-result-count");
 const spotlightCity = document.querySelector("#spotlight-city");
 const spotlightDescription = document.querySelector("#spotlight-description");
 const spotlightMedian = document.querySelector("#spotlight-median");
@@ -41,6 +43,11 @@ const snapshotSignals = document.querySelector("#snapshot-signals");
 const readinessLabel = document.querySelector("#readiness-label");
 const readinessBar = document.querySelector("#readiness-bar");
 const readinessDetail = document.querySelector("#readiness-detail");
+const saveDraftButton = document.querySelector("#save-draft");
+const restoreDraftButton = document.querySelector("#restore-draft");
+const clearDraftButton = document.querySelector("#clear-draft");
+const draftStatus = document.querySelector("#draft-status");
+const draftStorageKey = "airbnb-market-intelligence-listing-draft";
 let analyticsItems = [];
 let selectedMarket = null;
 
@@ -152,7 +159,8 @@ function analyticsItem(item) {
 }
 
 function sortedAnalyticsItems() {
-  const items = [...analyticsItems];
+  const query = analyticsSearch.value.trim().toLocaleLowerCase();
+  const items = analyticsItems.filter((item) => item.city.toLocaleLowerCase().includes(query));
   if (analyticsSort.value === "listings") {
     return items.sort((first, second) => second.listing_count - first.listing_count);
   }
@@ -166,7 +174,16 @@ function sortedAnalyticsItems() {
 }
 
 function renderAnalytics() {
-  analyticsGrid.replaceChildren(...sortedAnalyticsItems().map(analyticsItem));
+  const items = sortedAnalyticsItems();
+  marketResultCount.textContent = `${items.length} of ${analyticsItems.length} markets shown`;
+  if (!items.length) {
+    const emptyState = document.createElement("p");
+    emptyState.className = "market-empty-state";
+    emptyState.textContent = "No supported market matches that search.";
+    analyticsGrid.replaceChildren(emptyState);
+    return;
+  }
+  analyticsGrid.replaceChildren(...items.map(analyticsItem));
   if (selectedMarket) {
     selectMarket(selectedMarket);
   }
@@ -199,6 +216,7 @@ async function loadAnalytics() {
 loadAnalytics();
 
 analyticsSort.addEventListener("change", renderAnalytics);
+analyticsSearch.addEventListener("input", renderAnalytics);
 
 useMarketButton.addEventListener("click", () => {
   if (!selectedMarket || !modelOptions) {
@@ -326,6 +344,85 @@ function updateEstimatorReadiness() {
       : "Complete the highlighted sections to prepare a complete estimate.";
 }
 
+// Keep only the current listing form values in local browser storage for a later visit.
+function listingDraft() {
+  return Array.from(predictionForm.elements)
+    .filter((field) => field.name)
+    .reduce((draft, field) => {
+      draft[field.name] = field.type === "checkbox" ? field.checked : field.value;
+      return draft;
+    }, {});
+}
+
+function storedDraft() {
+  try {
+    const draft = window.localStorage.getItem(draftStorageKey);
+    return draft ? JSON.parse(draft) : null;
+  } catch (error) {
+    console.warn("Listing draft could not be read", error);
+    return null;
+  }
+}
+
+function updateDraftControls(message) {
+  const hasDraft = Boolean(storedDraft());
+  restoreDraftButton.disabled = !hasDraft;
+  clearDraftButton.disabled = !hasDraft;
+  draftStatus.textContent = message || (hasDraft ? "A listing draft is saved on this device." : "No draft saved on this device.");
+}
+
+function restoreListingDraft() {
+  const draft = storedDraft();
+  if (!draft) {
+    updateDraftControls();
+    return;
+  }
+  if (typeof draft.city === "string" && Array.from(citySelect.options).some((option) => option.value === draft.city)) {
+    citySelect.value = draft.city;
+    updateCityFields();
+  }
+  Object.entries(draft).forEach(([name, value]) => {
+    if (name === "city") {
+      return;
+    }
+    const field = predictionForm.elements.namedItem(name);
+    if (!field || (field.tagName === "SELECT" && !Array.from(field.options).some((option) => option.value === value))) {
+      return;
+    }
+    if (field.type === "checkbox") {
+      field.checked = value === true;
+    } else {
+      field.value = value;
+    }
+  });
+  updateCityFields();
+  updateListingSnapshot();
+  updateEstimatorReadiness();
+  updateDraftControls("Draft restored. Review it before estimating.");
+}
+
+saveDraftButton.addEventListener("click", () => {
+  try {
+    window.localStorage.setItem(draftStorageKey, JSON.stringify(listingDraft()));
+    updateDraftControls("Draft saved in this browser. It is not sent to the platform.");
+  } catch (error) {
+    console.warn("Listing draft could not be saved", error);
+    draftStatus.textContent = "This browser could not save a draft.";
+  }
+});
+
+restoreDraftButton.addEventListener("click", restoreListingDraft);
+
+clearDraftButton.addEventListener("click", () => {
+  try {
+    window.localStorage.removeItem(draftStorageKey);
+    updateDraftControls("Browser draft cleared.");
+  } catch (error) {
+    console.warn("Listing draft could not be cleared", error);
+    draftStatus.textContent = "This browser could not clear the draft.";
+  }
+});
+
 async function loadModelOptions() {
   const response = await fetch("model-options.json", { cache: "no-store" });
   if (!response.ok) {
@@ -340,6 +437,7 @@ async function loadModelOptions() {
     citySelect.value = requestedCity;
   }
   updateCityFields();
+  updateDraftControls();
 }
 
 function numericFormValue(formData, field, optional = false) {

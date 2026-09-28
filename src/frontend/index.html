@@ -132,6 +132,18 @@
               </div>
             </dl>
           </div>
+          <!-- Draft controls keep a non-sensitive listing setup in this browser only. -->
+          <div class="draft-controls">
+            <div>
+              <span class="snapshot-label">Browser draft</span>
+              <p id="draft-status">No draft saved on this device.</p>
+            </div>
+            <div class="draft-actions">
+              <button id="save-draft" class="draft-button" type="button">Save draft</button>
+              <button id="restore-draft" class="draft-button" type="button" disabled>Restore</button>
+              <button id="clear-draft" class="draft-button draft-button-quiet" type="button" disabled>Clear</button>
+            </div>
+          </div>
           <div class="estimate-note">
             <span>Model scope</span>
             <p>Typical listings up to each city's learned 99th-percentile price boundary.</p>
@@ -245,15 +257,21 @@
               in local currency and should not be compared as a single global scale.
             </p>
           </div>
-          <label class="sort-control">
-            Arrange markets by
-            <select id="analytics-sort">
-              <option value="city">City name</option>
-              <option value="listings">Listing count</option>
-              <option value="median">Median price</option>
-              <option value="rating">Average rating</option>
-            </select>
-          </label>
+          <div class="market-tools">
+            <label class="market-search-control">
+              Find a city
+              <input id="analytics-search" type="search" placeholder="Search markets" autocomplete="off">
+            </label>
+            <label class="sort-control">
+              Arrange markets by
+              <select id="analytics-sort">
+                <option value="city">City name</option>
+                <option value="listings">Listing count</option>
+                <option value="median">Median price</option>
+                <option value="rating">Average rating</option>
+              </select>
+            </label>
+          </div>
         </div>
 
         <div class="market-spotlight" aria-live="polite">
@@ -270,7 +288,10 @@
           <button id="use-market" class="secondary-button" type="button" disabled>Use in estimator</button>
         </div>
 
-        <p id="analytics-message" class="status-message">Loading processed market data...</p>
+        <div class="analytics-status-row">
+          <p id="analytics-message" class="status-message">Loading processed market data...</p>
+          <p id="market-result-count" class="market-result-count" aria-live="polite"></p>
+        </div>
         <div id="analytics-grid" class="analytics-grid" aria-live="polite"></div>
       </section>
 
