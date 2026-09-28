@@ -55,7 +55,7 @@ terraform output analytics_url
 
 CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. The assistant can query only the signed-in user's ten latest DynamoDB prediction records and supplies those records as bounded context; DynamoDB is not treated as a general knowledge base. Authenticated predictions are stored under the token-derived user identifier. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
 
-Cognito uses email verification, a strong password policy, authorization-code flow with PKCE, and token revocation. TOTP authenticator-app MFA is supported and should be required again after the initial authenticated test; the application never handles passwords or MFA secrets.
+Cognito uses email verification, a strong password policy, authorization-code flow with PKCE, token revocation, and required TOTP authenticator-app MFA. The application never handles passwords or MFA secrets.
 
 ## Technology list
 
@@ -106,8 +106,7 @@ provisioned for the current scope.
 
 ## Known limitations
 
-- Full sign-up, email verification, prediction save, and history retrieval require a manual browser test with a real email account.
-- Full sign-up, email verification, prediction save, and history retrieval still need a dedicated browser journey with a consented test mailbox.
+- A consented single-account browser journey covering sign-up, verification, TOTP MFA, prediction save, history retrieval, and protected chat is recorded in `evidence/test-functional.md`; a separate multi-user browser isolation test remains future work.
 - The city analytics use different local currencies and must not be compared as if they shared one currency.
 - The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation and descriptive market analytics, not future-price forecasting or condition monitoring.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.

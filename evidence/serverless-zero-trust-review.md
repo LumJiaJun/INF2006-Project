@@ -1,6 +1,6 @@
 # Serverless Applications Lens and Zero Trust review
 
-Date: 2026-09-24
+Date: 2026-09-28
 
 This review compares the deployed architecture with the supplied AWS Serverless Applications Lens and Zero Trust guidance. It records implemented decisions, evidence, and remaining gaps. It does not claim formal AWS Well-Architected certification.
 
@@ -10,7 +10,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 |------|--------------------|----------------------------|
 | Compute | Five focused Lambda functions provide health, prediction, history, analytics, and protected AI. Functions keep durable state in managed services. Warm-container globals cache only SDK clients or the read-only model bundle. | `src/backend/`; 25 unit tests. Strict idempotency is not implemented for repeated authenticated prediction submissions, so a retry after an uncertain response can create another history item. The browser disables duplicate submission while a request is active, but that is not a complete idempotency control. |
 | Data | Static assets, application records, and analytical data use separate S3 and DynamoDB resources. DynamoDB uses on-demand capacity and a user/time access pattern. Glue writes city-partitioned Parquet queried through Athena. | `src/infrastructure/frontend.tf`, `data.tf`, `data_lake.tf`; `evidence/data-pipeline.md`. The prediction model is isolated in an immutable ECR image rather than the data-lake model prefix. |
-| Identity | Cognito handles application users. API Gateway validates JWTs for history, saved predictions, and AI access. History ownership comes only from the verified `sub` claim. AWS services use separate IAM roles. | `src/infrastructure/auth.tf`; `tests/test_history.py`; `tests/test_chat.py`; `evidence/test-security.md`. MFA is disabled to keep the university sign-up flow simple; a higher-risk deployment should enable and test MFA. |
+| Identity | Cognito handles application users with required TOTP authenticator-app MFA. API Gateway validates JWTs for history, saved predictions, and AI access. History ownership comes only from the verified `sub` claim. AWS services use separate IAM roles. | `src/infrastructure/auth.tf`; `tests/test_history.py`; `tests/test_chat.py`; `evidence/test-security.md`. The authenticated browser journey verified the protected flow; no credentials or MFA codes are stored in evidence. |
 | Edge | CloudFront is the frontend entry point and uses a private OAC S3 origin. The response policy adds CSP, HSTS, anti-framing, MIME-sniffing protection, and a strict referrer policy. | `src/infrastructure/frontend.tf`; live smoke security-header test. WAF is not added because no demonstrated threat justifies its cost and rule operations for this project. |
 | Monitoring | Structured logs, detailed API metrics, Lambda invocation/error/duration/throttle metrics, a dashboard, five alarms, and an encrypted SNS action topic are provisioned. AI duration and errors have their own series. | `src/infrastructure/monitoring.tf`; `evidence/monitoring.md`. The topic requires an operator-managed confirmed subscriber. |
 | Deployment | Terraform controls cloud resources. Plans are reviewed before apply. ECR tags are immutable, shared state uses a versioned S3 backend with KMS encryption and lockfiles, and GitHub Actions validates every change. Raw-data upload and Glue execution remain controlled data operations. | `src/infrastructure/README.md`, `src/infrastructure/bootstrap`, `.github/workflows`; Git history. The AWS deployment role and GitHub environment variables must be configured before CD can run. |
@@ -68,5 +68,5 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 2. Configure the GitHub OIDC deployment role and protected environment variables.
 3. Design server-side idempotency before adding retries to saved predictions.
 4. Request a suitable Lambda concurrency quota and repeat the stress test.
-5. Enable and test Cognito MFA if user-risk assumptions change.
+5. Keep required Cognito TOTP MFA enabled and retest it after authentication changes.
 6. Re-evaluate CloudTrail when the account becomes shared or long-lived.

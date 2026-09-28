@@ -7,7 +7,7 @@ project:
   title: "Airbnb Pricing and Market Intelligence Platform"
   problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
   cloud_provider: "AWS"
-  repository_commit: "af9c604"
+  repository_commit: "2e67d0f"
 
 team:
   members:
@@ -67,7 +67,7 @@ data_ai:
 security:
   threat_control_map: "evidence/threat-control-map.md"
   secrets_handling: "No credentials are stored in source or Terraform variables; deployment uses the standard AWS credential chain and Lambda IAM roles."
-  authentication: "Cognito authorization-code flow with PKCE; API Gateway JWT authorization derives history ownership from the verified subject claim and protects AI access."
+  authentication: "Cognito authorization-code flow with PKCE, email verification, and required TOTP MFA; API Gateway JWT authorization derives history ownership from the verified subject claim and protects AI access."
 
 run:
   prerequisites:

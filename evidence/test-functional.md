@@ -37,7 +37,8 @@
 - **Expected result:** Cognito redirects to its login page, all frontend authentication assets load with their correct content types, and unauthenticated protected calls return HTTP 401.
 - **Actual result:** Passed. Cognito returned HTTP 302 to `/login`; frontend assets returned HTTP 200 with correct content types; history, saved prediction, and AI chat routes returned HTTP 401 without a token.
 - **Date:** 2026-09-23
-- **Limitation:** Creating and verifying a real user was not automated because it requires an external email account. The authenticated save-and-read path is covered by handler unit tests but still needs a recorded manual browser test.
+- **Actual authenticated journey:** Passed manually on 2026-09-28 with a consented test account during the explicitly temporary no-MFA test window. The tester signed up, logged in, saved a Bangkok estimate, viewed private history, and asked the protected assistant for the latest prediction. Cognito TOTP MFA was restored to `ON` and verified immediately afterward. No credentials, codes, or tokens were recorded.
+- **Limitation:** The journey used one test account and does not replace a separate multi-user isolation browser test.
 - **Artefact path:** `src/frontend/auth.js`, `src/frontend/app.js`, `src/infrastructure/auth.tf`, and `tests/smoke_api.ps1`
 
 ## Live market analytics

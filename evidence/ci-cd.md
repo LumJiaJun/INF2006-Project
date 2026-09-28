@@ -2,13 +2,13 @@
 
 **Validation date:** 2026-09-28
 
-**Validated commit:** `af9c604`
+**Validated commit:** `2e67d0f`
 
 ## GitHub Actions results
 
-- CI completed successfully: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36377882219
-- CodeQL SAST completed successfully for Python and JavaScript/TypeScript: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36377882314
-- The CI run executed 25 unit tests, Python compilation, frontend JavaScript syntax checks, AWS identifier checks, Terraform formatting, and validation of both Terraform roots.
+- CI completed successfully: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36418939012
+- CodeQL SAST completed successfully for Python and JavaScript/TypeScript: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36418939014
+- CI executed 26 unit tests, Python compilation, frontend JavaScript syntax checks, AWS identifier checks, Terraform formatting, and validation of both Terraform roots.
 - Actions are pinned to full commit hashes. Workflow permissions are read-only by default; only the manual deployment workflow can request an OIDC token.
 
 ## Dynamic application security testing
@@ -19,10 +19,12 @@ or by manual dispatch, accepts only an HTTPS URL whose hostname exactly matches
 `DAST_ALLOWED_HOST`, uploads reports even when findings occur, and then fails
 closed on ZAP warning, failure, or scan-error exit codes.
 
-DAST has not been executed because the evidence deployment is currently
-offline. `DAST_TARGET_URL` and `DAST_ALLOWED_HOST` must be configured in the
-protected GitHub `development` environment after recreation. This records the
-control without fabricating a scan result.
+The pinned local ZAP baseline scan was executed against the live CloudFront
+deployment on 2026-09-28. It found no high-risk alerts; five warning categories
+remain under review, including intentional static caching and a crawler
+heuristic that needs a frontend regression test. The GitHub DAST workflow is
+configured but has not been invoked because its protected environment variables
+are not yet configured. No GitHub DAST result is claimed.
 
 The first CI run exposed that `boto3` was available on the deployment computer
 but missing from a clean runner. `tests/requirements.txt` now declares it
@@ -38,14 +40,16 @@ blocking, TLS-only access, and native S3 lockfile configuration. Account IDs,
 key ARNs, backend configuration, Terraform state, and plan files remain outside
 Git.
 
-The application state contains no resources because the evidence deployment was
-intentionally destroyed. A later recreation will start from the reviewed empty
-application state rather than an untracked live stack.
+The application stack is currently live in the configured Singapore development
+account. Terraform returned `No changes` after deployment, and the live
+functional, security, bounded-load, and local DAST results are recorded in
+`evidence/live-deployment-test-2026-09-28.md`. State remains outside Git.
 
 ## Deployment gate
 
-The `Deploy development` workflow is intentionally manual and was not executed
-during this validation. Before it can run, a maintainer must configure the
+The `Deploy development` workflow is intentionally manual and was not invoked
+during this evidence run; the live stack was applied from the reviewed local
+Terraform configuration. Before the GitHub workflow can run, a maintainer must configure the
 GitHub `development` environment, its approval policy, an AWS OIDC deployment
 role, state bucket and KMS variables, and the private S3 URI of the evaluated
 model artifact. This is an explicit incomplete operational prerequisite, not a

@@ -56,7 +56,7 @@ The 429 responses match the configured two-request-per-second API Gateway limit 
 
 The pinned OWASP ZAP baseline crawled 26 frontend URLs. It found no high-risk alerts. After the response-header update, it passed the CSP and Permissions Policy checks.
 
-Six warnings remain and keep the strict DAST workflow failing until they receive explicit review:
+Five warning categories remain and keep the strict DAST workflow failing until they receive explicit review:
 
 1. Cache-control and cacheable-content notices for intentional static CloudFront caching.
 2. Informational student-code comment notices without secrets or internal paths.
@@ -75,6 +75,6 @@ ECR scan-on-push is enabled. An additional manual scan was attempted, but AWS re
 1. Add a focused frontend regression test that proves crafted query values never reach executable DOM sinks, then review whether the ZAP form-attribute alert can be safely classified as a false positive.
 2. Keep DAST strict until each remaining warning has an evidence-backed disposition. Do not use a global ZAP ignore rule for potential XSS findings.
 3. Add a verified non-personal SNS subscriber and exercise a test alarm so operational notification delivery is evidenced.
-4. Run an authenticated Cognito browser journey using a dedicated, consented test mailbox to verify sign-up, email verification, saved predictions, history, and protected AI end to end.
+4. Configure the protected GitHub DAST variables and run the repository workflow against the approved live host.
 5. Repeat the bounded live load profile after requesting a higher Lambda concurrency quota, then compare CloudWatch p95 latency and throttle metrics across runs.
 6. Review ECR scan results after its quota resets and retain a redacted image-scan export as evidence.

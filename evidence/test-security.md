@@ -42,7 +42,7 @@
 - **Setup:** API Gateway JWT authorizer, a dedicated chat Lambda role with `dynamodb:Query` only, and a DynamoDB table partitioned by `user_id`.
 - **Command / steps:** Run `python tests/test_chat.py -v` and the deployed `tests/smoke_api.ps1` check without an authorization token.
 - **Expected result:** Missing claims return HTTP 401. For an authenticated event, the Lambda queries the `user_id` partition using the validated JWT `sub`, projects only required prediction fields, requests at most ten rows, and uses a strongly consistent read so a newly saved prediction is available to the chat context without eventual-consistency delay.
-- **Actual result:** Passed in focused handler tests on 2026-09-28. The test verified the bounded Bedrock request, injected prediction context, ten-row limit, and `ConsistentRead=True`; the deployed route rejected unauthenticated requests. A full Cognito browser journey that saves a real prediction and asks the live assistant remains outstanding because it requires a consented test mailbox.
+- **Actual result:** Passed in focused handler tests on 2026-09-28. The test verified the bounded Bedrock request, injected prediction context, ten-row limit, and `ConsistentRead=True`; the deployed route rejected unauthenticated requests. The live Cognito browser journey is recorded below.
 - **Artefact path:** `src/backend/chat/handler.py`, `src/infrastructure/chat.tf`, `tests/test_chat.py`, and `tests/smoke_api.ps1`
 
 ## Deployed AI and DynamoDB integration
@@ -58,7 +58,7 @@
 - **Objective:** Verify the real Cognito-to-API-to-DynamoDB-to-Bedrock journey from the website.
 - **Steps:** A signed-in tester created a Cognito account, submitted a Bangkok estimate for a barn/entire-place listing with 2 guests, 1 bedroom, and 2 minimum nights, then asked the guide for the latest saved prediction.
 - **Actual result:** Passed on 2026-09-28. The website displayed the saved `714.56 THB` Bangkok prediction in private history, and the chatbot returned the same Bangkok listing details and model version from DynamoDB context. No credentials, verification codes, or tokens were recorded.
-- **Security result:** The chat response was user-scoped and the test used the temporary no-MFA window only. Required TOTP MFA is being restored immediately after this journey.
+- **Security result:** The chat response was user-scoped. The journey used the explicitly temporary no-MFA test window; Cognito TOTP MFA was restored to `ON` and verified immediately afterward. No credentials, verification codes, or tokens were recorded.
 - **Known limitation:** The response is model-generated and must remain an estimate; this test proves retrieval and context flow, not universal factual accuracy for every question.
 
 ## Data-lake access control
@@ -97,6 +97,6 @@
 - **Setup:** CodeQL security-extended queries for Python and JavaScript plus an OWASP ZAP baseline workflow protected by the GitHub `development` environment.
 - **Command / steps:** Push or open a pull request to run `.github/workflows/codeql.yml`. After deployment, configure `DAST_TARGET_URL` and the exact `DAST_ALLOWED_HOST`, then run `.github/workflows/dast.yml` manually or allow the successful deployment workflow to trigger it.
 - **Expected result:** CodeQL uploads security analysis for both languages. ZAP accepts only an allowlisted HTTPS host, performs passive scanning, uploads HTML, JSON, and Markdown reports, and fails the workflow on warnings, failures, or scanner errors.
-- **Actual result:** CodeQL passed for both languages on 2026-09-28. The DAST workflow is configured but not executed because the evidence deployment is offline; no dynamic-scan result is claimed.
+- **Actual result:** CodeQL passed for both languages on 2026-09-28. A pinned local ZAP baseline scan against the live CloudFront deployment found no high-risk alerts; five warning categories remain under review. The GitHub DAST workflow is configured but was not invoked because protected target variables are not configured.
 - **Date:** 2026-09-28
 - **Artefact path:** `.github/workflows/codeql.yml`, `.github/workflows/dast.yml`, and `evidence/ci-cd.md`
