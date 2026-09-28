@@ -3,6 +3,8 @@
 const marketGrid = document.querySelector("#market-page-grid");
 const marketStatus = document.querySelector("#market-page-status");
 const marketSort = document.querySelector("#market-page-sort");
+const minimumListings = document.querySelector("#market-min-listings");
+const minimumRating = document.querySelector("#market-min-rating");
 const regionButtons = [...document.querySelectorAll("#region-filters button")];
 const apiBaseUrl = window.APP_CONFIG?.apiBaseUrl;
 let markets = [];
@@ -46,6 +48,14 @@ function marketCard(item) {
   region.textContent = details.region;
   const city = document.createElement("h3");
   city.textContent = item.city;
+  const image = document.createElement("img");
+  image.className = "directory-card-image";
+  image.src = marketImageFor(item.city);
+  image.alt = `${item.city} market context`;
+  image.loading = "lazy";
+  image.addEventListener("error", () => {
+    image.src = "assets/global-markets.webp";
+  }, { once: true });
   heading.append(region, city);
 
   const note = document.createElement("p");
@@ -71,13 +81,24 @@ function marketCard(item) {
   link.href = `index.html?city=${encodeURIComponent(item.city)}#estimator`;
   link.textContent = "Estimate this market";
   link.className = "directory-card-link";
-  article.append(heading, note, metrics, link);
+  article.append(image, heading, note, metrics, link);
   return article;
+}
+
+// Keep market imagery inside the private CloudFront origin.
+function marketImageFor(city) {
+  return city.length % 2 === 0 ? "assets/terrace-analytics.webp" : "assets/global-markets.webp";
 }
 
 function renderMarkets() {
   const filtered = markets.filter((item) => {
-    return activeRegion === "All" || cityDetails[item.city]?.region === activeRegion;
+    const listingMinimum = Number(minimumListings.value) || 0;
+    const ratingMinimum = Number(minimumRating.value) || 0;
+    const ratingMatches = ratingMinimum === 0
+      || (item.average_rating !== null && item.average_rating >= ratingMinimum);
+    return (activeRegion === "All" || cityDetails[item.city]?.region === activeRegion)
+      && item.listing_count >= listingMinimum
+      && ratingMatches;
   });
   marketGrid.replaceChildren(...sortedMarkets(filtered).map(marketCard));
   marketStatus.textContent = `${filtered.length} ${filtered.length === 1 ? "market" : "markets"} shown. Prices remain in local currency.`;
@@ -103,6 +124,8 @@ async function loadMarkets() {
 }
 
 marketSort.addEventListener("change", renderMarkets);
+minimumListings.addEventListener("input", renderMarkets);
+minimumRating.addEventListener("input", renderMarkets);
 regionButtons.forEach((button) => {
   button.addEventListener("click", () => {
     activeRegion = button.dataset.region;

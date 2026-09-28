@@ -243,6 +243,19 @@
           </form>
 
           <div id="prediction-result" class="prediction-result" aria-live="polite" hidden></div>
+
+          <section id="stay-planner" class="stay-planner" aria-labelledby="stay-planner-heading" hidden>
+            <div>
+              <p class="section-label">Stay cost planner</p>
+              <h3 id="stay-planner-heading">Plan a stay around the estimate</h3>
+              <p class="planner-note">Planning calculation only. This dataset does not contain live availability or booking inventory.</p>
+            </div>
+            <div class="planner-fields">
+              <label>Check-in <input id="planner-checkin" type="date"></label>
+              <label>Check-out <input id="planner-checkout" type="date"></label>
+            </div>
+            <p id="planner-summary" class="planner-summary" aria-live="polite">Choose dates to calculate an indicative stay total.</p>
+          </section>
         </div>
       </section>
 

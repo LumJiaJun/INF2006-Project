@@ -34,6 +34,11 @@ const guideAnswers = [
     action: { label: "See architecture", href: "project.html#architecture-heading" },
   },
   {
+    patterns: ["planner", "calendar", "dates", "stay cost"],
+    response:
+      "After an estimate is returned, the stay cost planner multiplies the estimated local-currency nightly rate by your selected nights. It does not check availability, taxes, fees, bookings, or exchange rates.",
+  },
+  {
     patterns: ["safe", "security", "private", "jwt"],
     response:
       "The S3 origins remain private, API history routes require Cognito JWTs, IAM permissions are scoped per service, and operational alerts are encrypted.",
@@ -103,7 +108,7 @@ function buildGuide() {
   const messages = createElement("div", "guide-messages");
   messages.setAttribute("aria-live", "polite");
   const quickReplies = createElement("div", "guide-quick-replies");
-  ["How do estimates work?", "Compare city markets", "How do I sign up?"].forEach((prompt) => {
+  ["How do estimates work?", "Compare city markets", "How does the stay planner work?", "How do I sign up?"].forEach((prompt) => {
     const button = createElement("button", null, prompt);
     button.type = "button";
     quickReplies.append(button);

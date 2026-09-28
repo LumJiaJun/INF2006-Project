@@ -48,6 +48,12 @@ const restoreDraftButton = document.querySelector("#restore-draft");
 const clearDraftButton = document.querySelector("#clear-draft");
 const draftStatus = document.querySelector("#draft-status");
 const draftStorageKey = "airbnb-market-intelligence-listing-draft";
+const stayPlanner = document.querySelector("#stay-planner");
+const plannerCheckin = document.querySelector("#planner-checkin");
+const plannerCheckout = document.querySelector("#planner-checkout");
+const plannerSummary = document.querySelector("#planner-summary");
+let plannerRate = null;
+let plannerCurrency = "";
 let analyticsItems = [];
 let selectedMarket = null;
 
@@ -146,6 +152,14 @@ function analyticsItem(item) {
   card.setAttribute("aria-label", `View ${item.city} market details`);
   const city = document.createElement("h3");
   city.textContent = item.city;
+  const image = document.createElement("img");
+  image.className = "market-card-image";
+  image.src = marketImageFor(item.city);
+  image.alt = `${item.city} market context`;
+  image.loading = "lazy";
+  image.addEventListener("error", () => {
+    image.src = "assets/global-markets.webp";
+  }, { once: true });
   const median = document.createElement("strong");
   median.textContent = `${item.currency} ${item.median_nightly_price.toLocaleString()}`;
   const medianLabel = document.createElement("span");
@@ -156,9 +170,14 @@ function analyticsItem(item) {
     ? "not available"
     : `${item.average_to_median_ratio.toFixed(2)}x`;
   details.textContent = `${item.listing_count.toLocaleString()} listings, average rating ${rating}/100, average-to-median ${shape}`;
-  card.append(city, median, medianLabel, details);
+  card.append(image, city, median, medianLabel, details);
   card.addEventListener("click", () => selectMarket(item));
   return card;
+}
+
+// Use repository-owned images and fall back to a known local asset.
+function marketImageFor(city) {
+  return city.length % 2 === 0 ? "assets/terrace-analytics.webp" : "assets/global-markets.webp";
 }
 
 function sortedAnalyticsItems() {
@@ -479,6 +498,25 @@ function showPredictionResult(content, isError = false) {
   predictionResult.classList.toggle("prediction-result-error", isError);
 }
 
+function updateStayPlanner() {
+  if (!plannerCheckin.value || !plannerCheckout.value || plannerRate === null) {
+    plannerSummary.textContent = "Choose dates to calculate an indicative stay total.";
+    return;
+  }
+  const checkin = new Date(`${plannerCheckin.value}T00:00:00Z`);
+  const checkout = new Date(`${plannerCheckout.value}T00:00:00Z`);
+  const nights = Math.round((checkout - checkin) / 86400000);
+  if (nights <= 0) {
+    plannerSummary.textContent = "Check-out must be after check-in.";
+    return;
+  }
+  const total = plannerRate * nights;
+  plannerSummary.textContent = `${nights} night${nights === 1 ? "" : "s"} x ${plannerCurrency} ${plannerRate.toLocaleString()} estimated nightly rate = ${plannerCurrency} ${total.toLocaleString(undefined, { maximumFractionDigits: 2 })}. Taxes, fees, availability, and currency conversion are not included.`;
+}
+
+plannerCheckin.addEventListener("change", updateStayPlanner);
+plannerCheckout.addEventListener("change", updateStayPlanner);
+
 citySelect.addEventListener("change", updateCityFields);
 predictionForm.addEventListener("input", updateListingSnapshot);
 predictionForm.addEventListener("change", updateListingSnapshot);
@@ -533,6 +571,10 @@ predictionForm.addEventListener("submit", async (event) => {
       content.append(price, disclaimer);
     }
     showPredictionResult(content);
+    plannerRate = result.estimated_nightly_price;
+    plannerCurrency = result.currency;
+    stayPlanner.hidden = false;
+    updateStayPlanner();
     if (result.saved) {
       await loadHistory();
     }
