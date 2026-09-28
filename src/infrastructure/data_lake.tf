@@ -288,9 +288,10 @@ resource "aws_glue_catalog_table" "listings" {
 }
 
 resource "aws_athena_workgroup" "analytics" {
-  name        = "${local.name_prefix}-analytics"
-  description = "Governed workgroup for application market analytics"
-  state       = "ENABLED"
+  name          = "${local.name_prefix}-analytics"
+  description   = "Governed workgroup for application market analytics"
+  state         = "ENABLED"
+  force_destroy = true
 
   configuration {
     enforce_workgroup_configuration    = true

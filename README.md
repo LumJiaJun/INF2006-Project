@@ -21,11 +21,12 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 
 ## Deployment status
 
-The development stack was recreated and tested on 2026-09-28 using the
-evaluated model artifact and the supplied listings dataset. The main page is
-the estimator and market dashboard, with separate market and project pages.
-See `evidence/live-deployment-test-2026-09-28.md` for redacted deployment and
-test results.
+The development stack was last recreated and tested on 2026-09-28 using the
+evaluated model artifact and the supplied listings dataset. It was intentionally
+destroyed after evidence collection to control cost; the main page is the
+estimator and market dashboard, with separate market and project pages when
+deployed. See `evidence/live-deployment-test-2026-09-28.md` for historical,
+redacted deployment and test results.
 
 ## Quickstart commands
 
@@ -70,7 +71,7 @@ Cognito uses email verification, a strong password policy, authorization-code fl
 - Identity and data: branded Cognito Managed Login v2 and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
 - Operations: CloudWatch structured logs, metrics, dashboard and alarms with an encrypted SNS action topic
-- Delivery: GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, Dependabot, and a manually approved OIDC deployment workflow
+- Delivery: GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, and a manually approved OIDC deployment workflow
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline plus a bounded Amazon Bedrock Claude Haiku 4.5 assistant
 - Application: HTML, CSS, JavaScript, and Python
 

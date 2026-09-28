@@ -8,6 +8,8 @@ Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
 Evidence date: 28 September 2026
 
+Deployment status: The stack described here was last deployed and tested on 28 September 2026, then intentionally destroyed after evidence collection. The Terraform configuration remains reproducible for a future deployment.
+
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 
 ## 1. Problem, users and success criteria
