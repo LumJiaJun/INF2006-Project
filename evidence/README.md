@@ -4,7 +4,8 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 
 | File | Purpose |
 |------|---------|
-| architecture.png | Labelled architecture, trust boundaries, and data flows |
+| architecture-current.png | Current labelled architecture, trust boundaries, data flows, and improvement roadmap |
+| architecture.png | Earlier labelled architecture diagram retained for history |
 | test-functional.md | Functional workflow test |
 | test-security.md | Security control test |
 | test-data-ai.md | Data / AI validation test |

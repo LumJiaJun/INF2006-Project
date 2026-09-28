@@ -28,7 +28,7 @@ team:
       role: ""
 
 architecture:
-  diagram: "evidence/architecture.png"
+  diagram: "evidence/architecture-current.png"
   review: "evidence/serverless-zero-trust-review.md"
   service_model: "Serverless managed services"
   deployment_model: "Public cloud"
