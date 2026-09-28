@@ -117,6 +117,7 @@ provisioned for the current scope.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
 - The development AWS account has a concurrency quota of 10. A high-concurrency stress test caused Lambda throttles despite API Gateway rate limits; see `evidence/test-resilience.md`.
-- The SNS alert topic has no human subscription in source control and needs an operator-managed confirmed endpoint.
+- Authenticated prediction retries now use a server-side idempotency key; a separate cross-region recovery exercise remains future work.
+- The SNS alert topic has no human subscription in source control and needs an operator-managed confirmed endpoint. Terraform supports an optional `alert_email` variable, but AWS confirmation is still required.
 - Cloud deployment requires an AWS account and may incur a small cost.
 - Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`.

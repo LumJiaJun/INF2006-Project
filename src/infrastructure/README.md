@@ -72,7 +72,7 @@ terraform output operations_dashboard_name
 terraform output operational_alerts_topic_arn
 ```
 
-The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`. Signed-in users can call `/chat`; the separate AI Lambda uses the global Claude Haiku 4.5 inference profile, a 220-token output cap, and a tighter one-request-per-second API route limit.
+The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`. Signed-in prediction requests include an `Idempotency-Key`, which is stored with a 24-hour TTL so a retry replays the original result instead of creating a duplicate history item. Signed-in users can call `/chat`; the separate AI Lambda uses the global Claude Haiku 4.5 inference profile, a 220-token output cap, and a tighter one-request-per-second API route limit.
 
 After changing frontend files, invalidate CloudFront so cached objects are refreshed:
 
@@ -99,6 +99,8 @@ The job is limited to two `G.1X` workers, a ten-minute timeout, and no retries. 
 ## Monitoring
 
 CloudWatch alarms track API 5xx responses, prediction/analytics/chat Lambda errors, and health throttles. The dashboard gives the chat Lambda its own duration and error series so AI latency can be reviewed independently. Their SNS topic uses a rotating customer-managed KMS key whose policy permits only this account's named CloudWatch alarms to publish. No subscription is committed because recipient addresses are personal deployment configuration. Add and confirm an operator endpoint separately before treating the topic as a complete notification channel.
+
+To provision an optional email subscription without storing the address in Git, apply with `-var='alert_email=operator@example.com'`. AWS sends a confirmation email; the endpoint is not active until the recipient confirms it. Omitting the variable keeps the topic without a subscription.
 
 The development account has a Lambda concurrency quota of 10, so the API stage uses a conservative two-request burst and two-request-per-second limit. See `evidence/test-resilience.md` for passing expected-load results and the honestly recorded higher-concurrency failure.
 

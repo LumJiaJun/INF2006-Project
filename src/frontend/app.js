@@ -496,6 +496,7 @@ predictionForm.addEventListener("submit", async (event) => {
     const headers = { "content-type": "application/json" };
     if (idToken) {
       headers.authorization = `Bearer ${idToken}`;
+      headers["Idempotency-Key"] = crypto.randomUUID();
     }
     const response = await fetch(`${apiBaseUrl}/${route}`, {
       method: "POST",

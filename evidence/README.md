@@ -18,6 +18,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | ci-cd.md | GitHub Actions and encrypted shared-state validation |
 | ../.github/workflows/security.yml | Pinned dependency and Python static-security gates |
 | aws-serverless-reference-review-2026-09-28.md | Official AWS pattern comparison and VPC decision |
+| cross-region-recovery-plan.md | Regional recovery status, trade-offs, and implementation order |
 
 Redact account IDs, public IPs, tokens and sensitive config. Prefer text/config
 exports over screenshots. Do not include credentials or personal data.

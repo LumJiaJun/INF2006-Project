@@ -34,6 +34,16 @@ data "aws_iam_policy_document" "prediction_lambda_logs" {
   }
 
   statement {
+    sid = "ManagePredictionIdempotency"
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+    ]
+    resources = [aws_dynamodb_table.prediction_idempotency.arn]
+  }
+
+  statement {
     sid = "WritePredictionFunctionLogs"
     actions = [
       "logs:CreateLogStream",
@@ -68,7 +78,8 @@ resource "aws_lambda_function" "prediction" {
 
   environment {
     variables = {
-      HISTORY_TABLE_NAME = aws_dynamodb_table.prediction_history.name
+      HISTORY_TABLE_NAME     = aws_dynamodb_table.prediction_history.name
+      IDEMPOTENCY_TABLE_NAME = aws_dynamodb_table.prediction_idempotency.name
     }
   }
 

@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import json
 import logging
 import os
@@ -10,6 +11,7 @@ import boto3
 import joblib
 import numpy as np
 import pandas as pd
+from botocore.exceptions import ClientError
 
 
 logger = logging.getLogger()
@@ -20,6 +22,7 @@ MODEL_PATH = os.environ.get(
     os.path.join(os.path.dirname(__file__), "model", "airbnb_price_model.joblib"),
 )
 HISTORY_TABLE_NAME = os.environ.get("HISTORY_TABLE_NAME")
+IDEMPOTENCY_TABLE_NAME = os.environ.get("IDEMPOTENCY_TABLE_NAME")
 CURRENCY_BY_CITY = {
     "Bangkok": "THB",
     "Cape Town": "ZAR",
@@ -65,6 +68,7 @@ ALLOWED_FIELDS = REQUIRED_FIELDS | OPTIONAL_NUMERIC_FIELDS
 
 _model_bundle = None
 _history_table = None
+_idempotency_table = None
 
 
 def response(status_code, body):
@@ -100,6 +104,71 @@ def history_table():
             raise RuntimeError("HISTORY_TABLE_NAME is not configured")
         _history_table = boto3.resource("dynamodb").Table(HISTORY_TABLE_NAME)
     return _history_table
+
+
+def idempotency_table():
+    global _idempotency_table
+    if _idempotency_table is None:
+        if not IDEMPOTENCY_TABLE_NAME:
+            raise RuntimeError("IDEMPOTENCY_TABLE_NAME is not configured")
+        _idempotency_table = boto3.resource("dynamodb").Table(IDEMPOTENCY_TABLE_NAME)
+    return _idempotency_table
+
+
+def request_header(event, name):
+    headers = event.get("headers", {}) if isinstance(event, dict) else {}
+    return next((value for key, value in headers.items() if key.lower() == name.lower()), None)
+
+
+def idempotency_key(event):
+    value = request_header(event, "Idempotency-Key")
+    if not isinstance(value, str) or not value or len(value) > 128:
+        return None
+    if not all(character.isalnum() or character in "._-~" for character in value):
+        return None
+    return value
+
+
+def request_fingerprint(payload):
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def claim_idempotency(user_id, key, fingerprint):
+    try:
+        idempotency_table().put_item(
+            Item={
+                "user_id": user_id,
+                "idempotency_key": key,
+                "request_fingerprint": fingerprint,
+                "status": "IN_PROGRESS",
+                "expires_at": int(datetime.now(UTC).timestamp()) + 86400,
+            },
+            ConditionExpression="attribute_not_exists(user_id)",
+        )
+        return None
+    except ClientError as error:
+        if error.response.get("Error", {}).get("Code") != "ConditionalCheckFailedException":
+            raise
+        existing = idempotency_table().get_item(Key={"user_id": user_id, "idempotency_key": key}).get("Item")
+        if not existing or existing.get("request_fingerprint") != fingerprint:
+            return error_response(409, "idempotency_conflict", "This idempotency key was used for another request.")
+        if existing.get("status") == "COMPLETED" and existing.get("response_body"):
+            return {"statusCode": int(existing.get("response_status", 200)), "headers": {"content-type": "application/json", "cache-control": "no-store"}, "body": existing["response_body"]}
+        return error_response(409, "request_in_progress", "This prediction request is already being processed.")
+
+
+def complete_idempotency(user_id, key, result):
+    idempotency_table().update_item(
+        Key={"user_id": user_id, "idempotency_key": key},
+        UpdateExpression="SET #status = :status, response_status = :response_status, response_body = :response_body",
+        ExpressionAttributeNames={"#status": "status"},
+        ExpressionAttributeValues={
+            ":status": "COMPLETED",
+            ":response_status": 200,
+            ":response_body": json.dumps(result),
+        },
+    )
 
 
 def authenticated_user_id(event):
@@ -270,8 +339,15 @@ def lambda_handler(event, context):
         }
         user_id = authenticated_user_id(event)
         if user_id:
+            key = idempotency_key(event)
+            if not key:
+                return error_response(400, "missing_idempotency_key", "Authenticated predictions require an Idempotency-Key header.")
+            claim_result = claim_idempotency(user_id, key, request_fingerprint(model_input))
+            if claim_result:
+                return claim_result
             result["prediction_id"] = persist_prediction(user_id, model_input, result)
             result["saved"] = True
+            complete_idempotency(user_id, key, result)
 
         return response(200, result)
     except Exception:

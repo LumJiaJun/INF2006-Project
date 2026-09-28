@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+from botocore.exceptions import ClientError
 
 
 HANDLER_PATH = Path(__file__).parents[1] / "src" / "backend" / "predict" / "handler.py"
@@ -28,6 +29,31 @@ class FakeHistoryTable:
 
     def put_item(self, **kwargs):
         self.items.append(kwargs["Item"])
+
+
+class FakeIdempotencyTable:
+    def __init__(self):
+        self.items = {}
+
+    def put_item(self, **kwargs):
+        item = kwargs["Item"]
+        key = (item["user_id"], item["idempotency_key"])
+        if key in self.items:
+            raise ClientError(
+                {"Error": {"Code": "ConditionalCheckFailedException"}},
+                "PutItem",
+            )
+        self.items[key] = item
+
+    def get_item(self, **kwargs):
+        key = (kwargs["Key"]["user_id"], kwargs["Key"]["idempotency_key"])
+        return {"Item": self.items[key]}
+
+    def update_item(self, **kwargs):
+        key = (kwargs["Key"]["user_id"], kwargs["Key"]["idempotency_key"])
+        self.items[key]["status"] = "COMPLETED"
+        self.items[key]["response_body"] = kwargs["ExpressionAttributeValues"][":response_body"]
+        self.items[key]["response_status"] = 200
 
 
 def model_bundle(prediction=125.5):
@@ -81,6 +107,9 @@ class PredictionHandlerTests(unittest.TestCase):
         prediction_handler._model_bundle = model_bundle()
         self.history_table = FakeHistoryTable()
         prediction_handler._history_table = self.history_table
+        self.idempotency_table = FakeIdempotencyTable()
+        prediction_handler._idempotency_table = self.idempotency_table
+        prediction_handler.IDEMPOTENCY_TABLE_NAME = "idempotency"
 
     def test_returns_real_model_response_shape(self):
         event = {"body": json.dumps(valid_payload()), "requestContext": {"requestId": "test"}}
@@ -145,6 +174,7 @@ class PredictionHandlerTests(unittest.TestCase):
                 "requestId": "test",
                 "authorizer": {"jwt": {"claims": {"sub": "authenticated-user"}}},
             },
+            "headers": {"Idempotency-Key": "test-prediction-1"},
         }
 
         response = prediction_handler.lambda_handler(event, None)
@@ -154,6 +184,33 @@ class PredictionHandlerTests(unittest.TestCase):
         self.assertTrue(body["saved"])
         self.assertEqual(len(self.history_table.items), 1)
         self.assertEqual(self.history_table.items[0]["user_id"], "authenticated-user")
+
+    def test_authenticated_prediction_requires_idempotency_key(self):
+        event = {
+            "body": json.dumps(valid_payload()),
+            "requestContext": {"authorizer": {"jwt": {"claims": {"sub": "authenticated-user"}}}},
+        }
+
+        response = prediction_handler.lambda_handler(event, None)
+        body = json.loads(response["body"])
+
+        self.assertEqual(response["statusCode"], 400)
+        self.assertEqual(body["error"]["code"], "missing_idempotency_key")
+
+    def test_authenticated_retry_replays_original_result(self):
+        event = {
+            "body": json.dumps(valid_payload()),
+            "headers": {"idempotency-key": "retryable-prediction"},
+            "requestContext": {"authorizer": {"jwt": {"claims": {"sub": "authenticated-user"}}}},
+        }
+
+        first = prediction_handler.lambda_handler(event, None)
+        second = prediction_handler.lambda_handler(event, None)
+
+        self.assertEqual(first["statusCode"], 200)
+        self.assertEqual(second["statusCode"], 200)
+        self.assertEqual(json.loads(first["body"])["prediction_id"], json.loads(second["body"])["prediction_id"])
+        self.assertEqual(len(self.history_table.items), 1)
 
 
 if __name__ == "__main__":

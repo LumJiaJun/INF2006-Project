@@ -8,7 +8,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 
 | Area | Implemented design | Evidence and remaining gap |
 |------|--------------------|----------------------------|
-| Compute | Five focused Lambda functions provide health, prediction, history, analytics, and protected AI. Functions keep durable state in managed services. Warm-container globals cache only SDK clients or the read-only model bundle. | `src/backend/`; 25 unit tests. Strict idempotency is not implemented for repeated authenticated prediction submissions, so a retry after an uncertain response can create another history item. The browser disables duplicate submission while a request is active, but that is not a complete idempotency control. |
+| Compute | Five focused Lambda functions provide health, prediction, history, analytics, and protected AI. Functions keep durable state in managed services. Warm-container globals cache only SDK clients or the read-only model bundle. | `src/backend/`; 29 unit tests. Authenticated predictions require an idempotency key stored in a dedicated encrypted DynamoDB table with TTL, so a same-key retry replays the original response instead of creating another history item. |
 | Data | Static assets, application records, and analytical data use separate S3 and DynamoDB resources. DynamoDB uses on-demand capacity and a user/time access pattern. Glue writes city-partitioned Parquet queried through Athena. | `src/infrastructure/frontend.tf`, `data.tf`, `data_lake.tf`; `evidence/data-pipeline.md`. The prediction model is isolated in an immutable ECR image rather than the data-lake model prefix. |
 | Identity | Cognito handles application users with required TOTP authenticator-app MFA. API Gateway validates JWTs for history, saved predictions, and AI access. History ownership comes only from the verified `sub` claim. AWS services use separate IAM roles. | `src/infrastructure/auth.tf`; `tests/test_history.py`; `tests/test_chat.py`; `evidence/test-security.md`. The authenticated browser journey verified the protected flow; no credentials or MFA codes are stored in evidence. |
 | Edge | CloudFront is the frontend entry point and uses a private OAC S3 origin. The response policy adds CSP, HSTS, anti-framing, MIME-sniffing protection, and a strict referrer policy. | `src/infrastructure/frontend.tf`; live smoke security-header test. WAF is not added because no demonstrated threat justifies its cost and rule operations for this project. |
@@ -25,7 +25,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 - DynamoDB uses on-demand billing because the workload is low and unpredictable. Glue runs with two `G.1X` workers, a ten-minute timeout, and no retries.
 - Bedrock runs through a separate Lambda and protected route. Prompts are limited to 500 characters, responses to 220 tokens, and route throughput to one request per second.
 - Malformed input, unsupported categories, missing claims, Athena failure, model failure, and DynamoDB failure return controlled responses without stack traces. Downstream failures are logged.
-- Automatic retries are not added to synchronous write paths because blind retries could create duplicate history records. A future idempotency-key design should precede any client retry policy.
+- Authenticated prediction retries are safe only when the client reuses the same idempotency key; blind retries with a new key still represent a new user request.
 
 ## Zero Trust interaction map
 
@@ -66,7 +66,8 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 
 1. Add a confirmed SNS operator endpoint outside source control.
 2. Configure the GitHub OIDC deployment role and protected environment variables.
-3. Design server-side idempotency before adding retries to saved predictions.
-4. Request a suitable Lambda concurrency quota and repeat the stress test.
-5. Keep required Cognito TOTP MFA enabled and retest it after authentication changes.
-6. Re-evaluate CloudTrail when the account becomes shared or long-lived.
+3. Request a suitable Lambda concurrency quota and repeat the stress test. The current account reports 10 executions, while the Service Quotas API rejects a request below its reported default of 1,000; do not request an unsafe value without AWS support guidance.
+4. Add and confirm an operator-managed SNS endpoint using the optional Terraform variable.
+5. Design cross-region backup and restore only after selecting a DR region, RPO/RTO, and budget.
+6. Keep required Cognito TOTP MFA enabled and retest it after authentication changes.
+7. Re-evaluate CloudTrail when the account becomes shared or long-lived.

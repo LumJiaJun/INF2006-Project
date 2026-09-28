@@ -26,3 +26,15 @@ variable "environment" {
     error_message = "environment must be 2 to 12 lowercase letters, numbers, or hyphens and start with a letter."
   }
 }
+
+variable "alert_email" {
+  description = "Optional operator email for the encrypted SNS alert topic. The recipient must confirm the subscription."
+  type        = string
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.alert_email == null || can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", var.alert_email))
+    error_message = "alert_email must be null or a valid email address."
+  }
+}

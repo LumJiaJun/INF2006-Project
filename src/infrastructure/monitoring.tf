@@ -55,6 +55,14 @@ resource "aws_sns_topic" "operational_alerts" {
   kms_master_key_id = aws_kms_key.operational_alerts.arn
 }
 
+# Terraform can request the subscription; the recipient must confirm it by email.
+resource "aws_sns_topic_subscription" "operational_email" {
+  count     = var.alert_email == null ? 0 : 1
+  topic_arn = aws_sns_topic.operational_alerts.arn
+  protocol  = "email"
+  endpoint  = var.alert_email
+}
+
 # CloudWatch alarms cover API failures and important Lambda errors.
 resource "aws_cloudwatch_metric_alarm" "api_server_errors" {
   alarm_name          = "${local.name_prefix}-api-server-errors"

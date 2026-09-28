@@ -20,3 +20,18 @@
 - **Actual result:** Passed on 2026-09-23. Both statuses were `ENABLED`.
 - **Interpretation:** PITR protects history records against accidental writes or deletion within DynamoDB's recovery window. A restore creates a separate table and was not executed because it would add cost and require application cutover.
 - **Artefact path:** `src/infrastructure/data.tf`
+
+## Cross-region recovery status
+
+- **Current result:** Not deployed or tested. The application has regional DynamoDB PITR and Terraform recreation evidence, but no second-region replica, S3 replication path, or tested endpoint cutover.
+- **Reason:** A DR region, RPO/RTO, data-residency decision, and cost budget are required before creating cross-region resources.
+- **Plan:** See `evidence/cross-region-recovery-plan.md`.
+
+## Authenticated prediction idempotency
+
+- **Objective:** Prevent a client retry after an uncertain response from creating duplicate prediction-history records.
+- **Setup:** Authenticated `/predictions` requests, a required `Idempotency-Key` header, and an encrypted on-demand DynamoDB idempotency table with 24-hour TTL.
+- **Command / steps:** Run `python -m unittest discover -s tests -p "test_prediction.py" -v` and inspect `src/backend/predict/handler.py` and `src/infrastructure/data.tf`.
+- **Expected result:** A missing key returns HTTP 400; a repeated key with the same request replays the original response; a key reused for different input is rejected with HTTP 409.
+- **Actual result:** Passed in 29-test local suite. The unit test confirms the original saved record is replayed and only one history item is written. Live browser deployment now sends a fresh key per authenticated submission; a live retry test should be repeated after the next authenticated journey.
+- **Artefact path:** `src/backend/predict/handler.py`, `src/infrastructure/data.tf`, and `tests/test_prediction.py`

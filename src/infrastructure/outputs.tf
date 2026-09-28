@@ -59,6 +59,11 @@ output "prediction_history_table_name" {
   value       = aws_dynamodb_table.prediction_history.name
 }
 
+output "prediction_idempotency_table_name" {
+  description = "DynamoDB table used to deduplicate authenticated prediction retries."
+  value       = aws_dynamodb_table.prediction_idempotency.name
+}
+
 output "data_lake_bucket_name" {
   description = "Private S3 bucket containing raw, processed, model, and query-output data."
   value       = aws_s3_bucket.data_lake.id
