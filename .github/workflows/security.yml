@@ -1,0 +1,85 @@
+name: Security gates
+
+on:
+  push:
+    branches: [main, nixon]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-audit:
+    name: Dependency audit (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: application
+            requirements: tests/requirements.txt
+          - name: analytics
+            requirements: analytics/requirements.txt
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: ${{ matrix.requirements }}
+
+      - name: Install pip-audit
+        run: python -m pip install --disable-pip-version-check "pip-audit==2.9.0"
+
+      - name: Audit pinned dependencies
+        run: pip-audit -r "${{ matrix.requirements }}" --format json --output "pip-audit-${{ matrix.name }}.json"
+
+      - name: Upload dependency report
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: pip-audit-${{ matrix.name }}-${{ github.run_id }}
+          path: pip-audit-${{ matrix.name }}.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  python-static:
+    name: Python static security
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Bandit
+        run: python -m pip install --disable-pip-version-check "bandit==1.8.6"
+
+      - name: Scan Python source
+        run: bandit -r src/backend analytics -x analytics/artifacts -f json -o bandit.json
+
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: bandit-${{ github.run_id }}
+          path: bandit.json
+          if-no-files-found: warn
+          retention-days: 14

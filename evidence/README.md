@@ -16,6 +16,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | serverless-zero-trust-review.md | Serverless Lens and Zero Trust design review |
 | adheesh-branch-review.md | Compatibility review of Adheesh's parallel implementation |
 | ci-cd.md | GitHub Actions and encrypted shared-state validation |
+| ../.github/workflows/security.yml | Pinned dependency and Python static-security gates |
 | aws-serverless-reference-review-2026-09-28.md | Official AWS pattern comparison and VPC decision |
 
 Redact account IDs, public IPs, tokens and sensitive config. Prefer text/config

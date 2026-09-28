@@ -75,7 +75,9 @@ Cognito uses email verification, a strong password policy, authorization-code fl
 
 Pull requests and pushes to `main` or `nixon` run unit tests, Python compilation,
 frontend syntax checks, secret-pattern checks, Terraform formatting and
-validation, and CodeQL SAST for Python and JavaScript. Deployment is manual,
+validation. The security gates additionally run pinned dependency audits for
+the application and analytics requirements plus Bandit Python static analysis;
+CodeQL SAST covers Python and JavaScript. Deployment is manual,
 requires typing `DEPLOY`, and is gated by the GitHub `development` environment.
 The `Deploy development` workflow accepts only `main` or `nixon`, repeats the
 application and Terraform validation before assuming AWS access, then requires

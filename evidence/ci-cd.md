@@ -9,6 +9,7 @@
 - CI completed successfully: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36418939012
 - CodeQL SAST completed successfully for Python and JavaScript/TypeScript: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36418939014
 - CI executed 26 unit tests, Python compilation, frontend JavaScript syntax checks, AWS identifier checks, Terraform formatting, and validation of both Terraform roots.
+- `.github/workflows/security.yml` adds separate pinned `pip-audit` checks for application and analytics dependencies plus Bandit scanning for Python source. The new security workflow requires a successful run before it should be configured as a protected branch check.
 - Actions are pinned to full commit hashes. Workflow permissions are read-only by default; only the manual deployment workflow can request an OIDC token.
 
 ## Dynamic application security testing
