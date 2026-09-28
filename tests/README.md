@@ -61,3 +61,16 @@ $apiHost = ([Uri]$healthUrl).Host
 ```
 
 This profile uses one paced visitor at about 1.4 requests per second, below the deployed two-request-per-second API Gateway limit. It asserts HTTP 200 and the expected health JSON, so any Lambda, API Gateway, or response failure fails the run.
+
+Run the controlled deployed chat integration check only against an AWS environment you own:
+
+```powershell
+$table = terraform -chdir=src/infrastructure output -raw prediction_history_table_name
+$chatFunction = terraform -chdir=src/infrastructure output -raw chat_lambda_name
+./tests/run_chat_integration.ps1 `
+  -TableName $table `
+  -ChatFunctionName $chatFunction `
+  -IConfirmAuthorizedTarget
+```
+
+The script creates one synthetic prediction under a random test user, directly invokes the deployed chat Lambda with that user claim, confirms the safe `history_record_count: 1` completion telemetry and bounded Bedrock reply, then deletes the test record in `finally`. It does not replace the separate browser test of Cognito and API Gateway JWT enforcement.

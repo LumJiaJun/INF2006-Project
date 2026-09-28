@@ -45,6 +45,14 @@
 - **Actual result:** Passed in focused handler tests on 2026-09-28. The test verified the bounded Bedrock request, injected prediction context, ten-row limit, and `ConsistentRead=True`; the deployed route rejected unauthenticated requests. A full Cognito browser journey that saves a real prediction and asks the live assistant remains outstanding because it requires a consented test mailbox.
 - **Artefact path:** `src/backend/chat/handler.py`, `src/infrastructure/chat.tf`, `tests/test_chat.py`, and `tests/smoke_api.ps1`
 
+## Deployed AI and DynamoDB integration
+
+- **Objective:** Verify the deployed chat Lambda can retrieve a user-scoped prediction and use it in a real Bedrock response.
+- **Command / steps:** Run `tests/run_chat_integration.ps1` with the Terraform prediction-history table and chat Lambda outputs and the explicit authorization switch.
+- **Expected result:** One synthetic prediction is inserted under a random test subject, the deployed Lambda returns a bounded answer describing that record, completion telemetry reports `history_record_count: 1`, and the synthetic row is deleted.
+- **Actual result:** Passed on 2026-09-28. Claude Haiku returned an answer describing the synthetic Paris/Louvre prediction at EUR 123.45; CloudWatch recorded one retrieved history row; cleanup completed. This direct Lambda test proves model-plus-DynamoDB integration, while the separate anonymous API test proves the protected route rejects missing JWTs.
+- **Artefact path:** `tests/run_chat_integration.ps1`, `src/backend/chat/handler.py`, and `src/infrastructure/outputs.tf`
+
 ## Data-lake access control
 
 - **Objective:** Verify that raw and processed analytical data are encrypted and unavailable through anonymous S3 requests.

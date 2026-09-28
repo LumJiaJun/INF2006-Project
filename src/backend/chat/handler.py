@@ -94,10 +94,10 @@ def recent_prediction_context(event):
             Limit=10,
         )
         records = json.loads(json.dumps(result.get("Items", []), default=str))
-        return json.dumps(records, separators=(",", ":"))
+        return json.dumps(records, separators=(",", ":")), len(records)
     except Exception:
         logger.exception("chat_history_read_failed")
-        return "unavailable"
+        return "unavailable", None
 
 
 def parse_request(event):
@@ -134,7 +134,7 @@ def lambda_handler(event, context):
         return response(400, {"error": {"code": "invalid_request", "message": str(error)}})
 
     try:
-        history_context = recent_prediction_context(event)
+        history_context, history_record_count = recent_prediction_context(event)
     except ValueError as error:
         return response(401, {"error": {"code": "unauthenticated", "message": str(error)}})
 
@@ -176,6 +176,7 @@ def lambda_handler(event, context):
                     "event": "chat_completed",
                     "request_id": event.get("requestContext", {}).get("requestId", "unknown"),
                     "page": page,
+                    "history_record_count": history_record_count,
                     "input_tokens": usage.get("inputTokens"),
                     "output_tokens": usage.get("outputTokens"),
                 }

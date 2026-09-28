@@ -79,6 +79,11 @@ output "chat_url" {
   value       = "${aws_apigatewayv2_api.platform.api_endpoint}/chat"
 }
 
+output "chat_lambda_name" {
+  description = "Name of the separate Lambda that handles authenticated AI requests."
+  value       = aws_lambda_function.chat.function_name
+}
+
 output "operational_alerts_topic_arn" {
   description = "Encrypted SNS topic used by CloudWatch operational alarms."
   value       = aws_sns_topic.operational_alerts.arn
