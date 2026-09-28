@@ -380,6 +380,61 @@ h3 {
   margin-top: 1.5rem;
 }
 
+/* The live snapshot turns the long model form into an easy-to-scan listing brief. */
+.listing-snapshot {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: rgb(255 255 255 / 7%);
+}
+
+.snapshot-label {
+  color: rgb(255 255 255 / 58%);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.listing-snapshot h3 {
+  margin: 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.3rem;
+  line-height: 1.15;
+}
+
+.listing-snapshot dl {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.listing-snapshot dl > div {
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  gap: 0.5rem;
+}
+
+.listing-snapshot dt,
+.listing-snapshot dd {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.listing-snapshot dt {
+  color: rgb(255 255 255 / 52%);
+}
+
+.listing-snapshot dd {
+  color: rgb(255 255 255 / 86%);
+  font-weight: 700;
+}
+
 .preset-button {
   display: grid;
   width: 100%;

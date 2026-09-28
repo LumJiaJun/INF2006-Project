@@ -34,6 +34,10 @@ const spotlightRating = document.querySelector("#spotlight-rating");
 const useMarketButton = document.querySelector("#use-market");
 const heroCityCount = document.querySelector("#hero-city-count");
 const presetButtons = [...document.querySelectorAll(".preset-button")];
+const snapshotLocation = document.querySelector("#snapshot-location");
+const snapshotStay = document.querySelector("#snapshot-stay");
+const snapshotSpace = document.querySelector("#snapshot-space");
+const snapshotSignals = document.querySelector("#snapshot-signals");
 let analyticsItems = [];
 let selectedMarket = null;
 
@@ -219,6 +223,7 @@ function applyPreset(name) {
   presetButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.preset === name);
   });
+  updateListingSnapshot();
 }
 
 presetButtons.forEach((button) => {
@@ -258,6 +263,32 @@ function updateCityFields() {
     (city.coordinate_range.longitude.minimum + city.coordinate_range.longitude.maximum) /
     2
   ).toFixed(5);
+  updateListingSnapshot();
+}
+
+// Keep a concise listing summary visible while the user adjusts model inputs.
+function updateListingSnapshot() {
+  const formData = new FormData(predictionForm);
+  const city = formData.get("city") || "Selected market";
+  const neighbourhood = formData.get("neighbourhood");
+  const guests = Number(formData.get("accommodates")) || 0;
+  const bedrooms = Number(formData.get("bedrooms")) || 0;
+  const signals = [];
+
+  if (formData.has("host_is_superhost")) {
+    signals.push("Superhost");
+  }
+  if (formData.has("instant_bookable")) {
+    signals.push("Instant book");
+  }
+  if (formData.has("host_identity_verified")) {
+    signals.push("Identity verified");
+  }
+
+  snapshotLocation.textContent = neighbourhood ? `${neighbourhood}, ${city}` : city;
+  snapshotStay.textContent = `${guests} guest${guests === 1 ? "" : "s"}, ${bedrooms} bedroom${bedrooms === 1 ? "" : "s"}`;
+  snapshotSpace.textContent = formData.get("room_type") || "Select a room type";
+  snapshotSignals.textContent = signals.length ? signals.join(" + ") : "No host signals selected";
 }
 
 async function loadModelOptions() {
@@ -313,6 +344,8 @@ function showPredictionResult(content, isError = false) {
 }
 
 citySelect.addEventListener("change", updateCityFields);
+predictionForm.addEventListener("input", updateListingSnapshot);
+predictionForm.addEventListener("change", updateListingSnapshot);
 
 predictionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
