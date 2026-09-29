@@ -37,6 +37,64 @@ Intelligence Platform consistently, safely, and with clear team coordination.
    Share the planned change, result, and any important outputs in the team
    chat so everyone can avoid conflicts and reproduce the work.
 
+## AWS access setup
+
+Use temporary credentials whenever possible. The project owner should grant
+each teammate only the permissions needed for their assigned work.
+
+### Preferred: IAM Identity Center
+
+1. Ask the project owner for the AWS access portal URL and the assigned account
+   and permission set.
+2. Sign in through the access portal using the invitation or school identity.
+3. Install or update the AWS CLI, then run `aws configure sso`.
+4. Choose the assigned account, role, region `ap-southeast-1`, and a profile
+   name such as `inf2006-dev`.
+5. Sign in when prompted and verify the session:
+
+   ```powershell
+   aws sso login --profile inf2006-dev
+   aws sts get-caller-identity --profile inf2006-dev
+   ```
+
+6. Use the profile for Terraform commands:
+
+   ```powershell
+   $env:AWS_PROFILE = "inf2006-dev"
+   ```
+
+### Fallback: individual access key
+
+Use this only when IAM Identity Center is unavailable and the project owner
+has approved it. Never use the root account or share keys with teammates.
+
+1. In the AWS Console, open IAM, select the assigned user, and open
+   **Security credentials**.
+2. Select **Create access key**, choose **Command Line Interface (CLI)**, and
+   complete the confirmation step.
+3. Copy the secret access key immediately into a secure password manager. AWS
+   shows it only once; do not paste it into GitHub, chat, Terraform variables,
+   `backend.hcl`, or screenshots.
+4. Configure the local AWS CLI without placing the values in the repository:
+
+   ```powershell
+   aws configure --profile inf2006-dev
+   aws sts get-caller-identity --profile inf2006-dev
+   ```
+
+5. Set the profile for the current PowerShell session before Terraform:
+
+   ```powershell
+   $env:AWS_PROFILE = "inf2006-dev"
+   ```
+
+6. Delete or rotate the key when the work is complete. If a key is exposed,
+   disable it immediately in IAM and notify the project owner.
+
+Do not put access keys in Terraform files, GitHub secrets for local work,
+`.env` files, commit messages, or evidence. GitHub Actions uses OIDC rather
+than long-lived AWS access keys.
+
 ## First-time Terraform setup
 
 The `bootstrap` Terraform root creates the private state bucket. A teammate
