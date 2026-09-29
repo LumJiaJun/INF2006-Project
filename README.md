@@ -59,7 +59,7 @@ terraform output analytics_url
 
 CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. The assistant can query only the signed-in user's ten latest DynamoDB prediction records and supplies those records as bounded context; DynamoDB is not treated as a general knowledge base. Authenticated predictions are stored under the token-derived user identifier. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
 
-The current Terraform design intentionally has no VPC, subnet, NAT Gateway, or VPC endpoint. DynamoDB is an AWS-managed regional service rather than a resource placed inside a customer VPC. A VPC would be reconsidered only if the workload adds a private-subnet dependency such as RDS, ElastiCache, or a private third-party connection; see `evidence/aws-serverless-reference-review-2026-09-28.md`.
+The current Terraform design places all five Lambda functions in private subnets across two availability zones. It uses S3 and DynamoDB gateway endpoints plus private interface endpoints for CloudWatch Logs, Athena, and Bedrock Runtime. There is deliberately no NAT Gateway: the functions only require the AWS services covered by those endpoints. DynamoDB remains an AWS-managed regional service rather than a resource placed inside the customer VPC; see `evidence/aws-serverless-reference-review-2026-09-28.md`. CloudFront is protected by a global WAF ACL, and a regional management CloudTrail writes validated logs to a dedicated S3 bucket; see `evidence/edge-security-2026-09-29.md`.
 
 Cognito uses email verification, a strong password policy, authorization-code flow with PKCE, token revocation, and required TOTP authenticator-app MFA. The application never handles passwords or MFA secrets.
 
@@ -67,6 +67,7 @@ Cognito uses email verification, a strong password policy, authorization-code fl
 
 - Cloud provider: AWS
 - Compute/deployment: API Gateway and AWS Lambda, provisioned with Terraform
+- Networking: two-AZ private Lambda VPC with S3/DynamoDB gateway endpoints and Logs/Athena/Bedrock interface endpoints
 - Frontend: private Amazon S3 origin and Amazon CloudFront
 - Identity and data: branded Cognito Managed Login v2 and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
@@ -109,8 +110,8 @@ Secrets Manager and no state, account ID, key ARN, or backend file is committed.
 
 CloudFront already provides HTTPS on its generated domain using an AWS-managed
 certificate. ACM becomes useful only after the team owns a custom domain and
-can complete DNS validation, so no custom certificate or Route 53 zone is
-provisioned for the current scope.
+can complete DNS validation, so a custom certificate remains pending until
+those domain details are supplied.
 
 ## Known limitations
 
@@ -120,8 +121,9 @@ provisioned for the current scope.
 - The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation and descriptive market analytics, not future-price forecasting or condition monitoring.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
-- The development AWS account has a concurrency quota of 10. A high-concurrency stress test caused Lambda throttles despite API Gateway rate limits; see `evidence/test-resilience.md`.
+- The development AWS account Lambda concurrency quota is now 1,000. API Gateway still throttles excess traffic, and bounded stress results are recorded in `evidence/test-resilience.md`.
 - Authenticated prediction retries now use a server-side idempotency key; a separate cross-region recovery exercise remains future work.
-- The SNS alert topic has no human subscription in source control and needs an operator-managed confirmed endpoint. Terraform supports an optional `alert_email` variable, but AWS confirmation is still required.
+- The SNS alert topic uses an operator-managed email subscription supplied through the Terraform `alert_email` variable; the current school email endpoint is confirmed, and any replacement endpoint must be confirmed before delivery is active.
 - Cloud deployment requires an AWS account and may incur a small cost.
 - Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`.
+- The original low-traffic estimate predates the two-AZ interface endpoints and WAF; the post-deployment FinOps addendum documents their fixed and variable costs.

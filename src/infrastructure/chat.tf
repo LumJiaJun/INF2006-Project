@@ -79,6 +79,11 @@ resource "aws_lambda_function" "chat" {
     }
   }
 
+  vpc_config {
+    subnet_ids         = local.lambda_private_subnet_ids
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
   logging_config {
     log_format            = "JSON"
     application_log_level = "INFO"
@@ -88,6 +93,7 @@ resource "aws_lambda_function" "chat" {
   depends_on = [
     aws_cloudwatch_log_group.chat_lambda,
     aws_iam_role_policy.chat_lambda_access,
+    aws_iam_role_policy.lambda_vpc_access["chat"],
   ]
 }
 

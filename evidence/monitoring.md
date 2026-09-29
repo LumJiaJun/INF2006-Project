@@ -27,9 +27,10 @@
 
 ## Alarms and notification path
 
-- **What is monitored:** API Gateway request, 4xx, 5xx, and p95 integration latency metrics plus Lambda invocations, errors, p95 duration, and health throttles. Four alarms cover API 5xx, prediction errors, analytics errors, and observed health throttling.
+- **What is monitored:** API Gateway request, 4xx, 5xx, and p95 integration latency metrics plus Lambda invocations, errors, p95 duration, and health throttles. Five alarms cover API 5xx, prediction errors, analytics errors, chat errors, and observed health throttling.
 - **Operational test / query:** Set the prediction-error alarm to `ALARM` with `aws cloudwatch set-alarm-state`, inspect action history, then reset it to `OK`.
 - **Result:** The first action failed because the AWS-managed SNS key did not grant CloudWatch access. After replacing it with a rotating customer-managed key scoped to this account's named alarms, action history reported `Successfully executed action` for the encrypted SNS topic. The test alarm was reset to `OK`.
-- **Interpretation:** Alarm-to-topic publishing works. The topic currently has no human subscription, so operators must add a confirmed endpoint outside the submission before relying on notifications.
+- **Interpretation:** Alarm-to-topic publishing works and the operator email subscription is confirmed. The test email was received successfully.
+- **2026-09-29 retest:** The prediction-error alarm was set to `ALARM`, the school mailbox received the SNS notification, SNS action history reported `Successfully executed action`, and the alarm was reset to `OK`.
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/monitoring.tf`

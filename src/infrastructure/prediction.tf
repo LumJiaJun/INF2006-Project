@@ -83,9 +83,15 @@ resource "aws_lambda_function" "prediction" {
     }
   }
 
+  vpc_config {
+    subnet_ids         = local.lambda_private_subnet_ids
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
   depends_on = [
     aws_cloudwatch_log_group.prediction_lambda,
     aws_iam_role_policy.prediction_lambda_logs,
+    aws_iam_role_policy.lambda_vpc_access["prediction"],
   ]
 }
 

@@ -11,8 +11,8 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 | Compute | Five focused Lambda functions provide health, prediction, history, analytics, and protected AI. Functions keep durable state in managed services. Warm-container globals cache only SDK clients or the read-only model bundle. | `src/backend/`; 29 unit tests. Authenticated predictions require an idempotency key stored in a dedicated encrypted DynamoDB table with TTL, so a same-key retry replays the original response instead of creating another history item. |
 | Data | Static assets, application records, and analytical data use separate S3 and DynamoDB resources. DynamoDB uses on-demand capacity and a user/time access pattern. Glue writes city-partitioned Parquet queried through Athena. | `src/infrastructure/frontend.tf`, `data.tf`, `data_lake.tf`; `evidence/data-pipeline.md`. The prediction model is isolated in an immutable ECR image rather than the data-lake model prefix. |
 | Identity | Cognito handles application users with required TOTP authenticator-app MFA. API Gateway validates JWTs for history, saved predictions, and AI access. History ownership comes only from the verified `sub` claim. AWS services use separate IAM roles. | `src/infrastructure/auth.tf`; `tests/test_history.py`; `tests/test_chat.py`; `evidence/test-security.md`. The authenticated browser journey verified the protected flow; no credentials or MFA codes are stored in evidence. |
-| Edge | CloudFront is the frontend entry point and uses a private OAC S3 origin. The response policy adds CSP, HSTS, anti-framing, MIME-sniffing protection, and a strict referrer policy. | `src/infrastructure/frontend.tf`; live smoke security-header test. WAF is not added because no demonstrated threat justifies its cost and rule operations for this project. |
-| Monitoring | Structured logs, detailed API metrics, Lambda invocation/error/duration/throttle metrics, a dashboard, five alarms, and an encrypted SNS action topic are provisioned. AI duration and errors have their own series. | `src/infrastructure/monitoring.tf`; `evidence/monitoring.md`. The topic requires an operator-managed confirmed subscriber. |
+| Edge | CloudFront is the frontend entry point and uses a private OAC S3 origin. The response policy adds CSP, HSTS, anti-framing, MIME-sniffing protection, and a strict referrer policy. A global WAF adds AWS IP reputation, Common Rule Set, and per-IP rate protection. | `src/infrastructure/frontend.tf`, `src/infrastructure/security_edge.tf`, and the live smoke security-header test. DDoS certification is not claimed. |
+| Monitoring | Structured logs, detailed API metrics, Lambda invocation/error/duration/throttle metrics, a dashboard, five alarms, and an encrypted SNS action topic are provisioned. AI duration and errors have their own series. | `src/infrastructure/monitoring.tf`; `evidence/monitoring.md`. A confirmed operator email subscription received the alarm test. |
 | Deployment | Terraform controls cloud resources. Plans are reviewed before apply. ECR tags are immutable, shared state uses a versioned S3 backend with KMS encryption and lockfiles, and GitHub Actions validates every change. Raw-data upload and Glue execution remain controlled data operations. | `src/infrastructure/README.md`, `src/infrastructure/bootstrap`, `.github/workflows`; Git history. The AWS deployment role and GitHub environment variables must be configured before CD can run. |
 | Release management | Immutable prediction images and Git/Terraform rollback provide basic release recovery. | `src/infrastructure/ecr.tf`. Lambda versions, aliases, and canary deployment are not added because the current single development environment has not demonstrated a need. |
 | Messaging | SNS is used only for operational notifications. Prediction remains a direct synchronous API-to-Lambda workflow. | `src/infrastructure/monitoring.tf`. SQS, EventBridge, and Step Functions are intentionally absent because there is no multi-step asynchronous workflow. |
@@ -20,7 +20,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 ## Performance, cost, and failure design
 
 - Prediction memory was increased from 1 GB to 2 GB only after a measured cold-start improvement from 13.8 seconds to approximately 3.0 to 3.3 seconds. Warm observations were 59 to 70 ms.
-- The expected-load health test accepts successful `200` and controlled `429` responses. The stress test honestly records `503` responses caused by the account concurrency quota of 10.
+- The historical expected-load health test accepted successful `200` and controlled `429` responses. The historical stress test honestly records `503` responses caused by the then-current account concurrency quota of 10; the later 1,000-quota retest is recorded separately.
 - Athena reads processed Parquet, not the raw CSV. The recorded aggregate scanned 566,077 bytes and completed in 697 ms.
 - DynamoDB uses on-demand billing because the workload is low and unpredictable. Glue runs with two `G.1X` workers, a ten-minute timeout, and no retries.
 - Bedrock runs through a separate Lambda and protected route. Prompts are limited to 500 characters, responses to 220 tokens, and route throughput to one request per second.
@@ -55,19 +55,18 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 
 ## Decisions not to add services
 
-- **AWS WAF:** No observed attack pattern or public scale requirement justifies rule cost and maintenance. API validation, JWT authorization, CORS, CSP, and throttling address the currently tested threats.
-- **ACM custom certificate and Route 53:** CloudFront's generated domain already has managed HTTPS. A custom certificate requires a domain and DNS validation, neither of which is a current project requirement.
-- **CloudTrail trail:** Account-level API auditing is valuable for a longer-lived shared environment, but creating a project trail adds another bucket, retention decisions, and account-level operational ownership. Git, Terraform, CloudWatch application logs, and alarm history cover current submission traceability. This is an acknowledged audit gap, not a claim that CloudTrail is unnecessary generally.
-- **VPC and NAT Gateway:** The functions use public AWS service endpoints and hold no private network resource. Adding a VPC would add cold-start, routing, and cost complexity without creating an identity boundary.
+- **AWS WAF:** WAF is deployed with limited managed rules and rate limiting. Bot Control, CAPTCHA, Shield Advanced, and DDoS certification remain outside scope.
+- **ACM custom certificate and Route 53:** CloudFront's generated domain already has managed HTTPS. A custom certificate requires a domain and DNS validation, neither of which has been supplied.
+- **CloudTrail trail:** A regional management trail is deployed with validated S3 delivery and a 90-day lifecycle. Multi-region trails, data events, CloudTrail Lake, and Insights remain outside scope.
+- **VPC and NAT Gateway:** All five functions use two private subnets across two AZs. S3 and DynamoDB use gateway endpoints; Logs, Athena, and Bedrock Runtime use private interface endpoints. No NAT Gateway is used because no Lambda requires general internet egress. The VPC complements, but does not replace, IAM and Cognito identity controls.
 - **Step Functions, SQS, and EventBridge:** The current workflows are short and synchronous. No demonstrated orchestration or buffering requirement exists.
 - **Customer-managed keys for every store:** Application S3 and DynamoDB use managed at-rest encryption. Customer-managed keys are limited to SNS and Terraform state, where alarm-policy and shared-state requirements justify the added cost and lifecycle.
 
 ## Priority follow-up work
 
-1. Add a confirmed SNS operator endpoint outside source control.
+1. Keep the confirmed SNS operator endpoint outside source control and periodically test notification delivery.
 2. Configure the GitHub OIDC deployment role and protected environment variables.
-3. Request a suitable Lambda concurrency quota and repeat the stress test. The current account reports 10 executions, while the Service Quotas API rejects a request below its reported default of 1,000; do not request an unsafe value without AWS support guidance.
-4. Add and confirm an operator-managed SNS endpoint using the optional Terraform variable.
-5. Design cross-region backup and restore only after selecting a DR region, RPO/RTO, and budget.
-6. Keep required Cognito TOTP MFA enabled and retest it after authentication changes.
-7. Re-evaluate CloudTrail when the account becomes shared or long-lived.
+3. Monitor VPC endpoint costs and Lambda ENI cold-start behavior after future load changes.
+4. Design cross-region backup and restore only after selecting a DR region, RPO/RTO, and budget.
+5. Keep required Cognito TOTP MFA enabled and retest it after authentication changes.
+6. Re-evaluate multi-region CloudTrail, data events, and CloudTrail Insights when the account becomes shared or long-lived.

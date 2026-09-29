@@ -66,9 +66,9 @@ Five warning categories remain and keep the strict DAST workflow failing until t
 
 The full ZAP HTML, JSON, and Markdown reports are retained only in ignored `tmp/zap-live-after-headers-20260928/` output because they include run-specific URLs and scanner artefacts.
 
-## ECR Scan Limitation
+## ECR Scan Limitation at the Time
 
-ECR scan-on-push is enabled. An additional manual scan was attempted, but AWS returned `LimitExceededException` because the per-image scan quota had already been reached. This is not evidence of a clean image scan. Review ECR's completed scan findings after the quota window before presenting image-vulnerability results.
+ECR scan-on-push was enabled. At the time of this 2026-09-28 run, an additional manual scan returned `LimitExceededException` because the per-image scan quota had already been reached; this historical run did not claim a clean image scan. On 2026-09-29, image tag `1.0.4` completed scanning with zero findings; the current result is recorded in the deployment handoff and should be retained with the final submission evidence.
 
 ## Prioritized Improvements
 

@@ -52,3 +52,58 @@ For this low-volume, uneven university workload, serverless avoids roughly $21 t
 - [Amazon EC2 On-Demand pricing](https://aws.amazon.com/ec2/pricing/on-demand/)
 - [Amazon Bedrock pricing](https://aws.amazon.com/bedrock/pricing/)
 - [AWS Price List API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html)
+
+## FinOps review after VPC, WAF, and CloudTrail
+
+The original estimate predates the private Lambda VPC, CloudFront WAF, and
+CloudTrail additions. The most important change is six interface endpoint
+network interfaces: Logs, Athena, and Bedrock Runtime are each provisioned in
+two availability zones. AWS PrivateLink charges for interface endpoints by
+endpoint-hour in each AZ and also charges for data processed, so this fixed
+cost can exceed the low-volume Lambda and API charges. S3 and DynamoDB gateway
+endpoints do not have the same interface-endpoint hourly model. See the
+[AWS PrivateLink pricing guidance](https://aws.amazon.com/privatelink/faqs/).
+
+The WAF adds one global web ACL, two AWS managed rule groups, one rate rule,
+and per-request inspection charges. AWS's current pricing page lists a base
+web ACL charge, per-rule charges, and request charges; the exact monthly total
+depends on CloudFront request volume. The current rules are intentionally
+limited to IP reputation, Common Rule Set, and rate limiting; Bot Control,
+CAPTCHA, and Fraud Control are not enabled because they would add cost without
+a demonstrated requirement. See the [AWS WAF pricing page](https://aws.amazon.com/waf/pricing/).
+
+The CloudTrail trail is scoped to one region and management events only. One
+copy of ongoing management events delivered to S3 has no CloudTrail delivery
+charge, but the S3 bucket still incurs storage and request charges. The 90-day
+lifecycle rule prevents indefinite log accumulation. Data events, CloudTrail
+Lake, Insights, CloudWatch Logs delivery, and multi-region duplication remain
+disabled unless a security requirement justifies their cost. See the [AWS
+CloudTrail pricing page](https://aws.amazon.com/cloudtrail/pricing/).
+
+Public ACM certificates used with CloudFront are free; the cost concern is the
+domain and DNS service, not the integrated certificate itself. A custom ACM
+certificate should only be added after a real domain and DNS ownership are
+available. See the [ACM pricing page](https://aws.amazon.com/certificate-manager/pricing/).
+
+### Recommended cost controls
+
+1. Keep the two-AZ endpoint layout for the assessed architecture; for a
+   temporary development environment, make the VPC optional and destroy it
+   after evidence collection rather than paying endpoint-hours overnight.
+2. Keep the prediction Lambda at 2 GB until a fresh cold-start benchmark
+   proves a lower memory size meets the latency target. Right-size the other
+   functions from CloudWatch p95 duration and memory metrics instead of
+   reducing them blindly.
+3. Keep chat protected by Cognito, 500-character input validation, 220-token
+   output limits, and a one-request-per-second route throttle because Bedrock
+   is the variable usage cost.
+4. Keep Glue manual or data-change triggered, with two `G.1X` workers, a
+   ten-minute timeout, no retries, Parquet partitioning, and Athena's 1 GiB
+   scan cutoff.
+5. Keep CloudWatch logs at 14 days, ECR at three images, CloudTrail at 90 days,
+   and CloudFront at `PriceClass_100` unless evidence requires expansion.
+6. Add an AWS Budget alert and Cost Anomaly Detection in the account console,
+   with a low development threshold, before long-running demonstrations.
+7. Review Cost Explorer by `Project` and `Environment` tags after 24-48 hours;
+   the endpoint, WAF, Bedrock, Glue, and CloudTrail line items should be
+   checked separately rather than hidden in a single serverless estimate.

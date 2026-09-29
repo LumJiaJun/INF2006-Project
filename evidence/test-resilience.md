@@ -3,13 +3,21 @@
 ## Bounded concurrency and overload behavior
 
 - **Objective:** Observe API behavior under bounded concurrent health checks and verify that overload is rejected rather than silently corrupting responses.
-- **Setup:** API Gateway HTTP API with a two-request burst and two-request-per-second default route limit, Lambda health function, and an account-wide Lambda concurrency quota of 10.
+- **Historical setup (2026-09-23):** API Gateway HTTP API with a two-request burst and two-request-per-second default route limit, Lambda health function, and an account-wide Lambda concurrency quota of 10.
 - **Command / steps:** Run `python tests/load_health.py --url <health-url> --requests 20 --concurrency 2`.
 - **Expected result:** Every request returns either HTTP 200 or an explicit HTTP 429 throttle response; no backend 5xx response is accepted by the test.
 - **Actual result:** Passed on 2026-09-23. Eighteen requests returned HTTP 200 and two returned HTTP 429. The run completed in 0.975 seconds; median latency was 86.58 ms and maximum latency was 163.60 ms.
-- **Stress-test finding:** A deliberately excessive 50-request, concurrency-25 run produced 26 HTTP 200, 13 HTTP 429, and 11 HTTP 503 responses even after reducing the API limit. CloudWatch showed the account reaching its concurrency quota. API Gateway throttling is best-effort and cannot guarantee protection from the unusually low account-wide quota.
+- **Historical stress-test finding:** A deliberately excessive 50-request, concurrency-25 run produced 26 HTTP 200, 13 HTTP 429, and 11 HTTP 503 responses even after reducing the API limit. CloudWatch showed the account reaching the then-current concurrency quota. API Gateway throttling is best-effort and cannot guarantee protection from an unusually low account-wide quota.
 - **Improvement plan:** Request a higher Lambda concurrency quota before any higher-load deployment, repeat the load test, and consider route-specific usage controls if expected traffic increases. Do not claim high-scale readiness from this development account result.
 - **Artefact path:** `tests/load_health.py`, `src/infrastructure/api.tf`, and `src/infrastructure/monitoring.tf`
+
+### Approved-quota stress retest
+
+- **Objective:** Recheck bounded overload behavior after the account-level Lambda concurrency quota increase.
+- **Setup:** AWS Lambda account quota of 1,000 in `ap-southeast-1`; HTTPS API Gateway endpoints; 100 requests with concurrency 10 against `/health` and `/predict`. This is an authorized application stress test, not a DDoS test.
+- **Actual result on 2026-09-29:** Health returned 53 HTTP 200 and 47 HTTP 429 responses at 33.95 requests/second. Prediction returned 62 HTTP 200 and 38 HTTP 429 responses at 18.91 requests/second. No HTTP 5xx responses occurred. CloudWatch showed zero Lambda errors and zero Lambda throttles for the health function; the prediction function remained `Active` with a successful update state and no Lambda-level errors or throttles reported for the observation window.
+- **Interpretation:** API Gateway route throttling rejected excess traffic before it became a Lambda failure. The result demonstrates controlled overload handling at this test size, but it does not prove production-scale capacity or DDoS protection.
+- **Artefact path:** `tests/load_health.py` and the 2026-09-29 terminal run output.
 
 ## Prediction-history recovery
 

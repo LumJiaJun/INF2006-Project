@@ -24,25 +24,23 @@ project is production certified.
 | DynamoDB follows the application's access pattern | History uses `user_id` plus a time-ordered sort key and queries only the verified JWT subject | Retained |
 | Each function has a purpose-specific IAM role | Terraform scopes prediction, history, analytics, Glue, and chat roles separately | Retained |
 | Static web assets use CloudFront and S3 | CloudFront serves the private S3 origin through Origin Access Control | Retained |
-| VPC/private subnets are used when a function must reach private-subnet resources | No current function needs RDS, ElastiCache, or another private-subnet dependency | Not added |
+| VPC/private subnets are used when private network control is justified | All five Lambdas use two private subnets across two AZs; gateway endpoints cover S3/DynamoDB and interface endpoints cover Logs, Athena, and Bedrock Runtime | Added |
 
 ## VPC boundary
 
-There is no VPC, subnet, NAT Gateway, security group, or VPC endpoint in the
-current Terraform root. DynamoDB is an AWS-managed regional service and is not
-placed inside a customer VPC. This is consistent with the reviewed serverless
-patterns for a Lambda/API Gateway/DynamoDB application.
+The Terraform root now contains a dedicated VPC, two private subnets across
+two AZs, route tables, a Lambda security group, and an endpoint security group.
+S3 and DynamoDB use gateway endpoints, while CloudWatch Logs, Athena, and
+Bedrock Runtime use private interface endpoints with private DNS. There is no
+NAT Gateway because the deployed functions do not require general internet
+egress. DynamoDB remains an AWS-managed regional service and is not placed
+inside the customer VPC.
 
-Adding a minimal VPC would not make the current DynamoDB table private. It
-would require moving selected Lambdas into subnets and then designing routes,
-security groups, service endpoints, and outbound access. A NAT Gateway would
-also add recurring cost. The current identity, IAM, API throttling, S3 OAC,
-encryption, validation, and logging controls provide the relevant V1 boundary.
-
-If a future requirement introduces RDS, ElastiCache, a private third-party
-connection, or another subnet-only dependency, revisit the design in this
-order: private subnets, least-privilege security groups, gateway endpoints for
-S3 and DynamoDB where applicable, and only then a justified egress path.
+The VPC is a network-control boundary, not a replacement for identity. IAM,
+Cognito JWT validation, user-scoped access, encryption, input validation, API
+throttling, and logging remain required Zero Trust controls. The two AZs provide
+subnet-level redundancy for Lambda ENI placement; application recovery still
+requires the documented regional recovery plan.
 
 ## Refinements confirmed
 
@@ -59,6 +57,6 @@ S3 and DynamoDB where applicable, and only then a justified egress path.
 ## Remaining evidence work
 
 - Regenerate `report.pdf` from the corrected report source before submission.
-- Replace the stale report test count and ECR scan wording with current evidence.
+- Keep the report source, deployment evidence, VPC evidence, edge-security evidence, and ECR scan results synchronized before submission.
 - Complete `TEAM_CONTRIBUTIONS.md` with genuine team-provided roles, artefacts,
   test ownership, and reflections.

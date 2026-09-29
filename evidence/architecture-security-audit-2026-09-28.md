@@ -13,16 +13,16 @@ The current serverless architecture remains appropriate for the measured require
 - CloudFront serves a private S3 origin through Origin Access Control.
 - API Gateway invokes focused Lambda functions.
 - Cognito JWT authorization protects prediction history and the optional AI route.
-- DynamoDB is an AWS managed regional service and does not sit inside a customer VPC.
+- All five Lambda functions use private subnets across two AZs; S3 and DynamoDB use gateway endpoints, while Logs, Athena, and Bedrock Runtime use interface endpoints. DynamoDB remains an AWS managed regional service and does not sit inside a customer VPC.
 - S3 stores frontend and data lake objects with public access blocked and encryption at rest.
 - Glue and Athena provide the approved analytics path.
 - CloudWatch and SNS provide logs, metrics, alarms, and notifications.
 
-No VPC or NAT Gateway was added. The Lambda functions currently use managed AWS services and public AWS service endpoints, and no private subnet resource requires VPC connectivity. Adding a VPC now would add NAT cost, cold-start/network complexity, and new failure modes without creating a meaningful data boundary around DynamoDB. If a future Lambda must enter a VPC, gateway endpoints for S3 and DynamoDB should be preferred before a NAT Gateway.
+The VPC was added after architecture review as a measured network-control improvement. It uses two private subnets, a restrictive Lambda security group, S3/DynamoDB gateway endpoints, and private interface endpoints for Logs, Athena, and Bedrock Runtime. No NAT Gateway was added because no deployed Lambda requires general internet egress. This does not make DynamoDB a resource inside the VPC; identity and IAM controls remain the primary Zero Trust boundary.
 
-No WAF was added. API throttling, input validation, restricted CORS, JWT authorization, and CloudFront security headers address the current low-volume academic workload. WAF should be reconsidered only if deployment evidence shows an internet threat or abuse pattern that justifies its recurring cost.
+CloudFront WAF is now enabled with AWS IP reputation, AWS Common Rule Set, and per-IP rate-based protection. API throttling, input validation, restricted CORS, JWT authorization, and CloudFront security headers remain necessary layered controls. This does not claim DDoS certification; Shield and a separate incident response plan are not part of this project.
 
-No custom ACM certificate or Route 53 zone was added. CloudFront already provides HTTPS using its managed `cloudfront.net` certificate. A custom certificate would require an owned domain and ACM in `us-east-1`. The default CloudFront certificate does not allow Terraform to set a stricter minimum TLS policy, so this remains a documented limitation rather than an invented domain dependency.
+The CloudFront managed certificate remains active. A custom ACM certificate requires an owned domain, DNS validation, and ACM in `us-east-1`; it is not attached until the team supplies those values. The default CloudFront certificate does not allow Terraform to set a stricter minimum TLS policy, so custom ACM remains the next domain-dependent step.
 
 ## Zero Trust Review
 
@@ -60,7 +60,7 @@ Observed results:
 - Checkov reported 314 passed and 72 failed checks after hardening, compared with 299 passed and 72 failed before hardening.
 - The targeted API access logging, S3 HTTPS enforcement, and incomplete multipart upload checks no longer appeared as failures.
 
-The remaining Checkov failures are not all exploitable vulnerabilities. They include broad enterprise baselines such as one-year retention for every log group, customer-managed KMS keys on every log and data store, VPC placement for every Lambda, WAF, CloudFront origin failover, cross-region S3 replication, X-Ray, Lambda code signing, reserved concurrency, and dead-letter queues for synchronous functions. These controls should be added only when risk, recovery objectives, or measured workload requirements justify their cost and complexity.
+The remaining Checkov failures are not all exploitable vulnerabilities. They include broad enterprise baselines such as one-year retention for every log group, customer-managed KMS keys on every log and data store, CloudFront origin failover, cross-region S3 replication, X-Ray, Lambda code signing, reserved concurrency, and dead-letter queues for synchronous functions. These controls should be added only when risk, recovery objectives, or measured workload requirements justify their cost and complexity. The scan predates the VPC, WAF, and CloudTrail additions and should be rerun before submission.
 
 ## Residual Risks and Follow-Up
 
@@ -75,11 +75,10 @@ The remaining Checkov failures are not all exploitable vulnerabilities. They inc
 
 The AWS reference comparison is recorded in
 `evidence/aws-serverless-reference-review-2026-09-28.md`. It confirms that the
-current Cognito, API Gateway, focused Lambda, DynamoDB, CloudFront, and S3
-pattern is aligned with the reviewed AWS serverless samples. It also confirms
-that a VPC is not a mandatory component of this Lambda/API Gateway/DynamoDB
-pattern; it becomes justified when a function must reach a private-subnet
-dependency or controlled private egress.
+current Cognito, API Gateway, focused Lambda, private-subnet, DynamoDB,
+CloudFront, and S3 pattern is aligned with the reviewed AWS serverless samples.
+The VPC is implemented as an additional network-control boundary, not as a
+claim that DynamoDB itself is inside the VPC.
 
 ## Adheesh Branch Decision
 

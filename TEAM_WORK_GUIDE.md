@@ -3,8 +3,7 @@
 Class: EP2, Group: G014
 
 This guide explains how to work on the current Airbnb Pricing and Market
-Intelligence Platform without overwriting another person's deployment or
-claiming work that was not performed.
+Intelligence Platform consistently, safely, and with clear team coordination.
 
 ## Repository and branches
 
@@ -12,9 +11,8 @@ claiming work that was not performed.
 - `nixon` contains the current cloud/infrastructure implementation and is
   already merged into `main`.
 - `origin/adheesh` is preserved separately because it contains the StaySphere
-  FastAPI application, synthetic demo data, and a different API contract. Do
-  not copy its runtime files into this serverless application without an
-  explicit design review.
+  FastAPI application, synthetic demo data, and a different API contract. Ideas
+  from it can be adapted after checking that they fit this serverless design.
 - Create a feature branch from the latest `main`, run focused checks, and open
   a pull request. Do not force-push shared branches.
 
@@ -32,9 +30,9 @@ claiming work that was not performed.
    not use local state for the shared deployed stack.
 4. Never commit credentials, `.env` files, `backend.hcl`, Terraform state,
    plan files, raw datasets, or model binaries.
-5. Never run `apply` or `destroy` while another teammate is changing the
-   shared stack. State lockfiles prevent concurrent Terraform operations, but
-   they do not replace team coordination.
+5. Coordinate before running `apply` or `destroy` if another teammate is
+   working on the shared stack. State lockfiles help prevent concurrent
+   Terraform operations, but they do not replace team coordination.
 6. Keep the team updated whenever you plan, apply, or destroy AWS resources.
    Share the planned change, result, and any important outputs in the team
    chat so everyone can avoid conflicts and reproduce the work.
@@ -77,8 +75,8 @@ terraform output frontend_url
 terraform output health_url
 ```
 
-Post the planned change and final result in the team chat after every apply.
-Do not apply a plan silently, even if it contains only frontend assets.
+Post the planned change and final result in the team chat after every apply,
+including frontend-only updates, so the team has a shared record.
 
 After changes, run focused checks from the repository root:
 
@@ -107,13 +105,13 @@ terraform show -no-color destroy.tfplan
 terraform apply destroy.tfplan
 ```
 
-Never use `terraform destroy -auto-approve` on the shared environment. Confirm
+Avoid `terraform destroy -auto-approve` on the shared environment. Coordinate
 with the team first, post the destroy plan in the team chat, save required
 evidence, and verify the destroy result.
 
 ## Current workstreams
 
-Teammates can earn credit through genuine work in any of these areas:
+Suggested contribution areas include:
 
 - **Data and ML:** reproducible EDA, per-city error analysis, defensible model
   comparisons, currency documentation, and training-serving consistency.
@@ -129,15 +127,19 @@ Teammates can earn credit through genuine work in any of these areas:
   evidence, rubric review, and PDF regeneration from the updated report.
 
 Record each person's actual role, artefacts, tests, and reflection in
-`TEAM_CONTRIBUTIONS.md`; do not copy a suggested workstream as proof of work.
+`TEAM_CONTRIBUTIONS.md` so the contribution record stays accurate.
 
 ## Current known constraints
 
-- The development account has a Lambda concurrency quota of 10.
+- The development account Lambda concurrency quota is now 1,000 in
+  `ap-southeast-1`. API Gateway route throttling still rejects excess traffic;
+  the approved-quota stress result is recorded in `evidence/test-resilience.md`.
 - No cross-region replica or tested regional failover is deployed.
-- SNS has no confirmed human subscription by default.
-- ECR scan-on-push is enabled, but the latest manual scan was limited by the
-  per-image scan quota.
+- The SNS operational alert email is confirmed for the current environment;
+  a replacement endpoint must be confirmed again if the Terraform variable
+  changes.
+- ECR scan-on-push is enabled. The latest recorded image scan completed with
+  no findings; future image builds still need their scan result checked.
 - The model estimates listing price from a cross-sectional dataset; it does
   not prove future prices, demand, or condition monitoring.
 
