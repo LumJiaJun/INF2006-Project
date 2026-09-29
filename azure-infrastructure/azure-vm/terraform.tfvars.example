@@ -1,0 +1,8 @@
+subscription_id       = "00000000-0000-0000-0000-000000000000"
+resource_group_name    = "inf2006-azure-rg"
+location               = "southeastasia"
+vm_name                = "inf2006-vm"
+vm_size                = "Standard_B2s"
+admin_username         = "azureuser"
+admin_cidr             = "203.0.113.10/32"
+admin_ssh_public_key   = "ssh-ed25519 AAAA... replace-with-your-public-key"
