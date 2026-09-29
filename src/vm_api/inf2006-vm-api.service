@@ -1,0 +1,16 @@
+[Unit]
+Description=INF2006 VM API adapter
+After=network.target
+
+[Service]
+Type=simple
+User=azureuser
+WorkingDirectory=/home/azureuser/INF2006-Project
+Environment=VM_API_HOST=127.0.0.1
+Environment=VM_API_PORT=8000
+ExecStart=/home/azureuser/INF2006-Project/.venv/bin/python /home/azureuser/INF2006-Project/src/vm_api/server.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
