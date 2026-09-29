@@ -35,6 +35,9 @@ claiming work that was not performed.
 5. Never run `apply` or `destroy` while another teammate is changing the
    shared stack. State lockfiles prevent concurrent Terraform operations, but
    they do not replace team coordination.
+6. Keep the team updated whenever you plan, apply, or destroy AWS resources.
+   Share the planned change, result, and any important outputs in the team
+   chat so everyone can avoid conflicts and reproduce the work.
 
 ## First-time Terraform setup
 
@@ -74,6 +77,9 @@ terraform output frontend_url
 terraform output health_url
 ```
 
+Post the planned change and final result in the team chat after every apply.
+Do not apply a plan silently, even if it contains only frontend assets.
+
 After changes, run focused checks from the repository root:
 
 ```powershell
@@ -102,7 +108,8 @@ terraform apply destroy.tfplan
 ```
 
 Never use `terraform destroy -auto-approve` on the shared environment. Confirm
-with the team first, save required evidence, and verify the destroy plan.
+with the team first, post the destroy plan in the team chat, save required
+evidence, and verify the destroy result.
 
 ## Current workstreams
 
