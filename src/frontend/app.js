@@ -19,6 +19,8 @@ let modelOptions;
 const accountLabel = document.querySelector("#account-label");
 const signInButton = document.querySelector("#sign-in");
 const signOutButton = document.querySelector("#sign-out");
+const menuToggle = document.querySelector("#menu-toggle");
+const primaryNav = document.querySelector("#primary-nav");
 const historySection = document.querySelector("#history-section");
 const historyMessage = document.querySelector("#history-message");
 const historyList = document.querySelector("#history-list");
@@ -56,6 +58,20 @@ let plannerRate = null;
 let plannerCurrency = "";
 let analyticsItems = [];
 let selectedMarket = null;
+
+function closeNavigation() {
+  if (!menuToggle || !primaryNav) return;
+  menuToggle.setAttribute("aria-expanded", "false");
+  primaryNav.classList.remove("is-open");
+}
+
+menuToggle?.addEventListener("click", () => {
+  const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+  menuToggle.setAttribute("aria-expanded", String(!isOpen));
+  primaryNav?.classList.toggle("is-open", !isOpen);
+});
+
+primaryNav?.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNavigation));
 
 const presets = {
   couple: {

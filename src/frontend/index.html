@@ -18,7 +18,11 @@
           <span class="brand-mark" aria-hidden="true">AM</span>
           <span>Market Intelligence</span>
         </a>
-        <div class="nav-links">
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+          <span class="menu-toggle-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="menu-toggle-label">Menu</span>
+        </button>
+        <div id="primary-nav" class="nav-links">
           <a href="#estimator">Estimator</a>
           <a href="markets.html">Markets</a>
           <a href="project.html">Project</a>
@@ -69,6 +73,40 @@
           </div>
         </aside>
       </header>
+
+      <section class="command-center" aria-labelledby="command-center-heading">
+        <div class="command-center-intro">
+          <p class="section-label">Your command center</p>
+          <h2 id="command-center-heading">What would you like to explore?</h2>
+          <p>Move from a quick estimate to market context, then save the result in your private workspace.</p>
+        </div>
+        <div class="command-actions">
+          <a class="command-card command-card-featured" href="#estimator">
+            <span class="command-icon" aria-hidden="true">01</span>
+            <span>
+              <strong>Build an estimate</strong>
+              <small>Shape a listing profile and compare it with the city median.</small>
+            </span>
+            <span class="command-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a class="command-card" href="#analytics">
+            <span class="command-icon" aria-hidden="true">02</span>
+            <span>
+              <strong>Explore markets</strong>
+              <small>Filter ten supported cities using local-currency summaries.</small>
+            </span>
+            <span class="command-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a class="command-card" href="#history-section">
+            <span class="command-icon" aria-hidden="true">03</span>
+            <span>
+              <strong>Open workspace</strong>
+              <small>Sign in to save predictions and ask the protected AI guide.</small>
+            </span>
+            <span class="command-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </section>
 
       <section class="story-banner" aria-labelledby="story-banner-heading">
         <img
