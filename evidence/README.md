@@ -4,9 +4,9 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 
 | File | Purpose |
 |------|---------|
-| architecture-current.png | Current labelled architecture, trust boundaries, data flows, and improvement roadmap |
+| architecture-current.png | Current numbered architecture showing WAF, CloudFront, Cognito, two-AZ Lambda VPC, endpoints, data stores, operations, and CI/CD |
 | architecture.png | Earlier labelled architecture diagram retained for history |
-| architecture.svg | Earlier editable architecture diagram retained for history |
+| architecture.svg | Editable source for the current numbered architecture diagram |
 | architecture-security-audit-2026-09-28.md | Architecture and security audit findings |
 | test-functional.md | Functional workflow test |
 | test-security.md | Security control test |
