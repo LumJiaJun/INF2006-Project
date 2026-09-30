@@ -62,8 +62,9 @@ Git.
 
 The application stack is currently live in the configured Singapore development
 account. Terraform returned `No changes` after deployment, and the live
-functional, security, bounded-load, and local DAST results are recorded in
-`evidence/live-deployment-test-2026-09-28.md`. State remains outside Git.
+functional, security, bounded-load, and local DAST results are recorded in the
+test evidence files and `evidence/verification-2026-09-30.txt`. State remains
+outside Git.
 
 ## Deployment gate
 

@@ -1,10 +1,5 @@
 # Airbnb Pricing and Market Intelligence Platform
 
-<!--
-Entry point for the submission. Keep this concise and factual.
-A marker should be able to understand the project and run safe, offline commands from here.
--->
-
 ## Problem statement
 
 Airbnb hosts and prospective hosts can struggle to interpret local listing patterns and choose a reasonable nightly price. This project provides an estimated nightly price from listing characteristics, supported market analytics, and authenticated prediction history through a secure serverless AWS application. Predictions are estimates, not guaranteed market prices.
@@ -21,12 +16,9 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 
 ## Deployment status
 
-The development stack was last recreated and tested on 2026-09-28 using the
-evaluated model artifact and the supplied listings dataset. It was intentionally
-destroyed after evidence collection to control cost; the main page is the
-estimator and market dashboard, with separate market and project pages when
-deployed. See `evidence/live-deployment-test-2026-09-28.md` for historical,
-redacted deployment and test results.
+As of 2026-09-30, the development stack is deployed in `ap-southeast-1` using
+the evaluated model artifact and supplied listings dataset. The current
+redacted terminal transcript is `evidence/verification-2026-09-30.txt`.
 
 ## Quickstart commands
 

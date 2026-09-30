@@ -1,0 +1,53 @@
+INF2006 current verification transcript
+Date: 2026-09-30
+Base commit tested: 8e0e0e2
+Sensitive account identifiers and resource URLs are omitted.
+
+> terraform fmt -check -recursive src/infrastructure
+PASS
+
+> terraform -chdir=src/infrastructure validate -no-color
+Success! The configuration is valid.
+
+> python -m unittest discover -s tests -p "test_*.py" -v
+----------------------------------------------------------------------
+Ran 29 tests in 0.077s
+
+OK
+
+> node --check <each src/frontend/*.js file>
+PASS (4 files)
+
+> ./tests/smoke_api.ps1 -FrontendUrl <terraform-output> -ApiBaseUrl <terraform-output>
+Health check passed.
+Frontend asset checks passed.
+Frontend security header checks passed.
+Prediction passed: 65.98 EUR.
+Analytics passed: 10 city summaries.
+Protected route authentication checks passed.
+Malformed request validation passed.
+
+> terraform apply after normalizing the deployed index.html line endings
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+> terraform plan with deployed alert email and prediction image tag variables
+No changes. Your infrastructure matches the configuration.
+
+> aws cloudwatch describe-alarms --alarm-name-prefix airbnb-market-intelligence-dev-
+airbnb-market-intelligence-dev-analytics-errors    OK
+airbnb-market-intelligence-dev-api-server-errors   OK
+airbnb-market-intelligence-dev-chat-errors         OK
+airbnb-market-intelligence-dev-health-throttles    OK
+airbnb-market-intelligence-dev-prediction-errors   OK
+
+> GitHub Actions API, main branch, commit 8e0e0e2
+36725635570  Security gates  completed  success
+36725635828  SAST - CodeQL   completed  success
+36725635537  CI              completed  success
+
+> pinned OWASP ZAP baseline with .zap/rules.tsv
+FAIL-NEW: 0  FAIL-INPROG: 0  WARN-NEW: 0  WARN-INPROG: 0  IGNORE: 4  PASS: 63
+ZAP_EXIT_CODE=0
+
+The four ignored rules and their justifications are version controlled in
+.zap/rules.tsv. A passing GitHub-hosted DAST rerun is not claimed here.

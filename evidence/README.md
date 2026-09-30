@@ -7,9 +7,9 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | architecture-current.png | Current numbered architecture showing WAF, CloudFront, Cognito, two-AZ Lambda VPC, endpoints, data stores, operations, and CI/CD |
 | architecture-detailed.png | Detailed enterprise view of trust boundaries, routes, private networking, managed services, data engineering, monitoring, and delivery flows |
 | architecture-detailed.svg | Editable source for the detailed enterprise architecture diagram |
-| architecture.png | Earlier labelled architecture diagram retained for history |
 | architecture.svg | Editable source for the current numbered architecture diagram |
 | architecture-security-audit-2026-09-28.md | Architecture and security audit findings |
+| verification-2026-09-30.txt | Redacted terminal transcript for current validation, live smoke checks, Terraform state, alarms, GitHub Actions, and DAST summary |
 | test-functional.md | Functional workflow test |
 | test-security.md | Security control test |
 | test-data-ai.md | Data / AI validation test |
@@ -17,14 +17,11 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | test-resilience.md | Scalability / resilience / recovery test |
 | test-load-safety-2026-09-28.md | Safe load-test guardrails and authorization controls |
 | test-web-load.md | Browser/static web-load test |
-| frontend-and-lambda-load-2026-09-28.md | Frontend and Lambda load observations |
-| live-deployment-test-2026-09-28.md | Historical deployment verification and limitations |
 | prediction-runtime.md | Model container and Lambda runtime evidence |
 | monitoring.md | Logging / monitoring evidence |
 | cost-estimate.md | Cost assumptions and FinOps review |
 | threat-control-map.md | Threat-to-control mapping + secrets handling |
 | serverless-zero-trust-review.md | Serverless Lens and Zero Trust design review |
-| adheesh-branch-review.md | Compatibility review of Adheesh's parallel implementation |
 | ci-cd.md | GitHub Actions and encrypted shared-state validation |
 | ../.github/workflows/security.yml | Pinned dependency and Python static-security gates |
 | aws-serverless-reference-review-2026-09-28.md | Official AWS pattern comparison and VPC decision |

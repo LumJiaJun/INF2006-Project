@@ -79,7 +79,3 @@ current Cognito, API Gateway, focused Lambda, private-subnet, DynamoDB,
 CloudFront, and S3 pattern is aligned with the reviewed AWS serverless samples.
 The VPC is implemented as an additional network-control boundary, not as a
 claim that DynamoDB itself is inside the VPC.
-
-## Adheesh Branch Decision
-
-The `origin/adheesh` branch was reviewed separately. Its StaySphere booking brand, FastAPI/RDS/container runtime, and synthetic application behavior do not match the approved serverless pricing platform or its dataset-backed claims. Those components were not merged. Only the general interaction idea of summarizing a configured listing was adapted into the existing estimator, using the current project brand and real model inputs.
