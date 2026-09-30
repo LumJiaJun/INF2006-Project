@@ -102,7 +102,7 @@ CloudWatch alarms track API 5xx responses, prediction/analytics/chat Lambda erro
 
 To provision an optional email subscription without storing the address in Git, apply with `-var='alert_email=operator@example.com'`. AWS sends a confirmation email; the endpoint is not active until the recipient confirms it. Omitting the variable keeps the topic without a subscription.
 
-The development account has a Lambda concurrency quota of 10, so the API stage uses a conservative two-request burst and two-request-per-second limit. See `evidence/test-resilience.md` for passing expected-load results and the honestly recorded higher-concurrency failure.
+The development account now has an approved Lambda concurrency quota of 1,000. The API stage intentionally retains a conservative two-request burst and two-request-per-second limit to bound cost and reject excess traffic before it reaches Lambda. See `evidence/test-resilience.md` for both the historical quota-10 result and the approved-quota retest.
 
 ## Build prediction image
 

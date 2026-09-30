@@ -6,9 +6,9 @@ Class: EP2, Group G014
 
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
-Evidence date: 28 September 2026
+Evidence date: 30 September 2026
 
-Deployment status: The stack described here was last deployed and tested on 28 September 2026, then intentionally destroyed after evidence collection. The Terraform configuration remains reproducible for a future deployment.
+Deployment status: The stack described here is deployed in `ap-southeast-1`. A 30 September 2026 audit confirmed no Terraform drift and repeated the public frontend, health, prediction, analytics, authorization, and validation smoke checks successfully.
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 
@@ -82,7 +82,7 @@ The repository contains 29 passing Python unit tests covering health responses, 
 
 A JMeter 5.6.3 browser journey ran 25 visitors over 45 seconds against the three public pages and shared assets. All 929 requests passed at 20.3 requests per second, with 666.9 ms mean and 1,508 ms maximum response time. This bounded result verifies the tested CloudFront profile, not an unlimited scaling claim.
 
-Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR scan-on-push is enabled, but a later manual scan was blocked by the per-image scan quota; this is not evidence of a clean image scan. Unit tests confirm history queries use only the verified JWT subject.
+Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR scan-on-push is enabled, and the deployed prediction image tag `1.0.4` completed scanning with no findings on 30 September 2026. Unit tests confirm history queries use only the verified JWT subject.
 
 IAM policy simulation added a service-to-service authorization check. Required prediction writes, history queries, and Glue raw-listing reads returned `allowed`. Prediction reads of raw S3 data, history table scans, and Glue reads of the unused raw-review prefix returned `implicitDeny`. This verifies selected blast-radius boundaries without treating same-account services as implicitly trusted.
 
@@ -102,7 +102,7 @@ Sustainability benefits come from avoiding idle servers and reducing repeated da
 
 Operational procedures include reviewing Terraform plans, using immutable ECR tags, invalidating CloudFront after frontend changes, running smoke tests, checking alarm state, and confirming the Glue run before expecting analytics. AWS credentials remain outside Git through the standard credential chain. Raw datasets, Terraform state, model binaries, environment files, and plan files are ignored.
 
-Before a public or longer-lived deployment, the team should request an appropriate Lambda concurrency quota, add and confirm an SNS recipient, enable a remote encrypted Terraform backend with state locking, define ownership for alarms, schedule backup-restore exercises, and review current cloud spend. The university environment is intentionally small and should be destroyed when evidence collection is complete.
+For a longer-lived deployment, the team should monitor use of the approved 1,000 Lambda concurrency quota, retain ownership of the confirmed SNS recipient, preserve the remote encrypted Terraform backend and state locking, schedule backup-restore exercises, test cross-region recovery, and review current cloud spend. The university environment remains intentionally small and should be destroyed when evidence collection is complete.
 
 ## 8. Team contribution, ethical considerations and reflection
 
@@ -119,6 +119,6 @@ The strongest engineering lesson is that managed services do not remove the need
 ## References
 
 1. INF2006 Cloud Computing and Big Data, Team Project 1 brief, 2026.
-2. mysarahmadbhat, “Airbnb Listings & Reviews,” Kaggle, CC0 1.0 Public Domain.
+2. mysarahmadbhat, "Airbnb Listings & Reviews," Kaggle, CC0 1.0 Public Domain.
 3. AWS service configuration and behavior are evidenced by Terraform files and dated CLI results in `evidence/`.
 4. scikit-learn documentation and BSD-3-Clause licensed implementation, https://scikit-learn.org/.

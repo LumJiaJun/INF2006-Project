@@ -7,7 +7,7 @@ project:
   title: "Airbnb Pricing and Market Intelligence Platform"
   problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
   cloud_provider: "AWS"
-  repository_commit: "59ecfb0"
+  repository_commit: "e57c4bd"
 
 team:
   members:
@@ -34,9 +34,12 @@ architecture:
   deployment_model: "Public cloud"
   components:
     - "Amazon CloudFront"
+    - "AWS WAF"
     - "Amazon S3 private frontend origin"
     - "Amazon API Gateway HTTP API"
     - "AWS Lambda"
+    - "Amazon VPC with two private subnets"
+    - "Amazon VPC gateway and interface endpoints"
     - "Amazon Elastic Container Registry"
     - "Amazon Cognito"
     - "Amazon DynamoDB"
@@ -48,6 +51,7 @@ architecture:
     - "Amazon CloudWatch dashboard and alarms"
     - "Amazon SNS"
     - "AWS Key Management Service"
+    - "AWS CloudTrail"
     - "GitHub Actions CI/CD"
 
 evidence:
