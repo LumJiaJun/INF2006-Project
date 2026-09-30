@@ -5,6 +5,8 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | File | Purpose |
 |------|---------|
 | architecture-current.png | Current numbered architecture showing WAF, CloudFront, Cognito, two-AZ Lambda VPC, endpoints, data stores, operations, and CI/CD |
+| architecture-detailed.png | Detailed enterprise view of trust boundaries, routes, private networking, managed services, data engineering, monitoring, and delivery flows |
+| architecture-detailed.svg | Editable source for the detailed enterprise architecture diagram |
 | architecture.png | Earlier labelled architecture diagram retained for history |
 | architecture.svg | Editable source for the current numbered architecture diagram |
 | architecture-security-audit-2026-09-28.md | Architecture and security audit findings |
