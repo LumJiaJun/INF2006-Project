@@ -92,7 +92,9 @@ It uses GitHub OIDC rather than stored AWS access keys.
 After a successful deployment, OWASP ZAP DAST performs a passive baseline scan.
 It can also be started manually. The scan accepts only HTTPS and requires the
 target hostname to exactly match the allowlisted host, uploads HTML, JSON, and
-Markdown reports, and fails on any ZAP warning, failure, or scanner error.
+Markdown reports, and fails on scanner errors plus new or explicitly actionable
+findings. Narrowly accepted static-site findings are documented in
+`.zap/rules.tsv` and must not be broadened without review.
 Configure `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`, `TF_STATE_KMS_KEY_ARN`,
 `MODEL_ARTIFACT_S3_URI`, `DAST_TARGET_URL`, and `DAST_ALLOWED_HOST` in the
 protected GitHub environment before using deployment or DAST.

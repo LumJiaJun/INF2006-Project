@@ -1,0 +1,8 @@
+# Reviewed OWASP ZAP baseline policy for the public static frontend.
+# New rules remain WARN by default and therefore fail the workflow.
+10015	IGNORE	Public static assets intentionally use reviewed CloudFront cache controls.
+10027	FAIL	Frontend source comments must not disclose implementation details.
+10031	IGNORE	Reviewed false positive: allowlisted query values are assigned through DOM value properties, not HTML sinks.
+10036	IGNORE	CloudFront exposes the generic AmazonS3 origin header without a software version.
+10049	IGNORE	Only public static frontend content is cacheable; protected API responses are on a separate origin.
+90004	FAIL	The CloudFront response policy must provide the required cross-origin isolation header.

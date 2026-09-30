@@ -54,7 +54,10 @@ jobs:
         run: curl --fail --silent --show-error --location --max-time 20 "$DAST_TARGET_URL" > /dev/null
 
       - name: Prepare report directory
-        run: mkdir -p zap-output && chmod 777 zap-output
+        run: |
+          mkdir -p zap-output
+          cp .zap/rules.tsv zap-output/rules.tsv
+          chmod 777 zap-output
 
       - name: Run passive ZAP baseline
         id: zap
@@ -68,6 +71,7 @@ jobs:
             zap-baseline.py \
             -t "$DAST_TARGET_URL" \
             -m 3 \
+            -c rules.tsv \
             -r report.html \
             -J report.json \
             -w report.md

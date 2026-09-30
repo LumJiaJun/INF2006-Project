@@ -101,6 +101,12 @@ resource "aws_cloudfront_response_headers_policy" "frontend_security" {
       override = true
       value    = "same-origin"
     }
+
+    items {
+      header   = "Cross-Origin-Embedder-Policy"
+      override = true
+      value    = "require-corp"
+    }
   }
 }
 
