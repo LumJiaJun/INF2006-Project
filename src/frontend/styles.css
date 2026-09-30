@@ -13,6 +13,16 @@
   --line: #d8e1dc;
   --success: #23845f;
   --shadow: 0 1.4rem 4rem rgb(16 35 30 / 10%);
+  --panel-shadow: 0 1rem 2.5rem rgb(16 35 30 / 8%);
+  --panel-shadow-strong: 0 1.4rem 3.2rem rgb(16 35 30 / 10%);
+  --ui-radius-sm: 0.6rem;
+  --ui-radius-md: 0.8rem;
+  --ui-radius-lg: 1.2rem;
+  --ui-input-height: 3rem;
+  --ui-button-height: 3rem;
+  --ui-button-height-small: 2.5rem;
+  --ui-form-gap: 0.7rem;
+  --ui-panel-gap: 1rem;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   scroll-behavior: smooth;
 }
@@ -20,6 +30,76 @@
 /* Use one box model across the page so component spacing stays predictable. */
 * {
   box-sizing: border-box;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  min-height: var(--ui-button-height);
+  border-radius: var(--ui-radius-md);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: var(--ui-input-height);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  padding: 0.7rem 0.8rem;
+  color: var(--ink);
+  background: var(--surface-soft);
+  transition: border 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+label {
+  display: grid;
+  gap: var(--ui-form-gap);
+}
+
+.metric-label,
+.eyebrow,
+.section-label,
+.feature-number,
+.stat-kicker,
+.snapshot-label,
+.guide-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  color: var(--coral);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.panel-surface,
+.hero-panel,
+.command-center,
+.history-section,
+.directory-card,
+.market-card,
+.private-ai-card,
+.estimator-workspace,
+.market-directory,
+.page-cta,
+.story-banner,
+.project-pillars article,
+.build-stack,
+.architecture-flow article,
+.market-principles article,
+.status-card,
+.hero-stat,
+.command-card,
+.listing-snapshot,
+.guide-launcher,
+.market-guide {
+  box-shadow: var(--panel-shadow);
 }
 
 body {
@@ -65,7 +145,7 @@ a {
   flex-direction: column;
   width: min(1200px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: 1rem 0 2rem;
+  padding: 0 0 2rem;
 }
 
 .page-shell > .topbar { order: 1; }
@@ -80,13 +160,14 @@ a {
 
 .topbar {
   position: sticky;
-  top: 0.75rem;
+  top: 0;
   z-index: 20;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1.5rem;
   min-height: 4.25rem;
+  margin-top: 0;
   padding: 0.7rem 0.8rem;
   border: 1px solid rgb(216 225 220 / 85%);
   border-radius: 1.2rem;
@@ -212,6 +293,10 @@ a {
   margin: 0 0 0.8rem;
 }
 
+.metric-label {
+  margin: 0;
+}
+
 h1,
 h2,
 h3,
@@ -274,7 +359,7 @@ h3 {
 
 .primary-link {
   display: inline-flex;
-  min-height: 3.2rem;
+  min-height: var(--ui-button-height);
   align-items: center;
   border-radius: 999px;
   padding: 0 1.3rem;
@@ -797,7 +882,7 @@ h3 {
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: var(--ui-form-gap);
 }
 
 .form-grid label {
@@ -817,18 +902,6 @@ h3 {
   text-transform: uppercase;
 }
 
-input,
-select {
-  width: 100%;
-  min-height: 3rem;
-  border: 1px solid var(--line);
-  border-radius: 0.7rem;
-  padding: 0.65rem 0.8rem;
-  color: var(--ink);
-  background: var(--surface-soft);
-  transition: border 160ms ease, box-shadow 160ms ease, background 160ms ease;
-}
-
 input:hover,
 select:hover {
   border-color: #aec0b7;
@@ -846,7 +919,7 @@ a:focus-visible {
 .boolean-fields {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.7rem;
+  gap: var(--ui-form-gap);
 }
 
 .boolean-fields legend {
@@ -878,7 +951,7 @@ a:focus-visible {
 .prediction-submit,
 .secondary-button,
 .compact-button {
-  border: 0;
+  border: 1px solid transparent;
   font-weight: 800;
   cursor: pointer;
 }
@@ -886,10 +959,10 @@ a:focus-visible {
 .prediction-submit {
   display: flex;
   width: 100%;
-  min-height: 3.35rem;
+  min-height: var(--ui-button-height);
   align-items: center;
   justify-content: space-between;
-  border-radius: 0.8rem;
+  border-radius: var(--ui-radius-md);
   padding: 0 1.15rem;
   color: #fff;
   background: var(--coral);
@@ -908,7 +981,7 @@ button:disabled {
 
 .secondary-button {
   width: auto;
-  min-height: 2.7rem;
+  min-height: var(--ui-button-height-small);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.5rem 1rem;
@@ -924,7 +997,7 @@ button:disabled {
 }
 
 .compact-button {
-  min-height: 2.35rem;
+  min-height: var(--ui-button-height-small);
   padding: 0.35rem 0.8rem;
   font-size: 0.76rem;
 }
@@ -1024,6 +1097,8 @@ button:disabled {
 .sort-control {
   display: grid;
   min-width: 210px;
+  margin-left: auto;
+  align-self: center;
   gap: 0.4rem;
   color: var(--muted);
   font-size: 0.72rem;
@@ -1598,7 +1673,12 @@ button:disabled {
 
 /* Inner pages use wider editorial headers while retaining the dashboard navigation. */
 .inner-page-shell {
+  display: block;
   padding-bottom: 2rem;
+}
+
+.inner-page-shell .topbar {
+  margin-top: 0;
 }
 
 .nav-links a[aria-current="page"] {
@@ -1717,7 +1797,7 @@ button:disabled {
 .directory-heading-row {
   display: flex;
   gap: 2rem;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
 }
 
@@ -1756,12 +1836,27 @@ button:disabled {
 .market-filter-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
-  margin: 1rem 0;
+  align-items: end;
+  gap: 1rem;
+  margin: 1.5rem 0 0;
 }
 
-.market-filter-row input {
-  width: 9rem;
+.market-filter-row label {
+  flex: 1 1 11rem;
+  min-width: 9rem;
+}
+
+.market-filter-row input,
+.market-filter-row select {
+  width: 100%;
+  min-width: 0;
+}
+
+.sort-control {
+  flex: 0 1 12rem;
+  min-width: 12rem;
+  margin-left: 0;
+  align-self: stretch;
 }
 
 .market-page-grid {
@@ -1777,7 +1872,7 @@ button:disabled {
   border: 1px solid rgb(23 79 66 / 12%);
   border-radius: 1.35rem;
   background: var(--surface);
-  box-shadow: 0 1rem 2.5rem rgb(16 35 30 / 5%);
+  box-shadow: var(--panel-shadow);
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 

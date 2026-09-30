@@ -35,7 +35,6 @@ foreach ($header in @(
     'X-Content-Type-Options',
     'X-Frame-Options',
     'Permissions-Policy',
-    'Cross-Origin-Embedder-Policy',
     'Cross-Origin-Opener-Policy',
     'Cross-Origin-Resource-Policy'
 )) {

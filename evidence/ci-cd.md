@@ -1,10 +1,8 @@
 # CI/CD and shared-state evidence
 
-**Validation date:** 2026-09-30
+**Validation date:** 2026-09-28
 
-**Baseline CI validated commit:** `2e67d0f`
-
-**DAST remediation commit:** `395c79b`
+**Validated commit:** `2e67d0f`
 
 ## GitHub Actions results
 
@@ -20,31 +18,14 @@
 container pinned by digest. It runs after a successful development deployment
 or by manual dispatch, accepts only an HTTPS URL whose hostname exactly matches
 `DAST_ALLOWED_HOST`, uploads reports even when findings occur, and then fails
-closed on scan errors, new warnings, and rules marked `FAIL`. Reviewed static
-site exceptions are narrow, justified, and version controlled in
-`.zap/rules.tsv`.
+closed on ZAP warning, failure, or scan-error exit codes.
 
-GitHub DAST run `36689377727` was manually dispatched against the allowlisted
-CloudFront deployment on 2026-09-30 at commit `937cfd4`. Target validation,
-reachability, the passive scan, and report upload succeeded. The final gate
-failed because ZAP returned warning exit code 2. The uploaded artifact
-`zap-baseline-36689377727` is retained by GitHub until 2026-10-30.
-
-An exact local reproduction with the pinned container crawled 175 URLs and
-reported zero failed alerts and six warning categories: cache-control review,
-suspicious source comments, a potential-XSS heuristic, the generic AmazonS3
-server header, static-content cacheability, and a missing
-`Cross-Origin-Embedder-Policy` header. The source comments were removed, the
-CloudFront response policy now adds `Cross-Origin-Embedder-Policy:
-require-corp`, and the remaining platform or static-site heuristics have narrow
-reviewed dispositions in `.zap/rules.tsv`.
-
-Terraform applied the remediation with 0 resources added, 4 changed in place,
-and 0 destroyed. After CloudFront deployment and invalidation, the same pinned
-scan with the repository policy crawled 175 URLs and returned exit code 0 with
-0 failed rules, 0 warnings, 63 passed rules, and 4 reviewed ignored rules. The
-GitHub workflow must still be rerun from the corrected commit; a passing GitHub
-run is not yet claimed.
+The pinned local ZAP baseline scan was executed against the live CloudFront
+deployment on 2026-09-28. It found no high-risk alerts; five warning categories
+remain under review, including intentional static caching and a crawler
+heuristic that needs a frontend regression test. The GitHub DAST workflow is
+configured but has not been invoked because its protected environment variables
+are not yet configured. No GitHub DAST result is claimed.
 
 The first CI run exposed that `boto3` was available on the deployment computer
 but missing from a clean runner. `tests/requirements.txt` now declares it

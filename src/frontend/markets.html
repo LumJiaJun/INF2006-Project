@@ -17,12 +17,21 @@
           <span class="brand-mark" aria-hidden="true">AM</span>
           <span>Market Intelligence</span>
         </a>
-        <div class="nav-links">
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+          <span class="menu-toggle-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="menu-toggle-label">Menu</span>
+        </button>
+        <div id="primary-nav" class="nav-links">
           <a href="index.html#estimator">Estimator</a>
           <a href="markets.html" aria-current="page">Markets</a>
           <a href="project.html">Project</a>
+          <a href="index.html#history-section">Private workspace</a>
         </div>
-        <a class="secondary-button compact-button" href="index.html#estimator">Open estimator</a>
+        <div class="account-bar">
+          <span id="account-label">Not signed in</span>
+          <button id="sign-in" class="secondary-button compact-button" type="button">Sign in</button>
+          <button id="sign-out" class="secondary-button compact-button" type="button" hidden>Sign out</button>
+        </div>
       </nav>
 
       <header class="inner-hero market-page-hero">
@@ -73,6 +82,11 @@
               Loading live summaries from Athena...
             </p>
           </div>
+        </div>
+
+        <div class="market-filter-row" aria-label="Market filters">
+          <label>Minimum listings <input id="market-min-listings" type="number" min="0" step="100" placeholder="Any"></label>
+          <label>Minimum rating <input id="market-min-rating" type="number" min="0" max="100" step="1" placeholder="Any"></label>
           <label class="sort-control">
             Sort by
             <select id="market-page-sort">
@@ -82,11 +96,6 @@
               <option value="rating">Average rating</option>
             </select>
           </label>
-        </div>
-
-        <div class="market-filter-row" aria-label="Market filters">
-          <label>Minimum listings <input id="market-min-listings" type="number" min="0" step="100" placeholder="Any"></label>
-          <label>Minimum rating <input id="market-min-rating" type="number" min="0" max="100" step="1" placeholder="Any"></label>
         </div>
 
         <div id="region-filters" class="filter-pills" aria-label="Filter cities by region">
@@ -121,6 +130,7 @@
     <script src="config.js"></script>
     <script src="auth-config.js"></script>
     <script src="auth.js" defer></script>
+    <script src="nav.js" defer></script>
     <script src="markets.js" defer></script>
     <script src="chat.js" defer></script>
   </body>

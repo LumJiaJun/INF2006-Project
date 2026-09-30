@@ -82,6 +82,14 @@ class AnalyticsHandlerTests(unittest.TestCase):
         self.assertEqual(body["error"]["code"], "internal_error")
         self.assertNotIn("Athena", body["error"]["message"])
 
+    def test_returns_empty_items_when_result_set_has_no_data_rows(self):
+        fake = FakeAthena()
+        fake.get_query_results = lambda **kwargs: {"ResultSet": {"Rows": [{"Data": [{"VarCharValue": "city"}]}]}}
+        analytics_handler._athena = fake
 
-if __name__ == "__main__":
-    unittest.main()
+        result = analytics_handler.lambda_handler({"requestContext": {"requestId": "test"}}, None)
+        body = json.loads(result["body"])
+
+        self.assertEqual(result["statusCode"], 200)
+        self.assertEqual(body["items"], [])
+        self.assertEqual(body["count"], 0)

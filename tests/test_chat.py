@@ -108,6 +108,13 @@ class ChatHandlerTests(unittest.TestCase):
         )
         self.assertEqual(result["statusCode"], 400)
 
+    def test_rejects_unsupported_page(self):
+        result = chat_handler.lambda_handler(
+            self.event({"message": "hello", "page": "admin.html"}),
+            None,
+        )
+        self.assertEqual(result["statusCode"], 400)
+
     def test_returns_safe_error_when_bedrock_fails(self):
         chat_handler._bedrock = FakeBedrock(fail=True)
         result = chat_handler.lambda_handler(
@@ -119,6 +126,13 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(result["statusCode"], 503)
         self.assertEqual(body["error"]["code"], "assistant_unavailable")
         self.assertNotIn("bedrock", body["error"]["message"].lower())
+
+    def test_returns_safe_error_when_model_reply_is_not_text(self):
+        chat_handler._bedrock = FakeBedrock(reply=["not", "text"])
+
+        result = chat_handler.lambda_handler(self.event({"message": "hello"}), None)
+
+        self.assertEqual(result["statusCode"], 503)
 
     def test_rejects_direct_invocation_without_verified_claims(self):
         result = chat_handler.lambda_handler(
