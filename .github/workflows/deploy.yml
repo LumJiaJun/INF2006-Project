@@ -142,7 +142,12 @@ jobs:
 
       - name: Plan deployment
         working-directory: src/infrastructure
-        run: terraform plan -input=false -var="prediction_image_tag=$GITHUB_SHA" -out=deployment.tfplan
+        env:
+          TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
+        run: |
+          set -euo pipefail
+          test -n "$TF_VAR_alert_email"
+          terraform plan -input=false -var="prediction_image_tag=$GITHUB_SHA" -out=deployment.tfplan
 
       - name: Apply reviewed plan
         working-directory: src/infrastructure

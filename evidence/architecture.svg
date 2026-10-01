@@ -57,6 +57,7 @@
   <circle cx="1025" cy="245" r="24" class="step-circle"/><text x="1025" y="252" class="step">4</text>
   <rect x="1060" y="180" width="355" height="480" class="boundary" rx="20"/>
   <text x="1085" y="212" class="boundary-label">VPC 10.20.0.0/16</text>
+  <text x="1237" y="645" class="tiny">All functions attach to both subnets; AWS placement is not pinned to one AZ</text>
   <rect x="1085" y="235" width="145" height="385" class="network" rx="14"/>
   <text x="1157" y="267" class="label">Private AZ-a</text><text x="1157" y="290" class="tiny">10.20.1.0/24</text>
   <rect x="1100" y="320" width="115" height="95" class="box compute"/><text x="1157" y="357" class="label">Lambda</text><text x="1157" y="382" class="tiny">health / predict</text>
@@ -97,7 +98,7 @@
   <path d="M1215 370 L1260 370" class="arrow"/>
   <path d="M1390 500 L1490 250" class="green-arrow"/>
   <path d="M1157 545 L540 640" class="green-arrow"/><path d="M1317 545 L860 640" class="green-arrow"/>
-  <path d="M1000 730 L1040 837" class="purple-arrow"/><path d="M1000 702 L1325 702" class="green-arrow"/>
+  <path d="M1215 520 L1215 800" class="purple-arrow"/><path d="M1000 702 L1325 702" class="green-arrow"/>
   <path d="M1415 765 L1570 765" class="arrow"/>
   <path d="M675 1018 L720 1018" class="arrow"/><path d="M990 1018 L1035 1018" class="arrow"/><path d="M1305 1018 L1350 1018" class="arrow"/>
 

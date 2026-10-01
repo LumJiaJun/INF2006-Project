@@ -37,6 +37,7 @@ outputs, then initialize from `src/infrastructure`:
 aws sts get-caller-identity
 terraform init -backend-config=backend.hcl
 terraform state list
+$env:TF_VAR_alert_email = "<confirmed operator email>"
 terraform plan
 ```
 
@@ -52,6 +53,7 @@ sensitive infrastructure values.
 terraform init -backend-config=backend.hcl
 terraform fmt -check
 terraform validate
+$env:TF_VAR_alert_email = "<confirmed operator email>"
 terraform plan
 ```
 
@@ -109,7 +111,7 @@ The development account now has an approved Lambda concurrency quota of 1,000. T
 Run from the repository root after recreating `analytics/artifacts/airbnb_price_model.joblib`:
 
 ```powershell
-$imageTag = "1.0.3"
+$imageTag = "1.0.4"
 $repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
 $registry = $repositoryUrl.Split('/')[0]
 

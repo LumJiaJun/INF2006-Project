@@ -96,8 +96,10 @@ Markdown reports, and fails on scanner errors plus new or explicitly actionable
 findings. Narrowly accepted static-site findings are documented in
 `.zap/rules.tsv` and must not be broadened without review.
 Configure `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`, `TF_STATE_KMS_KEY_ARN`,
-`MODEL_ARTIFACT_S3_URI`, `DAST_TARGET_URL`, and `DAST_ALLOWED_HOST` in the
-protected GitHub environment before using deployment or DAST.
+`MODEL_ARTIFACT_S3_URI`, `ALERT_EMAIL`, `DAST_TARGET_URL`, and
+`DAST_ALLOWED_HOST` in the protected GitHub environment before using deployment
+or DAST. `ALERT_EMAIL` must contain the confirmed operator address so an
+automated deployment preserves the Terraform-managed SNS subscription.
 
 To deploy, open GitHub Actions, select `Deploy development`, choose `nixon` or
 `main`, and type `DEPLOY`. Configure required reviewers in the `development`

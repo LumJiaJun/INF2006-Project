@@ -2,7 +2,7 @@
 variable "prediction_image_tag" {
   description = "Immutable ECR image tag used by the prediction Lambda."
   type        = string
-  default     = "1.0.3"
+  default     = "1.0.4"
 }
 
 data "aws_iam_policy_document" "prediction_lambda_assume_role" {
