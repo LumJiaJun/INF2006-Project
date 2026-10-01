@@ -11,6 +11,9 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | architecture-security-audit-2026-09-28.md | Architecture and security audit findings |
 | verification-2026-09-30.txt | Redacted terminal transcript for current validation, live smoke checks, Terraform state, alarms, GitHub Actions, and DAST summary |
 | verification-2026-10-01.txt | Redacted deployment and validation transcript for the contributor navigation integration |
+| encryption-review-2026-10-01.md | Live encryption, public-access, recovery, and sensitive-logging verification |
+| video-demonstration-guide.md | Redacted 5-8 minute functional and AWS service demonstration checklist |
+| consultation-improvements-2026-10-01.md | Potential-host workflow, AI hardening, browser journey, deployment, and consultation validation |
 | test-functional.md | Functional workflow test |
 | test-security.md | Security control test |
 | test-data-ai.md | Data / AI validation test |

@@ -6,21 +6,21 @@ Class: EP2, Group G014
 
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
-Evidence date: 30 September 2026
+Evidence date: 1 October 2026
 
-Deployment status: The stack described here is deployed in `ap-southeast-1`. A 30 September 2026 audit confirmed no Terraform drift and repeated the public frontend, health, prediction, analytics, authorization, and validation smoke checks successfully.
+Deployment status: The stack described here is deployed in `ap-southeast-1`. A 1 October 2026 audit confirmed no Terraform drift and repeated the public frontend, health, prediction, analytics, authorization, and validation smoke checks successfully.
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 
 ## 1. Problem, users and success criteria
 
-Airbnb hosts and prospective hosts must choose a nightly price in markets that differ by location, room type, property characteristics, capacity, host characteristics, and review history. A single global average is not useful because the supplied dataset covers ten cities and prices are recorded in each city's local currency. Users also need to understand the surrounding historical market rather than treating a model output as an objectively correct price.
+Prospective and existing Airbnb hosts lack a simple way to evaluate a potential listing configuration before publishing it. They must reason about location, room type, property characteristics, capacity, host signals, and local price patterns across markets that use different currencies. Individual listing pages do not combine model-based scenario estimation, configuration comparison, historical market context, and private history in one focused workflow. A single global average is not useful because the supplied dataset covers ten cities and prices are recorded in each city's local currency.
 
-The primary user is a host or prospective host exploring a listing configuration. The main workflow accepts supported listing attributes, validates them in the browser and backend, runs a trained regression pipeline, and returns an estimated nightly price with its local currency and an explicit disclaimer. A signed-in user can save that estimate and later retrieve only their own history. A public market view provides city-level listing counts, median prices, and ratings from the processed analytical dataset.
+The primary users are existing hosts reviewing a listing and potential hosts exploring whether a property configuration may be suitable for hosting. The guided workflow selects a city and neighbourhood, describes a potential listing, returns a model-backed nightly-price estimate, compares it with the city's historical market, and keeps up to three browser-local scenarios for configuration comparison. A signed-in user can save estimates and later retrieve only their own history. Visitors can explore descriptive city-level listing counts, median prices, and ratings, but the service deliberately remains a host decision-support tool rather than a booking platform.
 
 The project defines success as a working, reproducible, and evidence-backed workflow rather than maximum feature count. Functional success requires a CloudFront page, healthy API, real model inference, ten-city analytics, and authenticated history routes. Data success requires a profiled source, reproducible preprocessing and training, held-out metrics, and a cloud transform that produces queryable Parquet. Security success requires private S3 origins, HTTPS, least-privilege roles, Cognito JWT authorization, input validation, encrypted persistent stores, and evidence against named threats. Operational success requires structured logs, metrics, alarms, recovery configuration, and an honestly interpreted load test.
 
-The service is deliberately scoped. Predictions cover the typical market up to a city-specific 99th-percentile boundary learned from training data. They are not valuations, guarantees, or financial advice. Analytics values use different local currencies and cannot be compared as though all values were denominated alike. Success does not mean eliminating model error, handling unlimited traffic, or proving production readiness from one university development account.
+The service is deliberately scoped. Predictions cover the typical market up to a city-specific 99th-percentile boundary learned from training data. They are not property valuations, purchase recommendations, occupancy forecasts, profitability estimates, guarantees, or financial advice. The dataset does not contain acquisition prices, operating costs, regulation, tax, mortgage, booking-demand, or return data. Analytics values use different local currencies and cannot be compared as though all values were denominated alike. Success does not mean eliminating model error, handling unlimited traffic, or proving production readiness from one university development account.
 
 ## 2. Solution overview and architecture
 
@@ -50,6 +50,8 @@ SageMaker, ECS, Kubernetes, RDS, and Redis were not selected. A VPC was added af
 
 Terraform provisions the frontend, API, two-AZ Lambda VPC, private subnets, route tables, security groups, S3/DynamoDB gateway endpoints, Logs/Athena/Bedrock interface endpoints, Lambda functions, ECR repository, Cognito, DynamoDB, S3 data lake, Glue job and catalog, Athena workgroup, CloudWatch resources, SNS topic, and KMS key. Resource names share a project and environment prefix. S3 buckets enable Block Public Access, bucket-owner enforcement, encryption, and versioning. Frontend reads are restricted to the CloudFront distribution. Raw data is never committed to Git or managed as a Terraform object.
 
+The framework-free frontend now supports the complete potential-host workflow: choose a city and neighbourhood, describe a listing, receive an estimate, compare it with historical market context, and retain up to three browser-local scenarios. A first-time-host preset does not assume prior ratings or hosting history. Direct scenario differences appear only when currencies match, and the interface states that it does not assess property value, occupancy, costs, regulation, or investment returns.
+
 CloudFront adds a Content Security Policy, one-year HSTS, anti-framing, MIME-sniffing protection, and a strict referrer policy. The CSP limits scripts and styles to the application origin and browser connections to the regional API Gateway hostname pattern and exact Cognito domain. A global CloudFront WAF now adds AWS IP reputation rules, the AWS Common Rule Set, and a per-IP rate rule. A regional management CloudTrail records validated management events in a protected S3 bucket. A custom ACM certificate remains pending because the team has not supplied a domain and DNS validation ownership.
 
 The prediction API accepts only the final model schema. It rejects missing or unknown fields, unsupported categories, invalid city-neighbourhood combinations, non-finite values, out-of-range coordinates, and unreasonable numeric values. It returns safe JSON errors without traces. Predictions are clipped to the supported market boundary and always include a disclaimer. Listing inputs are not written to logs.
@@ -78,7 +80,7 @@ Limitations include historical staleness, missing values, absent demand and book
 
 ## 6. Testing, scalability/resilience and monitoring results
 
-The repository contains 29 passing Python unit tests covering health responses, prediction validation and response shape, authenticated persistence, idempotent retries, history isolation, analytics parsing, bounded AI requests and safe failures, data profiling, and training behavior. JavaScript files pass Node syntax checks. Terraform formatting and validation pass. The deployed smoke script verifies frontend assets and MIME types, health, real prediction, ten-city analytics, malformed-input rejection, and unauthenticated `401` responses for all three protected capabilities.
+The repository contains 34 passing Python unit tests covering health responses, prediction validation and response shape, authenticated persistence, idempotent retries, history isolation, analytics parsing, bounded AI requests, prompt-injection wrapping, safe failures, data profiling, and training behavior. JavaScript files pass Node syntax checks. Terraform formatting and validation pass. The deployed smoke script verifies frontend assets and MIME types, health, real prediction, ten-city analytics, malformed-input rejection, and unauthenticated `401` responses for all three protected capabilities.
 
 A JMeter 5.6.3 browser journey ran 25 visitors over 45 seconds against the three public pages and shared assets. All 929 requests passed at 20.3 requests per second, with 666.9 ms mean and 1,508 ms maximum response time. This bounded result verifies the tested CloudFront profile, not an unlimited scaling claim.
 

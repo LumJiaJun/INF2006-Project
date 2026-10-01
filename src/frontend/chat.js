@@ -108,7 +108,7 @@ function buildGuide() {
   const messages = createElement("div", "guide-messages");
   messages.setAttribute("aria-live", "polite");
   const quickReplies = createElement("div", "guide-quick-replies");
-  ["How do estimates work?", "Compare city markets", "How does the stay planner work?", "How do I sign up?"].forEach((prompt) => {
+  ["How do estimates work?", "Compare my recent estimates", "Explore a potential listing", "How do I sign up?"].forEach((prompt) => {
     const button = createElement("button", null, prompt);
     button.type = "button";
     quickReplies.append(button);

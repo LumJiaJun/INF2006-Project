@@ -2,7 +2,7 @@
 
 ## Problem statement
 
-Airbnb hosts and prospective hosts can struggle to interpret local listing patterns and choose a reasonable nightly price. This project provides an estimated nightly price from listing characteristics, supported market analytics, and authenticated prediction history through a secure serverless AWS application. Predictions are estimates, not guaranteed market prices.
+Prospective and existing Airbnb hosts lack a simple way to estimate an appropriate nightly price and understand the surrounding market before listing or evaluating a property for hosting. Existing listing pages do not combine model-based scenario estimation, local market analytics, comparison of potential configurations, and private prediction history in one focused workflow. This platform helps users explore listing configurations and historical market patterns before deciding whether hosting may suit a property. It provides decision support, not property valuation, purchase advice, guaranteed demand, or predicted investment return.
 
 ## Team members
 
@@ -16,9 +16,9 @@ Airbnb hosts and prospective hosts can struggle to interpret local listing patte
 
 ## Deployment status
 
-As of 2026-09-30, the development stack is deployed in `ap-southeast-1` using
+As of 2026-10-01, the development stack is deployed in `ap-southeast-1` using
 the evaluated model artifact and supplied listings dataset. The current
-redacted terminal transcript is `evidence/verification-2026-09-30.txt`.
+redacted terminal transcript is `evidence/verification-2026-10-01.txt`.
 
 ## Quickstart commands
 

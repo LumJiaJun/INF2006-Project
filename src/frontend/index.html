@@ -39,8 +39,8 @@
           <p class="eyebrow">INF2006 Cloud Computing and Big Data</p>
           <h1>Price with context, not guesswork.</h1>
           <p class="hero-copy">
-            Explore ten Airbnb markets, compare typical listing patterns, and generate a model-backed
-            nightly price estimate in seconds.
+            Explore a potential listing, estimate its nightly price, compare configurations, and understand
+            the surrounding Airbnb market before deciding whether hosting may suit the property.
           </p>
           <div class="hero-actions">
             <a class="primary-link" href="#estimator">Build an estimate</a>
@@ -137,6 +137,10 @@
             ranges observed by the trained model.
           </p>
           <div class="preset-group" aria-label="Quick listing profiles">
+            <button class="preset-button" type="button" data-preset="starter">
+              <strong>First-time host</strong>
+              <span>No host history required</span>
+            </button>
             <button class="preset-button is-active" type="button" data-preset="couple">
               <strong>City break</strong>
               <span>2 guests &middot; 1 bedroom</span>
@@ -190,6 +194,7 @@
             <span data-step="market"><b>1</b> Market</span>
             <span data-step="listing"><b>2</b> Listing</span>
             <span data-step="host"><b>3</b> Host</span>
+            <span data-step="compare"><b>4</b> Compare</span>
           </div>
 
           <div class="estimator-readiness" aria-live="polite">
@@ -256,6 +261,7 @@
                 <label>
                   Host listing count
                   <input name="host_total_listings_count" type="number" min="0" max="10000" value="1" required>
+                  <small class="field-help">Use 0 if you have not hosted before.</small>
                 </label>
                 <label>
                   Number of amenities
@@ -278,6 +284,21 @@
           </form>
 
           <div id="prediction-result" class="prediction-result" aria-live="polite" hidden></div>
+
+          <section id="scenario-comparison" class="scenario-comparison" aria-labelledby="scenario-comparison-heading" hidden>
+            <div class="scenario-comparison-heading">
+              <div>
+                <p class="section-label">Potential host workspace</p>
+                <h3 id="scenario-comparison-heading">Compare listing scenarios</h3>
+              </div>
+              <button id="clear-scenarios" class="draft-button draft-button-quiet" type="button">Clear all</button>
+            </div>
+            <p id="scenario-comparison-note" class="scenario-comparison-note"></p>
+            <div id="scenario-comparison-list" class="scenario-comparison-list"></div>
+            <p class="scenario-disclaimer">
+              This compares model estimates, not property values, occupancy, costs, regulations, or investment returns.
+            </p>
+          </section>
 
           <section id="stay-planner" class="stay-planner" aria-labelledby="stay-planner-heading" hidden>
             <div>

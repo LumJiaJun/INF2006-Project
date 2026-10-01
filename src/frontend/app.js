@@ -54,10 +54,17 @@ const stayPlanner = document.querySelector("#stay-planner");
 const plannerCheckin = document.querySelector("#planner-checkin");
 const plannerCheckout = document.querySelector("#planner-checkout");
 const plannerSummary = document.querySelector("#planner-summary");
+const scenarioComparison = document.querySelector("#scenario-comparison");
+const scenarioComparisonList = document.querySelector("#scenario-comparison-list");
+const scenarioComparisonNote = document.querySelector("#scenario-comparison-note");
+const clearScenariosButton = document.querySelector("#clear-scenarios");
+const scenarioStorageKey = "airbnb-market-intelligence-scenarios";
 let plannerRate = null;
 let plannerCurrency = "";
 let analyticsItems = [];
 let selectedMarket = null;
+let lastPredictionScenario = null;
+let comparisonScenarios = [];
 
 function closeNavigation() {
   if (!menuToggle || !primaryNav) return;
@@ -74,6 +81,17 @@ menuToggle?.addEventListener("click", () => {
 primaryNav?.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNavigation));
 
 const presets = {
+  starter: {
+    accommodates: 2,
+    bedrooms: 1,
+    minimum_nights: 2,
+    review_scores_rating: "",
+    host_total_listings_count: 0,
+    amenities_count: 8,
+    instant_bookable: false,
+    host_is_superhost: false,
+    host_identity_verified: false,
+  },
   couple: {
     accommodates: 2,
     bedrooms: 1,
@@ -372,6 +390,7 @@ function updateEstimatorReadiness() {
   const completedCount = completedSections.length;
 
   document.querySelectorAll(".form-progress [data-step]").forEach((step) => {
+    if (step.dataset.step === "compare") return;
     step.classList.toggle("is-complete", completedSections.some(([name]) => name === step.dataset.step));
   });
   readinessBar.style.width = `${(completedCount / 3) * 100}%`;
@@ -514,6 +533,95 @@ function showPredictionResult(content, isError = false) {
   predictionResult.classList.toggle("prediction-result-error", isError);
 }
 
+function loadComparisonScenarios() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(scenarioStorageKey) || "[]");
+    comparisonScenarios = Array.isArray(stored) ? stored.slice(0, 3) : [];
+  } catch (error) {
+    console.warn("Comparison scenarios could not be loaded", error);
+    comparisonScenarios = [];
+  }
+}
+
+function saveComparisonScenarios() {
+  try {
+    window.localStorage.setItem(scenarioStorageKey, JSON.stringify(comparisonScenarios));
+    return true;
+  } catch (error) {
+    console.warn("Comparison scenarios could not be saved", error);
+    scenarioComparisonNote.textContent = "This browser could not save the comparison.";
+    return false;
+  }
+}
+
+function scenarioDifference(scenario) {
+  const baseline = comparisonScenarios[0];
+  if (!baseline || baseline.id === scenario.id) return "Comparison baseline";
+  if (baseline.currency !== scenario.currency) return "Different local currency; no direct price difference shown";
+  const difference = scenario.price - baseline.price;
+  const direction = difference >= 0 ? "above" : "below";
+  return `${scenario.currency} ${Math.abs(difference).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${direction} baseline`;
+}
+
+function renderScenarioComparison() {
+  scenarioComparison.hidden = comparisonScenarios.length === 0;
+  document.querySelector('[data-step="compare"]')?.classList.toggle(
+    "is-complete",
+    comparisonScenarios.length > 0,
+  );
+  if (!comparisonScenarios.length) {
+    scenarioComparisonList.replaceChildren();
+    return;
+  }
+
+  scenarioComparisonNote.textContent = `${comparisonScenarios.length} of 3 browser-local scenarios saved. Direct differences are shown only when currencies match.`;
+  const cards = comparisonScenarios.map((scenario) => {
+    const card = document.createElement("article");
+    card.className = "scenario-card";
+    const location = document.createElement("span");
+    location.className = "scenario-location";
+    location.textContent = `${scenario.neighbourhood}, ${scenario.city}`;
+    const price = document.createElement("strong");
+    price.textContent = `${scenario.currency} ${Number(scenario.price).toLocaleString()}`;
+    const details = document.createElement("p");
+    details.textContent = `${scenario.propertyType} | ${scenario.roomType} | ${scenario.guests} guests | ${scenario.bedrooms ?? "Unknown"} bedrooms | ${scenario.amenities} amenities`;
+    const difference = document.createElement("span");
+    difference.className = "scenario-difference";
+    difference.textContent = scenarioDifference(scenario);
+    const remove = document.createElement("button");
+    remove.className = "scenario-remove";
+    remove.type = "button";
+    remove.dataset.scenarioId = scenario.id;
+    remove.textContent = "Remove";
+    card.append(location, price, details, difference, remove);
+    return card;
+  });
+  scenarioComparisonList.replaceChildren(...cards);
+}
+
+function addCurrentScenario() {
+  if (!lastPredictionScenario) return;
+  const previousScenarios = [...comparisonScenarios];
+  if (comparisonScenarios.length >= 3) comparisonScenarios.shift();
+  comparisonScenarios.push(lastPredictionScenario);
+  if (!saveComparisonScenarios()) comparisonScenarios = previousScenarios;
+  renderScenarioComparison();
+}
+
+scenarioComparisonList.addEventListener("click", (event) => {
+  const scenarioId = event.target.closest("[data-scenario-id]")?.dataset.scenarioId;
+  if (!scenarioId) return;
+  comparisonScenarios = comparisonScenarios.filter((scenario) => scenario.id !== scenarioId);
+  saveComparisonScenarios();
+  renderScenarioComparison();
+});
+
+clearScenariosButton.addEventListener("click", () => {
+  comparisonScenarios = [];
+  window.localStorage.removeItem(scenarioStorageKey);
+  renderScenarioComparison();
+});
+
 function updateStayPlanner() {
   if (!plannerCheckin.value || !plannerCheckout.value || plannerRate === null) {
     plannerSummary.textContent = "Choose dates to calculate an indicative stay total.";
@@ -546,6 +654,7 @@ predictionForm.addEventListener("submit", async (event) => {
 
   try {
     const idToken = window.Auth.getIdToken();
+    const payload = predictionPayload(predictionForm);
     const route = idToken ? "predictions" : "predict";
     const headers = { "content-type": "application/json" };
     if (idToken) {
@@ -555,7 +664,7 @@ predictionForm.addEventListener("submit", async (event) => {
     const response = await fetch(`${apiBaseUrl}/${route}`, {
       method: "POST",
       headers,
-      body: JSON.stringify(predictionPayload(predictionForm)),
+      body: JSON.stringify(payload),
     });
     const result = await response.json();
     if (!response.ok) {
@@ -586,6 +695,32 @@ predictionForm.addEventListener("submit", async (event) => {
     } else {
       content.append(price, disclaimer);
     }
+    lastPredictionScenario = {
+      id: crypto.randomUUID(),
+      city: payload.city,
+      neighbourhood: payload.neighbourhood,
+      propertyType: payload.property_type,
+      roomType: payload.room_type,
+      guests: payload.accommodates,
+      bedrooms: payload.bedrooms,
+      amenities: payload.amenities_count,
+      price: result.estimated_nightly_price,
+      currency: result.currency,
+    };
+    const compareButton = document.createElement("button");
+    compareButton.className = "scenario-add";
+    compareButton.type = "button";
+    compareButton.textContent = "Add estimate to comparison";
+    compareButton.addEventListener(
+      "click",
+      () => {
+        addCurrentScenario();
+        compareButton.disabled = true;
+        compareButton.textContent = "Added to comparison";
+      },
+      { once: true },
+    );
+    content.append(compareButton);
     showPredictionResult(content);
     plannerRate = result.estimated_nightly_price;
     plannerCurrency = result.currency;
@@ -677,3 +812,7 @@ loadModelOptions().catch((error) => {
   message.textContent = "The estimator configuration is unavailable.";
   showPredictionResult(message, true);
 });
+
+// Scenario comparisons stay on this device and never enter prediction history.
+loadComparisonScenarios();
+renderScenarioComparison();
