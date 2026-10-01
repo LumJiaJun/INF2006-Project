@@ -1,0 +1,44 @@
+INF2006 contributor integration deployment verification
+Date: 2026-10-01
+Deployed commit: 9463fbd
+Sensitive account identifiers and resource URLs are omitted.
+
+> git merge --ff-only nixon
+Fast-forwarded main to 9463fbd and pushed origin/main.
+
+> terraform plan with deployed alert email and prediction image tag variables
+Plan: 1 to add, 3 to change, 0 to destroy.
+The plan added nav.js and updated markets.html, project.html, and styles.css.
+
+> terraform apply <saved-plan>
+Apply complete! Resources: 1 added, 3 changed, 0 destroyed.
+
+> CloudFront invalidation and tests/smoke_api.ps1
+CloudFront invalidation completed.
+Health check passed.
+Frontend asset checks passed.
+Frontend security header checks passed.
+Prediction passed: 65.98 EUR.
+Analytics passed: 10 city summaries.
+Protected route authentication checks passed.
+Malformed request validation passed.
+nav.js, markets.html, and project.html returned HTTP 200 with expected content types.
+Both inner pages referenced nav.js.
+
+> python -m unittest discover -s tests -p "test_*.py" -v
+Ran 33 tests.
+OK
+
+> terraform plan after apply
+No changes. Your infrastructure matches the configuration.
+
+> aws cloudwatch describe-alarms --alarm-name-prefix <project-prefix>
+All five project alarms reported OK.
+
+> aws lambda get-account-settings
+Concurrent execution quota: 1000.
+
+> GitHub Actions for commit 9463fbd
+CI: success - https://github.com/LumJiaJun/INF2006-Project/actions/runs/36801161459
+Security gates: success - https://github.com/LumJiaJun/INF2006-Project/actions/runs/36801161259
+SAST - CodeQL: success - https://github.com/LumJiaJun/INF2006-Project/actions/runs/36801161245

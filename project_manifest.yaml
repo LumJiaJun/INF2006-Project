@@ -7,7 +7,8 @@ project:
   title: "Airbnb Pricing and Market Intelligence Platform"
   problem_statement: "Help Airbnb hosts interpret market patterns and estimate a reasonable nightly listing price."
   cloud_provider: "AWS"
-  repository_commit: "3fda842"
+  # This points to the deployed predecessor because a commit cannot contain its own final hash.
+  repository_commit: "9463fbd"
 
 team:
   members:
