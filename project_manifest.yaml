@@ -8,7 +8,7 @@ project:
   problem_statement: "Help prospective and existing Airbnb hosts compare listing configurations, estimate a reasonable nightly price, and understand surrounding historical market conditions before deciding whether hosting may suit a property."
   cloud_provider: "AWS"
   # This points to the deployed predecessor because a commit cannot contain its own final hash.
-  repository_commit: "aaf3b0a"
+  repository_commit: "49bc6b9"
 
 team:
   members:
