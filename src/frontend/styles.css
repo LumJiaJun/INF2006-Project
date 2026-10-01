@@ -1355,7 +1355,7 @@ button:disabled {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .page-shell {
     width: min(100% - 1rem, 1200px);
     padding-top: 0.5rem;
@@ -2106,33 +2106,16 @@ button:disabled {
   .topbar {
     width: 100%;
     min-width: 0;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 1fr auto auto;
   }
 
-  .nav-links {
-    display: flex;
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-content: flex-start;
-    gap: 1.25rem;
-    min-width: 0;
-    overflow-x: auto;
-    padding: 0.25rem 0.3rem 0.4rem;
-    scrollbar-width: none;
-  }
-
-  .account-bar,
-  .topbar > .secondary-button {
-    grid-column: 2;
+  .account-bar {
+    grid-column: 3;
     grid-row: 1;
     justify-self: end;
   }
 
   .topbar > .secondary-button {
-    display: none;
-  }
-
-  .nav-links::-webkit-scrollbar {
     display: none;
   }
 

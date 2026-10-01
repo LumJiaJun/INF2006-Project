@@ -40,6 +40,10 @@ class HistoryHandlerTests(unittest.TestCase):
 
         self.assertEqual(response["statusCode"], 401)
 
+    def test_rejects_non_dictionary_event(self):
+        self.assertEqual(history_handler.lambda_handler(None, None)["statusCode"], 401)
+        self.assertEqual(history_handler.lambda_handler("not-a-dict", None)["statusCode"], 401)
+
     def test_queries_only_authenticated_user(self):
         event = {
             "requestContext": {

@@ -267,6 +267,15 @@ resource "aws_s3_object" "markets_application" {
   cache_control = "no-cache"
 }
 
+resource "aws_s3_object" "navigation_application" {
+  bucket        = aws_s3_bucket.frontend.id
+  key           = "nav.js"
+  source        = "${path.module}/../frontend/nav.js"
+  etag          = filemd5("${path.module}/../frontend/nav.js")
+  content_type  = "application/javascript; charset=utf-8"
+  cache_control = "no-cache"
+}
+
 resource "aws_s3_object" "chat_application" {
   bucket        = aws_s3_bucket.frontend.id
   key           = "chat.js"

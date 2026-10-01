@@ -17,12 +17,21 @@
           <span class="brand-mark" aria-hidden="true">AM</span>
           <span>Market Intelligence</span>
         </a>
-        <div class="nav-links">
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+          <span class="menu-toggle-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="menu-toggle-label">Menu</span>
+        </button>
+        <div id="primary-nav" class="nav-links">
           <a href="index.html#estimator">Estimator</a>
           <a href="markets.html" aria-current="page">Markets</a>
           <a href="project.html">Project</a>
+          <a href="index.html#history-section">Private workspace</a>
         </div>
-        <a class="secondary-button compact-button" href="index.html#estimator">Open estimator</a>
+        <div class="account-bar">
+          <span id="account-label">Not signed in</span>
+          <button id="sign-in" class="secondary-button compact-button" type="button">Sign in</button>
+          <button id="sign-out" class="secondary-button compact-button" type="button" hidden>Sign out</button>
+        </div>
       </nav>
 
       <header class="inner-hero market-page-hero">
@@ -121,6 +130,7 @@
     <script src="config.js"></script>
     <script src="auth-config.js"></script>
     <script src="auth.js" defer></script>
+    <script src="nav.js" defer></script>
     <script src="markets.js" defer></script>
     <script src="chat.js" defer></script>
   </body>
