@@ -21,6 +21,18 @@ python train_model.py \
   --metrics-output artifacts/model_evaluation.json
 ```
 
+For a safe submission-ZIP smoke test that does not require the 400 MB source
+archive, run this from the repository root:
+
+```bash
+python tests/local_preflight.py --include-ml
+```
+
+This trains all candidate pipelines against the committed deterministic
+synthetic sample and writes ignored outputs under `tmp/local-preflight/`. Its
+metrics verify execution only and are not substitutes for the full-dataset
+evaluation below.
+
 ## Method, evaluation and limitations
 
 - Method: A city-stratified 80/20 split compares a median baseline, regularized linear regression, and histogram gradient boosting. All models learn `log1p(price)`. Categorical values are target encoded for gradient boosting, while numeric missing values are median-imputed. The selected model adds amenity count and known host attributes.
@@ -35,3 +47,14 @@ Generated `.joblib` model files are intentionally excluded from Git. Recreate th
 `glue_transform.py` is deployed as an AWS Glue 5.0 Spark job. It selects documented listing fields, removes invalid required values, applies a city-specific 99th-percentile price boundary, and writes city-partitioned Parquet. Terraform defines the corresponding projected Glue Catalog table and a governed Athena workgroup. The public analytics Lambda exposes only a fixed city-summary query; clients cannot submit SQL.
 
 Deployment and run commands are documented in `src/infrastructure/README.md`. The measured run is recorded in `evidence/data-pipeline.md`.
+
+## Decision-support categories
+
+- Descriptive: city listing volume, average and median price, and rating.
+- Diagnostic: distribution shape and cross-sectional associations between
+  capacity, superhost status, and observed prices. These do not establish
+  causation.
+- Predictive: held-out price regression for a validated listing scenario.
+- Prescriptive: cautious next-step prompts based on the prediction's position
+  against its same-city median and browser-local scenario comparison. No
+  occupancy, profit, or investment recommendation is produced.

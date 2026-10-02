@@ -31,7 +31,10 @@ SELECT
     COUNT(*) AS listing_count,
     ROUND(AVG(price), 2) AS average_nightly_price,
     ROUND(approx_percentile(price, 0.5), 2) AS median_nightly_price,
-    ROUND(AVG(review_scores_rating), 1) AS average_rating
+    ROUND(AVG(review_scores_rating), 1) AS average_rating,
+    ROUND(corr(price, accommodates), 3) AS capacity_price_correlation,
+    ROUND(AVG(CASE WHEN host_is_superhost THEN price END), 2) AS superhost_average_nightly_price,
+    ROUND(AVG(CASE WHEN NOT host_is_superhost THEN price END), 2) AS non_superhost_average_nightly_price
 FROM {table_name}
 GROUP BY city
 ORDER BY city
@@ -83,6 +86,8 @@ def parse_rows(result):
         record = dict(zip(columns, values, strict=False))
         average_price = float(record["average_nightly_price"])
         median_price = float(record["median_nightly_price"])
+        superhost_average = optional_float(record.get("superhost_average_nightly_price"))
+        non_superhost_average = optional_float(record.get("non_superhost_average_nightly_price"))
         parsed.append(
             {
                 "city": record["city"],
@@ -94,9 +99,26 @@ def parse_rows(result):
                 "average_rating": (
                     float(record["average_rating"]) if record.get("average_rating") is not None else None
                 ),
+                "capacity_price_correlation": optional_float(record.get("capacity_price_correlation")),
+                "superhost_average_nightly_price": superhost_average,
+                "non_superhost_average_nightly_price": non_superhost_average,
+                "superhost_price_difference_percent": percentage_difference(
+                    superhost_average,
+                    non_superhost_average,
+                ),
             }
         )
     return parsed
+
+
+def optional_float(value):
+    return float(value) if value not in {None, ""} else None
+
+
+def percentage_difference(value, baseline):
+    if value is None or baseline in {None, 0}:
+        return None
+    return round(((value - baseline) / baseline) * 100, 1)
 
 
 def lambda_handler(event, context):
@@ -131,6 +153,7 @@ def lambda_handler(event, context):
                 "count": len(items),
                 "price_basis": "Local currency for each city",
                 "scope": "Positive prices up to each city's observed 99th percentile",
+                "diagnostic_scope": "Cross-sectional associations only; they do not establish causation.",
             },
         )
     except Exception:

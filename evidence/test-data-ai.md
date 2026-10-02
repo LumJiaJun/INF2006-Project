@@ -40,3 +40,13 @@
 - **Interpretation:** The frontend also reports each city's average-to-median price ratio. This is a currency-neutral within-city shape indicator, not an exchange-rate conversion or cross-city price ranking.
 - **Date:** 2026-09-23
 - **Artefact path:** `evidence/data-pipeline.md`
+
+## Offline submission reproduction
+
+- **Objective:** Confirm that a marker can execute preprocessing, all candidate models, evaluation, model selection, and export without AWS credentials or the excluded full dataset.
+- **Setup:** Pinned test dependencies and the committed 500-row deterministic synthetic sample.
+- **Command / steps:** Run `python tests/local_preflight.py --include-ml` from the repository root.
+- **Expected result:** Unit tests, source checks, manifest validation, Terraform validation where initialized, and synthetic end-to-end model training all complete successfully.
+- **Actual result:** Passed. All 37 unit tests passed, 12 manifest paths resolved, frontend syntax and Terraform checks passed, and histogram gradient boosting was selected from 390 scoped training rows and 98 test rows. The synthetic score is deliberately excluded from real-world quality claims.
+- **Date:** 2026-10-02
+- **Artefact path:** `tests/local_preflight.py`, `analytics/generate_sample_data.py`, `data/sample/listings_synthetic.csv`, and `evidence/rubric-gap-review-2026-10-02.md`

@@ -2,6 +2,12 @@
 
 The project uses an Airbnb listings and reviews archive supplied to the team. Raw files are deliberately excluded from Git because the combined size exceeds 400 MB.
 
+A committed deterministic synthetic sample is available at
+`data/sample/listings_synthetic.csv`. It contains no source listings or personal
+data and supports an offline end-to-end training smoke test. See
+`data/sample/README.md`; do not report its deliberately simple synthetic metrics
+as real model performance.
+
 ## Dataset provenance
 
 - Supplied archive: `archive (8).zip`

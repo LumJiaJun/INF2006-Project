@@ -10,6 +10,17 @@ At least four tests are required (see report Section 6 and evidence/):
 
 ## How to run
 
+Run the complete offline submission preflight from the repository root:
+
+```bash
+pip install -r tests/requirements.txt
+python tests/local_preflight.py --include-ml
+```
+
+This runs unit tests, Python compilation, manifest path validation, available
+frontend and Terraform checks, and an end-to-end model training smoke test on
+committed synthetic data. It does not require AWS credentials or a live stack.
+
 ```bash
 python -m unittest discover -s tests -p "test_*.py" -v
 ```

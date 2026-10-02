@@ -35,6 +35,9 @@ class FakeAthena:
                             {"VarCharValue": "average_nightly_price"},
                             {"VarCharValue": "median_nightly_price"},
                             {"VarCharValue": "average_rating"},
+                            {"VarCharValue": "capacity_price_correlation"},
+                            {"VarCharValue": "superhost_average_nightly_price"},
+                            {"VarCharValue": "non_superhost_average_nightly_price"},
                         ]
                     },
                     {
@@ -44,6 +47,9 @@ class FakeAthena:
                             {"VarCharValue": "110.25"},
                             {"VarCharValue": "90.0"},
                             {"VarCharValue": "94.5"},
+                            {"VarCharValue": "0.42"},
+                            {"VarCharValue": "120.0"},
+                            {"VarCharValue": "100.0"},
                         ]
                     },
                 ]
@@ -69,6 +75,9 @@ class AnalyticsHandlerTests(unittest.TestCase):
         self.assertEqual(body["items"][0]["average_nightly_price"], 110.25)
         self.assertEqual(body["items"][0]["average_to_median_ratio"], 1.23)
         self.assertEqual(body["items"][0]["currency"], "EUR")
+        self.assertEqual(body["items"][0]["capacity_price_correlation"], 0.42)
+        self.assertEqual(body["items"][0]["superhost_price_difference_percent"], 20.0)
+        self.assertIn("do not establish causation", body["diagnostic_scope"])
         self.assertIn("GROUP BY city", fake.query["QueryString"])
         self.assertEqual(fake.query["QueryExecutionContext"]["Database"], "database")
 

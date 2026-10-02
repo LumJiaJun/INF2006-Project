@@ -203,7 +203,10 @@ function analyticsItem(item) {
   const shape = item.average_to_median_ratio === null
     ? "not available"
     : `${item.average_to_median_ratio.toFixed(2)}x`;
-  details.textContent = `${item.listing_count.toLocaleString()} listings, average rating ${rating}/100, average-to-median ${shape}`;
+  const capacityAssociation = item.capacity_price_correlation === null
+    ? "not available"
+    : `r=${item.capacity_price_correlation.toFixed(2)}`;
+  details.textContent = `${item.listing_count.toLocaleString()} listings, average rating ${rating}/100, average-to-median ${shape}, capacity-price association ${capacityAssociation}`;
   card.append(image, city, median, medianLabel, details);
   card.addEventListener("click", () => selectMarket(item));
   return card;
@@ -691,7 +694,16 @@ predictionForm.addEventListener("submit", async (event) => {
         Math.abs(difference) < 2
           ? `Close to the historical ${market.city} median.`
           : `${Math.abs(difference).toFixed(0)}% ${difference > 0 ? "above" : "below"} the historical ${market.city} median.`;
-      content.append(price, comparison, disclaimer);
+      const guidance = document.createElement("span");
+      guidance.className = "prediction-guidance";
+      if (difference > 15) {
+        guidance.textContent = "Next step: verify that the listing's location, amenities, and host signals justify this above-median scenario, then compare a simpler configuration.";
+      } else if (difference < -15) {
+        guidance.textContent = "Next step: check that every listing feature is complete and compare a stronger-amenity scenario before setting a price.";
+      } else {
+        guidance.textContent = "Next step: use this near-median scenario as a baseline and compare one feature change at a time.";
+      }
+      content.append(price, comparison, guidance, disclaimer);
     } else {
       content.append(price, disclaimer);
     }
