@@ -21,7 +21,7 @@ verification the team performed, and any licences/attribution.
 
 | Area | Team verification | Evidence |
 |------|-------------------|----------|
-| Repository and Terraform | Ran 34 unit tests, JavaScript syntax checks, `terraform fmt -check`, `terraform validate`, and post-apply plans with no changes. | `evidence/verification-2026-09-30.txt`, `evidence/verification-2026-10-01.txt`, `evidence/consultation-improvements-2026-10-01.md` |
+| Repository and Terraform | Ran 37 unit tests, the loopback frontend/API smoke journey, JavaScript syntax checks, `terraform fmt -check`, `terraform validate`, and the earlier post-apply no-change plans. | `evidence/local-development-2026-10-02.md`, `evidence/verification-2026-09-30.txt`, `evidence/verification-2026-10-01.txt` |
 | Live application | Ran the deployed smoke script for frontend assets and headers, health, prediction, ten-city analytics, anonymous authorization rejection, and malformed input. | `evidence/verification-2026-09-30.txt`, `evidence/test-functional.md` |
 | Data and model | Reproduced profiling, training metrics, Glue transformation, Parquet output, Athena scan size, and ten-city response. | `evidence/test-data-ai.md`, `evidence/data-pipeline.md` |
 | Authentication and AI | Completed a consented Cognito journey and separate Bedrock-plus-DynamoDB integration check without retaining credentials, codes, tokens, or prompts. | `evidence/test-functional.md`, `evidence/test-security.md` |

@@ -4,7 +4,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 
 | File | Purpose |
 |------|---------|
-| architecture-current.png | Current numbered architecture showing WAF, CloudFront, Cognito, two-AZ Lambda VPC, endpoints, data stores, operations, and CI/CD |
+| architecture-current.png | Numbered Terraform-defined architecture showing WAF, CloudFront, Cognito, two-AZ Lambda VPC, endpoints, data stores, operations, and CI/CD |
 | architecture-detailed.png | Detailed enterprise view of trust boundaries, routes, private networking, managed services, data engineering, monitoring, and delivery flows |
 | architecture-detailed.svg | Editable source for the detailed enterprise architecture diagram |
 | architecture.svg | Editable source for the current numbered architecture diagram |
@@ -15,6 +15,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | video-demonstration-guide.md | Redacted 5-8 minute functional and AWS service demonstration checklist |
 | consultation-improvements-2026-10-01.md | Potential-host workflow, AI hardening, browser journey, deployment, and consultation validation |
 | repository-audit-2026-10-01.md | Full repository, security, infrastructure, live-state, documentation, and evidence audit |
+| repository-audit-2026-10-02.md | Final tracked-repository, local runtime, security-gate, branch, and submission-risk audit |
 | teardown-2026-10-02.md | Reviewed application teardown, recovery procedure, verification, and remaining FinOps baseline |
 | rubric-gap-review-2026-10-02.md | Rubric criterion mapping, local preflight result, and remaining submission risks |
 | iam-rbac-review-2026-10-02.md | User authorization, workload IAM, network scope, and regression-test review |

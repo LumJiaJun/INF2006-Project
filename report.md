@@ -6,9 +6,9 @@ Class: EP2, Group G014
 
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
-Evidence date: 1 October 2026
+Evidence dates: 1-2 October 2026
 
-Deployment status: The stack described here is deployed in `ap-southeast-1`. A 1 October 2026 audit confirmed no Terraform drift and repeated the public frontend, health, prediction, analytics, authorization, and validation smoke checks successfully.
+Deployment status: The stack described here was deployed and verified in `ap-southeast-1` on 1 October 2026. It was destroyed on 2 October 2026 after evidence collection to stop idle application costs; the encrypted Terraform backend remains available. The dated deployment evidence records the no-drift plan and repeated frontend, health, prediction, analytics, authorization, and validation smoke checks.
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 

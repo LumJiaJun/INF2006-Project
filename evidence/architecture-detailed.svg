@@ -40,7 +40,7 @@
 
   <rect width="2400" height="1500" fill="#ffffff"/>
   <text x="55" y="55" class="title">INF2006 Airbnb Pricing and Market Intelligence Platform</text>
-  <text x="55" y="88" class="subtitle">Detailed current architecture and trust flows | AWS ap-southeast-1 | Serverless, two-AZ private Lambda networking, Zero Trust controls</text>
+  <text x="55" y="88" class="subtitle">Terraform-defined architecture and trust flows | AWS ap-southeast-1 | Serverless, two-AZ private Lambda networking, Zero Trust controls</text>
 
   <rect x="1830" y="25" width="515" height="82" class="callout"/>
   <text x="1850" y="49" class="callout-title">Flow legend</text>

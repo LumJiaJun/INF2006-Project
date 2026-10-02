@@ -29,7 +29,7 @@
 
   <rect width="1800" height="1150" fill="#ffffff"/>
   <text x="70" y="58" class="title">INF2006 Airbnb Pricing and Market Intelligence Platform</text>
-  <text x="70" y="90" class="subtitle">Current deployed serverless architecture | Region: ap-southeast-1 | Two-AZ Lambda VPC, WAF, CloudTrail, Cognito, and GitHub CI/CD</text>
+  <text x="70" y="90" class="subtitle">Terraform-defined and previously verified architecture | ap-southeast-1 | Two-AZ Lambda VPC, WAF, CloudTrail, Cognito, and GitHub CI/CD</text>
 
   <rect x="45" y="130" width="250" height="790" class="boundary" rx="22"/>
   <text x="70" y="165" class="boundary-label">Public internet</text>
