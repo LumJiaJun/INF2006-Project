@@ -1,6 +1,6 @@
 import argparse
 import csv
-import random
+import hashlib
 from pathlib import Path
 
 
@@ -49,7 +49,6 @@ def parse_args():
 def generated_rows(rows_per_city):
     if rows_per_city < 10:
         raise ValueError("rows-per-city must be at least 10")
-    randomizer = random.Random(RANDOM_SEED)
     for city, (latitude, longitude, base_price) in CITIES.items():
         for index in range(rows_per_city):
             accommodates = 1 + index % 6
@@ -64,7 +63,7 @@ def generated_rows(rows_per_city):
                 + amenities_count * 0.012
                 + (0.18 if entire_place else 0)
                 + (0.06 if superhost else 0)
-                + randomizer.uniform(-0.06, 0.06)
+                + deterministic_offset(city, index, "price", 0.06)
             )
             amenities = [f"Sample amenity {number}" for number in range(1, amenities_count + 1)]
             yield {
@@ -75,8 +74,8 @@ def generated_rows(rows_per_city):
                 "instant_bookable": "t" if index % 2 == 0 else "f",
                 "host_is_superhost": "t" if superhost else "f",
                 "host_identity_verified": "t" if index % 5 != 0 else "f",
-                "latitude": round(latitude + randomizer.uniform(-0.04, 0.04), 6),
-                "longitude": round(longitude + randomizer.uniform(-0.04, 0.04), 6),
+                "latitude": round(latitude + deterministic_offset(city, index, "latitude", 0.04), 6),
+                "longitude": round(longitude + deterministic_offset(city, index, "longitude", 0.04), 6),
                 "accommodates": accommodates,
                 "bedrooms": bedrooms,
                 "minimum_nights": 1 + index % 7,
@@ -85,6 +84,13 @@ def generated_rows(rows_per_city):
                 "amenities": str(amenities).replace("'", '"'),
                 "price": round(max(base_price * price_multiplier, 1), 2),
             }
+
+
+def deterministic_offset(city, index, field, limit):
+    value = f"{RANDOM_SEED}:{city}:{index}:{field}".encode("utf-8")
+    integer = int.from_bytes(hashlib.sha256(value).digest()[:8], "big")
+    normalized = integer / ((1 << 64) - 1)
+    return (normalized * 2 - 1) * limit
 
 
 def main():
