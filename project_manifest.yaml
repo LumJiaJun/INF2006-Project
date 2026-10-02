@@ -8,7 +8,7 @@ project:
   problem_statement: "Help prospective and existing Airbnb hosts compare listing configurations, estimate a reasonable nightly price, and understand surrounding historical market conditions before deciding whether hosting may suit a property."
   cloud_provider: "AWS"
   # This points to the documented predecessor because a commit cannot contain its own final hash.
-  repository_commit: "99839e4"
+  repository_commit: "27c7409"
 
 team:
   members:
@@ -82,6 +82,7 @@ run:
     - "AWS credentials with permission to provision the declared resources"
   commands:
     - "python tests/local_preflight.py --include-ml"
+    - "python src/local_server.py"
     - "python -m unittest discover -s tests -p test_*.py -v"
     - "cd src/infrastructure && terraform init -backend=false"
     - "cd src/infrastructure && terraform validate"
