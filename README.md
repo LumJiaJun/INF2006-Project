@@ -28,8 +28,8 @@ For the full team handoff, shared Terraform workflow, cleanup safety, and
 remaining workstreams, see `TEAM_WORK_GUIDE.md`.
 
 ```bash
-# 1. Run offline unit tests
-python -m unittest discover -s tests -p "test_*.py" -v
+# 1. Run the complete offline preflight, including synthetic ML training
+python tests/local_preflight.py --include-ml
 
 # 2. Initialise and validate Terraform
 cd src/infrastructure
@@ -78,6 +78,29 @@ Cognito uses email verification, a strong password policy, authorization-code fl
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline plus a bounded Amazon Bedrock Claude Haiku 4.5 assistant
 - Application: HTML, CSS, JavaScript, and Python
 
+## Analytics decision flow
+
+The interface presents four bounded forms of analysis without overstating what
+the cross-sectional dataset supports:
+
+1. **Descriptive:** Athena returns listing count, average and median nightly
+   price, and average rating for each city.
+2. **Diagnostic:** the same governed query reports average-to-median shape,
+   capacity-price correlation, and the observed superhost/non-superhost price
+   difference. These are associations, not evidence that a feature causes a
+   price change.
+3. **Predictive:** the evaluated regression pipeline estimates a nightly price
+   for a validated listing scenario and reports its local currency and model
+   scope.
+4. **Prescriptive:** the browser compares that estimate with the same-city
+   historical median and suggests a cautious next comparison. It does not
+   recommend an investment, promise demand, or optimize profit.
+
+`data/sample/listings_synthetic.csv` and `python tests/local_preflight.py
+--include-ml` provide a safe offline reproduction path. Synthetic-sample
+metrics prove code execution only; the report uses the evaluated full-dataset
+metrics.
+
 ## CI/CD and shared state
 
 Pull requests and pushes to `main` or `nixon` run unit tests, Python compilation,
@@ -124,7 +147,7 @@ those domain details are supplied.
 - A consented single-account browser journey covering sign-up, verification, TOTP MFA, prediction save, history retrieval, and protected chat is recorded in `evidence/test-functional.md`; a separate multi-user browser isolation test remains future work.
 - Analytics now reports an average-to-median market-shape ratio so users can compare within-city price skew without pretending local-currency prices are globally comparable. User-currency conversion is intentionally not enabled because the dataset has no timestamped exchange-rate source.
 - The city analytics use different local currencies and must not be compared as if they shared one currency.
-- The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation and descriptive market analytics, not future-price forecasting or condition monitoring.
+- The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation, descriptive summaries, and bounded diagnostic associations, not causal conclusions, future-price forecasting, or condition monitoring.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory; warm calls were below 100 ms in the initial manual check.
 - The development AWS account Lambda concurrency quota is now 1,000. API Gateway still throttles excess traffic, and bounded stress results are recorded in `evidence/test-resilience.md`.
