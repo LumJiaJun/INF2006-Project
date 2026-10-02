@@ -18,6 +18,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | teardown-2026-10-02.md | Reviewed application teardown, recovery procedure, verification, and remaining FinOps baseline |
 | rubric-gap-review-2026-10-02.md | Rubric criterion mapping, local preflight result, and remaining submission risks |
 | iam-rbac-review-2026-10-02.md | User authorization, workload IAM, network scope, and regression-test review |
+| local-development-2026-10-02.md | Loopback frontend, analytics, schema, and model-backed prediction verification |
 | test-functional.md | Functional workflow test |
 | test-security.md | Security control test |
 | test-data-ai.md | Data / AI validation test |

@@ -19,7 +19,20 @@ python tests/local_preflight.py --include-ml
 
 This runs unit tests, Python compilation, manifest path validation, available
 frontend and Terraform checks, and an end-to-end model training smoke test on
-committed synthetic data. It does not require AWS credentials or a live stack.
+committed synthetic data. It also starts the application on an ephemeral
+loopback port and verifies the frontend, health, analytics, local model schema,
+and prediction routes over HTTP. It does not require AWS credentials or a live
+stack.
+
+For interactive local browser testing:
+
+```bash
+python src/local_server.py
+```
+
+The server opens `http://127.0.0.1:8000` and uses the same frontend and
+prediction handler as the cloud design. Local mode uses deterministic synthetic
+data and deliberately disables Cognito-dependent history and Bedrock access.
 
 ```bash
 python -m unittest discover -s tests -p "test_*.py" -v

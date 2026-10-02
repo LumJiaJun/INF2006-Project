@@ -31,21 +31,37 @@ remaining workstreams, see `TEAM_WORK_GUIDE.md`.
 # 1. Run the complete offline preflight, including synthetic ML training
 python tests/local_preflight.py --include-ml
 
-# 2. Initialise and validate Terraform
+# 2. Run the website and representative APIs locally
+python src/local_server.py
+
+# 3. Initialise and validate Terraform
 cd src/infrastructure
 terraform init -backend=false
 terraform fmt -check
 terraform validate
 
-# 3. Review and deploy the infrastructure
+# 4. Review and deploy the infrastructure
 terraform plan
 terraform apply
 
-# 4. Show the deployed endpoints
+# 5. Show the deployed endpoints
 terraform output frontend_url
 terraform output health_url
 terraform output analytics_url
 ```
+
+### Local website mode
+
+Install `tests/requirements.txt`, then run `python src/local_server.py` from the
+repository root. The command prepares the deterministic sample model when
+needed, opens `http://127.0.0.1:8000`, and serves the real frontend with local
+health, analytics, model-schema, and prediction routes. No AWS credentials are
+required. Stop it with `Ctrl+C`.
+
+Local mode is intentionally labelled in the navigation and uses synthetic
+data. Cognito sign-in, private history, Bedrock chat, WAF, CloudFront, VPC
+endpoints, alarms, and other managed-service controls remain AWS integration
+tests rather than local simulations.
 
 ## Architecture
 
