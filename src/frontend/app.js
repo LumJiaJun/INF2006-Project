@@ -752,6 +752,13 @@ predictionForm.addEventListener("submit", async (event) => {
 });
 
 function updateAccountUi() {
+  if (window.APP_CONFIG?.localMode) {
+    accountLabel.textContent = "Local mode";
+    signInButton.hidden = true;
+    signOutButton.hidden = true;
+    historySection.hidden = true;
+    return;
+  }
   const user = window.Auth.getUser();
   accountLabel.textContent = user?.email || "Not signed in";
   signInButton.hidden = Boolean(user);
@@ -809,7 +816,7 @@ window.Auth.ready
   .then(() => {
     updateAccountUi();
     const signInRequested = new URLSearchParams(window.location.search).get("signin") === "1";
-    if (signInRequested && !window.Auth.getUser()) {
+    if (!window.APP_CONFIG?.localMode && signInRequested && !window.Auth.getUser()) {
       window.Auth.signIn();
     }
   })

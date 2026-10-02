@@ -312,12 +312,11 @@ def training_metadata(frame, cleaning, scope, dataset_path):
     }
 
 
-def main():
-    args = parse_args()
-    if not args.listings.is_file():
-        raise FileNotFoundError(f"Listings dataset not found: {args.listings}")
+def train_and_export(listings, model_output, metrics_output):
+    if not listings.is_file():
+        raise FileNotFoundError(f"Listings dataset not found: {listings}")
 
-    frame, cleaning = load_training_data(args.listings)
+    frame, cleaning = load_training_data(listings)
     features = frame[FEATURES]
     target = frame[TARGET]
     train_features, test_features, train_target, test_target = train_test_split(
@@ -348,30 +347,36 @@ def main():
         evaluations,
         key=lambda name: evaluations[name]["median_city_normalized_mae"],
     )
-    metadata = training_metadata(frame, cleaning, scope, args.listings)
+    metadata = training_metadata(frame, cleaning, scope, listings)
     metadata["train_rows"] = int(len(train_features))
     metadata["test_rows"] = int(len(test_features))
     metadata["selection_metric"] = "median_city_normalized_mae"
     metadata["selected_model"] = selected_name
     metadata["evaluations"] = evaluations
 
-    args.model_output.parent.mkdir(parents=True, exist_ok=True)
+    model_output.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(
         {"model": fitted_models[selected_name], "metadata": metadata},
-        args.model_output,
+        model_output,
         compress=3,
     )
     metadata["model_artifact"] = {
-        "file": args.model_output.name,
-        "sha256": sha256(args.model_output),
-        "size_bytes": args.model_output.stat().st_size,
+        "file": model_output.name,
+        "sha256": sha256(model_output),
+        "size_bytes": model_output.stat().st_size,
     }
 
-    args.metrics_output.parent.mkdir(parents=True, exist_ok=True)
-    args.metrics_output.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    metrics_output.parent.mkdir(parents=True, exist_ok=True)
+    metrics_output.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     print(f"Selected {selected_name}")
-    print(f"Wrote model to {args.model_output}")
-    print(f"Wrote evaluation to {args.metrics_output}")
+    print(f"Wrote model to {model_output}")
+    print(f"Wrote evaluation to {metrics_output}")
+    return metadata
+
+
+def main():
+    args = parse_args()
+    train_and_export(args.listings, args.model_output, args.metrics_output)
 
 
 if __name__ == "__main__":

@@ -21,6 +21,12 @@ menuToggle?.addEventListener("click", () => {
 primaryNav?.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNavigation));
 
 function updateAccountControls() {
+  if (window.APP_CONFIG?.localMode) {
+    if (accountLabel) accountLabel.textContent = "Local mode";
+    if (signInButton) signInButton.hidden = true;
+    if (signOutButton) signOutButton.hidden = true;
+    return;
+  }
   const user = window.Auth.getUser();
   if (accountLabel) accountLabel.textContent = user?.email || "Not signed in";
   if (signInButton) signInButton.hidden = Boolean(user);
