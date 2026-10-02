@@ -6,9 +6,9 @@ Class: EP2, Group G014
 
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
-Evidence dates: 1-2 October 2026
+Evidence dates: 1-3 October 2026
 
-Deployment status: The stack described here was deployed and verified in `ap-southeast-1` on 1 October 2026. It was destroyed on 2 October 2026 after evidence collection to stop idle application costs; the encrypted Terraform backend remains available. The dated deployment evidence records the no-drift plan and repeated frontend, health, prediction, analytics, authorization, and validation smoke checks.
+Deployment status: The stack described here was redeployed and comprehensively retested in `ap-southeast-1` on 2-3 October 2026, then destroyed after evidence collection to stop idle application costs. Direct service inventory and Terraform state both reported zero remaining application resources; the encrypted Terraform backend remains available.
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 
@@ -34,7 +34,7 @@ The architecture has two explicit trust areas: the public browser and the AWS ac
 
 ## 3. Cloud service/deployment choices and trade-offs
 
-The deployment model is public cloud. The service model combines managed platform services and function-as-a-service. Terraform was selected so resources, policies, limits, and outputs are versioned and reviewable. This boundary reduces server maintenance but creates AWS coupling and requires careful control of provider-managed behavior and quotas.
+The deployment model is public cloud. The service model combines FaaS for five Lambda functions, managed PaaS/serverless services for the API, identity, data, analytics, AI, edge, and operations layers, and a small IaaS networking responsibility for the VPC, private subnets, route tables, security groups, and endpoints. GitHub Actions is external SaaS delivery tooling. ECR stores the Lambda image but the platform does not run a CaaS service such as ECS, EKS, Fargate, or Kubernetes. Terraform was selected so resources, policies, limits, and outputs are versioned and reviewable. This boundary reduces server maintenance but creates AWS coupling and requires careful control of provider-managed behavior and quotas.
 
 Lambda and API Gateway were selected instead of EC2 with an Auto Scaling Group and a reverse proxy. The workload is request-driven, low-volume, and uneven, so continuously running virtual machines would add patching, capacity planning, and idle cost. Lambda provides managed horizontal execution and per-request billing. Its trade-offs are cold starts, deployment package constraints, account concurrency limits, and a maximum request duration. The measured scientific Python cold start motivated 2 GB memory and a container image. The five functions now use private subnets across two availability zones with VPC endpoints for their required AWS services, while the approved account concurrency quota is 1,000.
 
@@ -86,11 +86,11 @@ Limitations include historical staleness, missing values, absent demand and book
 
 ## 6. Testing, scalability/resilience and monitoring results
 
-The repository contains 37 passing Python unit tests covering health responses, prediction validation and response shape, authenticated persistence, idempotent retries, history isolation, analytics parsing, bounded AI requests, prompt-injection wrapping, safe failures, data profiling, training behavior, protected-route authorization, purpose-specific Lambda roles, and restricted Lambda egress. JavaScript files pass Node syntax checks. Terraform formatting and validation pass. The offline preflight also validates manifest paths, trains all model candidates against deterministic synthetic data, and starts a loopback HTTP server to verify the real frontend plus local health, analytics, model-schema, and prediction routes before cloud deployment. The deployed smoke script verifies frontend assets and MIME types, health, real prediction, ten-city analytics, malformed-input rejection, and unauthenticated `401` responses for all three protected capabilities.
+The repository contains 38 passing Python unit tests covering health responses, prediction validation and response shape, authenticated persistence, idempotent retries, history isolation, analytics parsing, bounded AI requests, prompt-injection wrapping, safe failures, data profiling, training behavior, protected-route authorization, purpose-specific Lambda roles, restricted Lambda egress, and preservation of real WAF denial responses. JavaScript files pass Node syntax checks. Terraform formatting and validation pass. The offline preflight also validates manifest paths, trains all model candidates against deterministic synthetic data, and starts a loopback HTTP server to verify the real frontend plus local health, analytics, model-schema, and prediction routes before cloud deployment. The deployed smoke script verifies frontend assets and MIME types, health, real prediction, ten-city analytics, malformed-input rejection, and unauthenticated `401` responses for all three protected capabilities.
 
 A JMeter 5.6.3 browser journey ran 25 visitors over 45 seconds against the three public pages and shared assets. All 929 requests passed at 20.3 requests per second, with 666.9 ms mean and 1,508 ms maximum response time. This bounded result verifies the tested CloudFront profile, not an unlimited scaling claim.
 
-Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR scan-on-push is enabled, and the deployed prediction image tag `1.0.4` completed scanning with no findings on 30 September 2026. Unit tests confirm history queries use only the verified JWT subject.
+Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR scan-on-push is enabled; the rebuilt prediction image tag `1.0.5` updated the base-image curl packages after the 2 October scan identified two HIGH findings in tag `1.0.4`, and the replacement scan completed with zero HIGH or CRITICAL findings. Unit tests confirm history queries use only the verified JWT subject.
 
 IAM policy simulation added a service-to-service authorization check. Required prediction writes, history queries, and Glue raw-listing reads returned `allowed`. Prediction reads of raw S3 data, history table scans, and Glue reads of the unused raw-review prefix returned `implicitDeny`. This verifies selected blast-radius boundaries without treating same-account services as implicitly trusted.
 

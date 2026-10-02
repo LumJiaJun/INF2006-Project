@@ -43,6 +43,13 @@ class InfrastructureSecurityTests(unittest.TestCase):
             ["analytics_lambda", "chat_lambda", "health_lambda", "history_lambda", "prediction_lambda"],
         )
 
+    def test_cloudfront_does_not_mask_waf_forbidden_responses(self):
+        frontend = (INFRASTRUCTURE / "frontend.tf").read_text(encoding="utf-8")
+        self.assertNotRegex(
+            frontend,
+            r"custom_error_response\s*\{[^}]*error_code\s*=\s*403[^}]*response_code\s*=\s*200",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

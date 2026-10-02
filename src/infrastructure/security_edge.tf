@@ -84,7 +84,8 @@ resource "aws_wafv2_web_acl" "frontend" {
 
 # CloudTrail is scoped to Singapore management events with no data-event flood.
 resource "aws_s3_bucket" "cloudtrail" {
-  bucket = "${local.name_prefix}-cloudtrail-${random_id.bucket_suffix.hex}"
+  bucket        = "${local.name_prefix}-cloudtrail-${random_id.bucket_suffix.hex}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_ownership_controls" "cloudtrail" {

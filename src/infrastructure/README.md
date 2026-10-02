@@ -111,7 +111,7 @@ The development account now has an approved Lambda concurrency quota of 1,000. T
 Run from the repository root after recreating `analytics/artifacts/airbnb_price_model.joblib`:
 
 ```powershell
-$imageTag = "1.0.4"
+$imageTag = "1.0.5"
 $repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
 $registry = $repositoryUrl.Split('/')[0]
 

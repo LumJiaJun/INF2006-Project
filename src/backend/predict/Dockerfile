@@ -1,5 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.11
 
+RUN yum update -y curl libcurl && yum clean all && rm -rf /var/cache/yum
+
 COPY analytics/requirements-inference.txt ${LAMBDA_TASK_ROOT}/requirements.txt
 RUN pip install --no-cache-dir --requirement ${LAMBDA_TASK_ROOT}/requirements.txt
 

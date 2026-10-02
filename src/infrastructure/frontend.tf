@@ -4,7 +4,8 @@ resource "random_id" "bucket_suffix" {
 }
 
 resource "aws_s3_bucket" "frontend" {
-  bucket = "${local.name_prefix}-frontend-${random_id.bucket_suffix.hex}"
+  bucket        = "${local.name_prefix}-frontend-${random_id.bucket_suffix.hex}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "frontend" {
@@ -138,13 +139,6 @@ resource "aws_cloudfront_distribution" "frontend" {
         forward = "none"
       }
     }
-  }
-
-  custom_error_response {
-    error_code            = 403
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 0
   }
 
   custom_error_response {

@@ -60,11 +60,12 @@ blocking, TLS-only access, and native S3 lockfile configuration. Account IDs,
 key ARNs, backend configuration, Terraform state, and plan files remain outside
 Git.
 
-The application stack is currently live in the configured Singapore development
-account. Terraform returned `No changes` after deployment, and the live
-functional, security, bounded-load, and local DAST results are recorded in the
-test evidence files and `evidence/verification-2026-09-30.txt`. State remains
-outside Git.
+The application stack was redeployed and retested in the configured Singapore
+development account on 2-3 October 2026, then destroyed after evidence
+collection. Terraform state and direct service inventories reported zero
+remaining application resources. The functional, security, bounded-load, image
+scan, and local DAST results are recorded in
+`evidence/deployment-security-retest-2026-10-03.md`. State remains outside Git.
 
 ## Deployment gate
 

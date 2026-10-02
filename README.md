@@ -16,11 +16,11 @@ Prospective and existing Airbnb hosts lack a simple way to estimate an appropria
 
 ## Deployment status
 
-The development stack was verified in `ap-southeast-1` on 2026-10-01 and was
-destroyed on 2026-10-02 to stop overnight application costs. The separate,
-encrypted Terraform state backend remains available for the next deployment.
-See `evidence/verification-2026-10-01.txt` for deployment verification and
-`evidence/teardown-2026-10-02.md` for teardown verification.
+The development stack was redeployed and comprehensively retested in
+`ap-southeast-1` on 2026-10-02 and 2026-10-03, then destroyed to stop idle
+application costs. Terraform state and direct service inventories reported zero
+remaining application resources. The separate encrypted Terraform state backend
+remains available. See `evidence/deployment-security-retest-2026-10-03.md`.
 
 ## Quickstart commands
 
@@ -93,6 +93,17 @@ Cognito uses email verification, a strong password policy, authorization-code fl
 - Delivery: GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, and a manually approved OIDC deployment workflow
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline plus a bounded Amazon Bedrock Claude Haiku 4.5 assistant
 - Application: HTML, CSS, JavaScript, and Python
+
+### Cloud service-model classification
+
+- Deployment model: AWS public cloud in `ap-southeast-1`.
+- FaaS: five AWS Lambda functions provide request-driven compute without managed servers.
+- Managed PaaS/serverless data and application services: API Gateway, S3, DynamoDB, Cognito, Glue, Athena, Bedrock, CloudFront, WAF, CloudWatch, SNS, and KMS.
+- IaaS networking: the team configures the VPC, two private subnets, route tables, security groups, and VPC endpoints, but no EC2 virtual machines are operated.
+- SaaS delivery tooling: GitHub and GitHub Actions host source control and CI/CD outside the AWS runtime.
+- Container packaging, not CaaS: ECR stores the Lambda inference image; ECS, EKS, Fargate, and Kubernetes are not used.
+
+These labels describe responsibility boundaries rather than claiming that every managed AWS product fits only one service-model category.
 
 ## Analytics decision flow
 
