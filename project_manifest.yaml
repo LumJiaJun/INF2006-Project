@@ -8,7 +8,7 @@ project:
   problem_statement: "Help prospective and existing Airbnb hosts compare listing configurations, estimate a reasonable nightly price, and understand surrounding historical market conditions before deciding whether hosting may suit a property."
   cloud_provider: "AWS"
   # This points to the documented predecessor because a commit cannot contain its own final hash.
-  repository_commit: "dca5890"
+  repository_commit: "99839e4"
 
 team:
   members:
@@ -67,6 +67,7 @@ data_ai:
   method: "City-stratified price regression with log target transformation and histogram gradient boosting selected against median and ridge baselines"
   evaluation: "Held-out MAE 191.836, RMSE 629.762 and R-squared 0.644 in pooled local-currency units; log-price R-squared 0.850; see per-city metrics and limitations"
   reproducible_command: "python analytics/train_model.py --listings \"data/raw/Airbnb Data/Listings.csv\" --model-output analytics/artifacts/airbnb_price_model.joblib --metrics-output analytics/artifacts/model_evaluation.json"
+  offline_reproducible_command: "python tests/local_preflight.py --include-ml"
   cloud_pipeline_evidence: "evidence/data-pipeline.md"
 
 security:
@@ -80,6 +81,7 @@ run:
     - "Terraform 1.10 or newer"
     - "AWS credentials with permission to provision the declared resources"
   commands:
+    - "python tests/local_preflight.py --include-ml"
     - "python -m unittest discover -s tests -p test_*.py -v"
     - "cd src/infrastructure && terraform init -backend=false"
     - "cd src/infrastructure && terraform validate"
