@@ -44,11 +44,22 @@ resource "aws_security_group" "lambda" {
   vpc_id      = aws_vpc.lambda.id
 
   egress {
-    description = "HTTPS to AWS PrivateLink endpoints"
+    description = "HTTPS to interface endpoints inside the application VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [aws_vpc.lambda.cidr_block]
+  }
+
+  egress {
+    description = "HTTPS to S3 and DynamoDB gateway endpoints"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    prefix_list_ids = [
+      aws_vpc_endpoint.s3.prefix_list_id,
+      aws_vpc_endpoint.dynamodb.prefix_list_id,
+    ]
   }
 }
 
