@@ -15,6 +15,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | video-demonstration-guide.md | Redacted 5-8 minute functional and AWS service demonstration checklist |
 | consultation-improvements-2026-10-01.md | Potential-host workflow, AI hardening, browser journey, deployment, and consultation validation |
 | repository-audit-2026-10-01.md | Full repository, security, infrastructure, live-state, documentation, and evidence audit |
+| teardown-2026-10-02.md | Reviewed application teardown, recovery procedure, verification, and remaining FinOps baseline |
 | test-functional.md | Functional workflow test |
 | test-security.md | Security control test |
 | test-data-ai.md | Data / AI validation test |

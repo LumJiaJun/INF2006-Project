@@ -16,9 +16,11 @@ Prospective and existing Airbnb hosts lack a simple way to estimate an appropria
 
 ## Deployment status
 
-As of 2026-10-01, the development stack is deployed in `ap-southeast-1` using
-the evaluated model artifact and supplied listings dataset. The current
-redacted terminal transcript is `evidence/verification-2026-10-01.txt`.
+The development stack was verified in `ap-southeast-1` on 2026-10-01 and was
+destroyed on 2026-10-02 to stop overnight application costs. The separate,
+encrypted Terraform state backend remains available for the next deployment.
+See `evidence/verification-2026-10-01.txt` for deployment verification and
+`evidence/teardown-2026-10-02.md` for teardown verification.
 
 ## Quickstart commands
 
