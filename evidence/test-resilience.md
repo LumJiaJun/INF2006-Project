@@ -19,6 +19,17 @@
 - **Interpretation:** API Gateway route throttling rejected excess traffic before it became a Lambda failure. The result demonstrates controlled overload handling at this test size, but it does not prove production-scale capacity or DDoS protection.
 - **Artefact path:** `tests/load_health.py` and the 2026-09-29 terminal run output.
 
+### Bounded denial-of-service control retest
+
+- **Objective:** Verify that a short authorized traffic burst is handled by explicit throttling without backend errors, and confirm that the CloudFront WAF blocks a representative managed-rule attack signature.
+- **Setup:** Team-owned development deployment, exact-host allowlisting, a hard cap of 100 requests and concurrency 10, API Gateway route throttling, CloudFront WAF managed common rules, and CloudWatch metrics. This was a bounded load and control test, not a DDoS attack.
+- **Command / steps:** Run `python tests/load_health.py --url <health-url> --requests 100 --concurrency 10 --allowed-host <api-host> --confirm-authorized-target`; request the normal CloudFront page and one URL-encoded XSS probe; then inspect API Gateway 5xx, health Lambda errors and throttles, WAF sampled requests, and alarm states.
+- **Expected result:** Responses are HTTP 200 or controlled HTTP 429 only; there are no API 5xx, Lambda errors, or Lambda throttles; the normal frontend returns HTTP 200; the managed-rule probe returns HTTP 403; WAF records a sampled common-rule request; and all alarms remain OK.
+- **Actual result:** Passed on 2026-10-04. The bounded burst returned 60 HTTP 200 and 40 HTTP 429 responses at 27.89 requests per second. Median latency was 311.93 ms and maximum latency was 967.88 ms. API 5xx, health Lambda errors, and health Lambda throttles were all zero in the observation window. The normal frontend returned HTTP 200, the XSS probe returned HTTP 403, the WAF common-rule sample count was one, and all five alarms remained OK.
+- **Interpretation:** API Gateway throttling controlled the direct API burst. The CloudFront WAF protects the frontend distribution, not the public API Gateway hostname, and its 2,000-request rate rule was deliberately not saturated. This result does not claim DDoS certification, unlimited scale, volumetric-attack resistance, or validation of the WAF rate-limit threshold.
+- **Date:** 2026-10-04
+- **Artefact path:** `tests/load_health.py`, `src/infrastructure/api.tf`, `src/infrastructure/security_edge.tf`, and `src/infrastructure/monitoring.tf`
+
 ## Prediction-history recovery
 
 - **Objective:** Verify that application records have a managed recovery mechanism.
