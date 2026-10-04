@@ -98,3 +98,24 @@ $chatFunction = terraform -chdir=src/infrastructure output -raw chat_lambda_name
 ```
 
 The script creates one synthetic prediction under a random test user, directly invokes the deployed chat Lambda with that user claim, confirms the safe `history_record_count: 1` completion telemetry and bounded Bedrock reply, then deletes the test record in `finally`. It does not replace the separate browser test of Cognito and API Gateway JWT enforcement.
+
+Run the repeatable chatbot accuracy checks only with authorized AWS access:
+
+```powershell
+python tests/evaluate_chatbot.py --i-confirm-authorized-account
+
+$chatFunction = terraform -chdir=src/infrastructure output -raw chat_lambda_name
+$table = terraform -chdir=src/infrastructure output -raw prediction_history_table_name
+$chatUrl = terraform -chdir=src/infrastructure output -raw chat_url
+python tests/evaluate_deployed_chatbot.py `
+  --function-name $chatFunction `
+  --table-name $table `
+  --chat-url $chatUrl `
+  --i-confirm-authorized-target
+```
+
+Both evaluators cover 16 factual, history, arithmetic, currency, privacy,
+prompt-injection, and scope scenarios. The deployed evaluator inserts two
+isolated synthetic records, deletes them in `finally`, and requires the public
+API to reject an unauthenticated chat request with HTTP 401. Passing these
+bounded cases does not prove correctness for every possible question.

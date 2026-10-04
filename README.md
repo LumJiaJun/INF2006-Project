@@ -16,11 +16,11 @@ Prospective and existing Airbnb hosts lack a simple way to estimate an appropria
 
 ## Deployment status
 
-The development stack was rebuilt in `ap-southeast-1` on 2026-10-03 after the
-complete local preflight passed, loaded with the real listings dataset, and
-retested with zero Terraform drift. It was destroyed through Terraform on
-2026-10-04 to stop idle application costs. The encrypted remote Terraform
-backend remains available for reproducible redeployment. See
+The development stack is currently deployed in `ap-southeast-1`. It was rebuilt
+through Terraform on 2026-10-04 after the 41-test local preflight passed, loaded
+with the real listings dataset, and retested with a no-change Terraform plan.
+Use `terraform -chdir=src/infrastructure output -raw frontend_url` to obtain the
+current CloudFront address. See `evidence/chatbot-accuracy-2026-10-04.md` and
 `evidence/application-live-review-2026-10-03.md`.
 
 ## Quickstart commands
@@ -76,7 +76,7 @@ data pipeline, monitoring, and CI/CD control plane. It deliberately does not
 show AgentCore, ALB, NAT Gateway, containers, or third-party identity services
 because those components are not deployed in this project.
 
-CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. The assistant can query only the signed-in user's ten latest DynamoDB prediction records and supplies those records as bounded context; DynamoDB is not treated as a general knowledge base. Its response reports how many private records were used. Authenticated predictions retain the safe listing and host signals needed for useful follow-up questions while excluding coordinates. The estimator also offers bounded what-if predictions for amenities, guest capacity, and superhost status; these are model scenarios, not future-price forecasts. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
+CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. The assistant receives a compact server-controlled set of verified platform facts and only the signed-in user's ten latest DynamoDB prediction records; DynamoDB is not treated as a general knowledge base. History is explicitly ordered newest first, mixed-currency comparisons are blocked, model temperature is zero, and plain-text output is bounded to 120 words. Authenticated predictions retain the safe listing and host signals needed for useful follow-up questions while excluding coordinates. The estimator also offers bounded what-if predictions for amenities, guest capacity, and superhost status; these are model scenarios, not future-price forecasts. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
 
 The current Terraform design places all five Lambda functions in private subnets across two availability zones. It uses S3 and DynamoDB gateway endpoints plus private interface endpoints for CloudWatch Logs, Athena, and Bedrock Runtime. There is deliberately no NAT Gateway: the functions only require the AWS services covered by those endpoints. DynamoDB remains an AWS-managed regional service rather than a resource placed inside the customer VPC; see `evidence/aws-serverless-reference-review-2026-09-28.md`. CloudFront is protected by a global WAF ACL, and a regional management CloudTrail writes validated logs to a dedicated S3 bucket; see `evidence/edge-security-2026-09-29.md`.
 
@@ -180,7 +180,8 @@ those domain details are supplied.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory in the initial manual check. A first request immediately after the 2026-10-03 clean rebuild exceeded the API response window, returned HTTP 503, and then completed in Lambda; the browser now retries one transient 502/503/504 response while showing a model-warming state.
 - The development AWS account Lambda concurrency quota is now 1,000. API Gateway still throttles excess traffic, and bounded stress results are recorded in `evidence/test-resilience.md`.
 - Authenticated prediction retries now use a server-side idempotency key; a separate cross-region recovery exercise remains future work.
-- The SNS alert topic uses an operator-managed email subscription supplied through the Terraform `alert_email` variable; the current school email endpoint is confirmed, and any replacement endpoint must be confirmed before delivery is active.
+- The SNS alert topic supports an operator-managed email subscription through the Terraform `alert_email` variable. The temporary 2026-10-04 accuracy-test deployment omitted that variable to avoid alert noise; a future operator endpoint must be confirmed before email delivery is active.
+- The chatbot's 16-scenario evaluation checks known factual, history, arithmetic, privacy, injection, and scope cases but does not prove correctness for every possible question. Exact live analytics values remain on the Markets page rather than in assistant context.
 - Cloud deployment requires an AWS account and may incur a small cost.
 - Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`.
 - The original low-traffic estimate predates the two-AZ interface endpoints and WAF; the post-deployment FinOps addendum documents their fixed and variable costs.

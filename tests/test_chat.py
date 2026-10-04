@@ -30,8 +30,9 @@ class FakeBedrock:
 
 
 class FakeHistoryTable:
-    def __init__(self, fail=False):
+    def __init__(self, fail=False, items=None):
         self.fail = fail
+        self.items = items
         self.request = None
 
     def query(self, **kwargs):
@@ -39,7 +40,9 @@ class FakeHistoryTable:
         if self.fail:
             raise RuntimeError("history unavailable")
         return {
-            "Items": [
+            "Items": self.items
+            if self.items is not None
+            else [
                 {
                     "city": "Singapore",
                     "amenities_count": Decimal("12"),
@@ -77,14 +80,18 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(body["reply"], "Use the estimator form.")
         self.assertEqual(fake.request["modelId"], chat_handler.MODEL_ID)
         self.assertEqual(fake.request["inferenceConfig"]["maxTokens"], 220)
+        self.assertEqual(fake.request["inferenceConfig"]["temperature"], 0.0)
         self.assertIn("untrusted data", fake.request["system"][0]["text"])
         self.assertIn("no more than 120 words", fake.request["system"][0]["text"])
         self.assertIn("Be proactive and direct", fake.request["system"][0]["text"])
         self.assertIn("lacks purchase prices", fake.request["system"][0]["text"])
         self.assertIn("Never describe an estimated nightly price as revenue", fake.request["system"][0]["text"])
+        self.assertIn("records_newest_first", fake.request["system"][0]["text"])
+        self.assertIn('"listings":279712', fake.request["messages"][0]["content"][0]["text"])
         self.assertIn('"city":"Singapore"', fake.request["messages"][0]["content"][0]["text"])
         self.assertIn('"amenities_count":"12"', fake.request["messages"][0]["content"][0]["text"])
         self.assertIn('"host_is_superhost":true', fake.request["messages"][0]["content"][0]["text"])
+        self.assertIn('"direct_price_comparison_allowed":true', fake.request["messages"][0]["content"][0]["text"])
         self.assertEqual(chat_handler._history_table.request["Limit"], 10)
         self.assertTrue(chat_handler._history_table.request["ConsistentRead"])
         self.assertTrue(body["context"]["history_available"])
@@ -98,6 +105,16 @@ class ChatHandlerTests(unittest.TestCase):
 
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual(len(body["reply"].split()), chat_handler.MAX_REPLY_WORDS)
+
+    def test_removes_markdown_that_plain_text_ui_cannot_render(self):
+        chat_handler._bedrock = FakeBedrock(
+            reply="# Result\nUse **Paris** or [open the estimator](index.html)."
+        )
+
+        result = chat_handler.lambda_handler(self.event({"message": "Help me"}), None)
+        body = json.loads(result["body"])
+
+        self.assertEqual(body["reply"], "Result Use Paris or open the estimator.")
 
     def test_rejects_empty_message(self):
         result = chat_handler.lambda_handler(self.event({"message": "  "}), None)
@@ -173,6 +190,42 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(result["statusCode"], 200)
         self.assertIn(
             '"recent_saved_predictions":"unavailable"',
+            fake.request["messages"][0]["content"][0]["text"],
+        )
+
+    def test_marks_mixed_currency_history_as_not_directly_comparable(self):
+        fake = FakeBedrock()
+        chat_handler._bedrock = fake
+        chat_handler._history_table = FakeHistoryTable(
+            items=[
+                {"city": "Paris", "predicted_price": Decimal("120"), "currency": "EUR"},
+                {"city": "New York", "predicted_price": Decimal("180"), "currency": "USD"},
+            ]
+        )
+
+        result = chat_handler.lambda_handler(
+            self.event({"message": "Which saved prediction is cheaper?"}), None
+        )
+
+        self.assertEqual(result["statusCode"], 200)
+        request_text = fake.request["messages"][0]["content"][0]["text"]
+        self.assertIn('"currencies_present":["EUR","USD"]', request_text)
+        self.assertIn('"direct_price_comparison_allowed":false', request_text)
+
+    def test_supplies_explicit_empty_history_context(self):
+        fake = FakeBedrock()
+        chat_handler._bedrock = fake
+        chat_handler._history_table = FakeHistoryTable(items=[])
+
+        result = chat_handler.lambda_handler(
+            self.event({"message": "What is my latest saved prediction?"}), None
+        )
+        body = json.loads(result["body"])
+
+        self.assertEqual(result["statusCode"], 200)
+        self.assertEqual(body["context"]["saved_predictions_used"], 0)
+        self.assertIn(
+            '"records_newest_first":[]',
             fake.request["messages"][0]["content"][0]["text"],
         )
 
