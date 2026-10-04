@@ -6,9 +6,9 @@ Class: EP2, Group G014
 
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
-Evidence dates: 1-3 October 2026
+Evidence dates: 1-4 October 2026
 
-Deployment status: The stack described here was redeployed and comprehensively retested in `ap-southeast-1` on 2-3 October 2026, then destroyed after evidence collection to stop idle application costs. Direct service inventory and Terraform state both reported zero remaining application resources; the encrypted Terraform backend remains available.
+Deployment status: The stack described here was rebuilt in `ap-southeast-1` on 3 October 2026 after the complete local preflight passed, loaded with the real listings dataset, and retested with a no-change Terraform plan. It was destroyed through Terraform on 4 October 2026 to stop idle application costs; the encrypted remote Terraform backend was retained for reproducible redeployment.
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).
 
@@ -50,7 +50,7 @@ SageMaker, ECS, Kubernetes, RDS, and Redis were not selected. A VPC was added af
 
 Terraform provisions the frontend, API, two-AZ Lambda VPC, private subnets, route tables, security groups, S3/DynamoDB gateway endpoints, Logs/Athena/Bedrock interface endpoints, Lambda functions, ECR repository, Cognito, DynamoDB, S3 data lake, Glue job and catalog, Athena workgroup, CloudWatch resources, SNS topic, and KMS key. Resource names share a project and environment prefix. S3 buckets enable Block Public Access, bucket-owner enforcement, encryption, and versioning. Frontend reads are restricted to the CloudFront distribution. Raw data is never committed to Git or managed as a Terraform object.
 
-The framework-free frontend now supports the complete potential-host workflow: choose a city and neighbourhood, describe a listing, receive an estimate, compare it with historical market context, and retain up to three browser-local scenarios. A first-time-host preset does not assume prior ratings or hosting history. Direct scenario differences appear only when currencies match, and the interface states that it does not assess property value, occupancy, costs, regulation, or investment returns.
+The framework-free frontend covers the potential-host workflow from listing input through estimate, historical market context, and three browser-local comparisons. A first-time-host preset does not assume prior ratings or hosting history. A bounded what-if panel reruns the model after changing amenities, guest capacity, or superhost status one input at a time. It is labelled as scenario analysis, not future-price forecasting. Differences appear only when currencies match. The browser retries one transient gateway or service-unavailable response while showing that the model is warming.
 
 CloudFront adds a Content Security Policy, one-year HSTS, anti-framing, MIME-sniffing protection, and a strict referrer policy. The CSP limits scripts and styles to the application origin and browser connections to the regional API Gateway hostname pattern and exact Cognito domain. A global CloudFront WAF now adds AWS IP reputation rules, the AWS Common Rule Set, and a per-IP rate rule. A regional management CloudTrail records validated management events in a protected S3 bucket. A custom ACM certificate remains pending because the team has not supplied a domain and DNS validation ownership.
 
@@ -58,7 +58,7 @@ The prediction API accepts only the final model schema. It rejects missing or un
 
 Cognito uses email sign-in and verification, a 12-character mixed password policy, token revocation, and a public client without a secret. The browser generates a cryptographically random OAuth state and PKCE verifier, uses SHA-256 for the challenge, validates returned state, exchanges the code directly, and holds the ID token in session storage. This reduces code interception and long-lived browser persistence risk, although browser script compromise would still expose an active token.
 
-Authorization is enforced at API Gateway for `POST /predictions`, `GET /history`, and `POST /chat`. Backend code derives the user ID only from `requestContext.authorizer.jwt.claims.sub`; no request parameter can select another user. Saved records include server-computed output, model version, timestamp, and a limited feature subset. Coordinates are not retained. The history role can only query the table, the prediction role can only put items and write its own logs, and the chat role can invoke only the selected Haiku inference profile and model.
+API Gateway protects `POST /predictions`, `GET /history`, and `POST /chat`. Backend code derives the user ID only from the verified JWT `sub`; no request parameter can select another user. Saved records include the output, model version, timestamp, and safe listing and host signals needed for follow-up questions, but not coordinates. Chat projects only those fields, reads at most ten records, and reports the count used without exposing identifiers. Each Lambda retains a purpose-specific role.
 
 The analytics endpoint does not accept query text or view parameters. It submits a constant aggregate query in a named Athena workgroup and converts typed results to a stable response. Descriptive outputs cover city listing volume, average and median price, and rating. Diagnostic outputs add distribution shape, capacity-price correlation, and observed superhost/non-superhost price difference; the interface labels these as cross-sectional associations rather than causal effects. The Lambda role is limited to that workgroup, catalog resources, processed objects, query-result objects, and its log group. The Glue role can read only the raw listing prefix and script, then read, write, or remove only processed listing objects.
 
@@ -90,7 +90,7 @@ The repository contains 38 passing Python unit tests covering health responses, 
 
 A JMeter 5.6.3 browser journey ran 25 visitors over 45 seconds against the three public pages and shared assets. All 929 requests passed at 20.3 requests per second, with 666.9 ms mean and 1,508 ms maximum response time. This bounded result verifies the tested CloudFront profile, not an unlimited scaling claim.
 
-Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR scan-on-push is enabled; the rebuilt prediction image tag `1.0.5` updated the base-image curl packages after the 2 October scan identified two HIGH findings in tag `1.0.4`, and the replacement scan completed with zero HIGH or CRITICAL findings. Unit tests confirm history queries use only the verified JWT subject.
+Security tests confirmed all four Block Public Access settings on both S3 use cases, anonymous object requests returned `403`, and the data lake reported AES-256 default encryption. The Cognito authorization endpoint redirected to its hosted login page. ECR scan-on-push is enabled; prediction image tag `1.0.6` retains the updated base-image curl packages and its replacement scan completed with zero HIGH or CRITICAL findings. Unit tests confirm history queries use only the verified JWT subject.
 
 IAM policy simulation added a service-to-service authorization check. Required prediction writes, history queries, and Glue raw-listing reads returned `allowed`. Prediction reads of raw S3 data, history table scans, and Glue reads of the unused raw-review prefix returned `implicitDeny`. This verifies selected blast-radius boundaries without treating same-account services as implicitly trusted.
 

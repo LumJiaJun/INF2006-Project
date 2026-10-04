@@ -108,7 +108,7 @@ function buildGuide() {
   const messages = createElement("div", "guide-messages");
   messages.setAttribute("aria-live", "polite");
   const quickReplies = createElement("div", "guide-quick-replies");
-  ["How do estimates work?", "Compare my recent estimates", "Explore a potential listing", "How do I sign up?"].forEach((prompt) => {
+  ["What is my latest saved prediction?", "Compare my saved predictions", "What can I change for a different estimate?", "How do I sign up?"].forEach((prompt) => {
     const button = createElement("button", null, prompt);
     button.type = "button";
     quickReplies.append(button);
@@ -119,7 +119,7 @@ function buildGuide() {
   input.type = "text";
   input.placeholder = "Ask about the platform";
   input.autocomplete = "off";
-  input.maxLength = 160;
+  input.maxLength = 500;
   input.setAttribute("aria-label", "Message the market guide");
   const sendButton = createElement("button", null, "Send");
   sendButton.type = "submit";
@@ -223,6 +223,19 @@ async function answerQuestion(question) {
       throw new Error(result.error?.message || "The AI guide is unavailable.");
     }
     pending.querySelector("p").textContent = result.reply;
+    const context = result.context;
+    if (context?.history_available) {
+      const count = Number(context.saved_predictions_used || 0);
+      pending.append(
+        createElement(
+          "small",
+          "guide-context-note",
+          count
+            ? `Used ${count} saved prediction${count === 1 ? "" : "s"} from your private history.`
+            : "No saved predictions were available for this answer.",
+        ),
+      );
+    }
   } catch {
     pending.querySelector("p").textContent =
       fallback?.response || "The AI guide is temporarily unavailable. Please try again shortly.";

@@ -77,7 +77,6 @@ resource "aws_cloudwatch_metric_alarm" "api_server_errors" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.operational_alerts.arn]
-  ok_actions          = [aws_sns_topic.operational_alerts.arn]
 
   dimensions = {
     ApiId = aws_apigatewayv2_api.platform.id
@@ -98,7 +97,6 @@ resource "aws_cloudwatch_metric_alarm" "prediction_errors" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.operational_alerts.arn]
-  ok_actions          = [aws_sns_topic.operational_alerts.arn]
 
   dimensions = {
     FunctionName = aws_lambda_function.prediction.function_name
@@ -118,7 +116,6 @@ resource "aws_cloudwatch_metric_alarm" "analytics_errors" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.operational_alerts.arn]
-  ok_actions          = [aws_sns_topic.operational_alerts.arn]
 
   dimensions = {
     FunctionName = aws_lambda_function.analytics.function_name
@@ -138,7 +135,6 @@ resource "aws_cloudwatch_metric_alarm" "chat_errors" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.operational_alerts.arn]
-  ok_actions          = [aws_sns_topic.operational_alerts.arn]
 
   dimensions = {
     FunctionName = aws_lambda_function.chat.function_name
@@ -158,7 +154,6 @@ resource "aws_cloudwatch_metric_alarm" "health_throttles" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.operational_alerts.arn]
-  ok_actions          = [aws_sns_topic.operational_alerts.arn]
 
   dimensions = {
     FunctionName = aws_lambda_function.health.function_name

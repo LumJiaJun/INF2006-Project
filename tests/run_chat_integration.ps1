@@ -30,19 +30,25 @@ $responseFile = Join-Path $temporaryDirectory 'lambda-response.json'
 New-Item -ItemType Directory -Path $temporaryDirectory -Force | Out-Null
 
 $item = @{
-    user_id                  = @{ S = $testUserId }
-    created_at_prediction_id = @{ S = $sortKey }
-    created_at               = @{ S = $createdAt }
-    city                     = @{ S = 'Paris' }
-    neighbourhood            = @{ S = 'Louvre' }
-    property_type            = @{ S = 'Entire apartment' }
-    room_type                = @{ S = 'Entire place' }
-    accommodates             = @{ N = '2' }
-    bedrooms                 = @{ N = '1' }
-    minimum_nights           = @{ N = '2' }
-    predicted_price          = @{ N = '123.45' }
-    currency                 = @{ S = 'EUR' }
-    model_version            = @{ S = 'integration-test' }
+    user_id                   = @{ S = $testUserId }
+    created_at_prediction_id  = @{ S = $sortKey }
+    created_at                = @{ S = $createdAt }
+    city                      = @{ S = 'Paris' }
+    neighbourhood             = @{ S = 'Louvre' }
+    property_type             = @{ S = 'Entire apartment' }
+    room_type                 = @{ S = 'Entire place' }
+    accommodates              = @{ N = '2' }
+    bedrooms                  = @{ N = '1' }
+    minimum_nights            = @{ N = '2' }
+    amenities_count           = @{ N = '17' }
+    host_total_listings_count = @{ N = '3' }
+    instant_bookable          = @{ BOOL = $true }
+    host_is_superhost         = @{ BOOL = $true }
+    host_identity_verified    = @{ BOOL = $true }
+    review_scores_rating      = @{ N = '98' }
+    predicted_price           = @{ N = '123.45' }
+    currency                  = @{ S = 'EUR' }
+    model_version             = @{ S = 'integration-test' }
 } | ConvertTo-Json -Depth 5 -Compress
 $key = @{
     user_id                  = @{ S = $testUserId }
@@ -50,9 +56,9 @@ $key = @{
 } | ConvertTo-Json -Depth 4 -Compress
 
 $event = @{
-    body = (@{ message = 'What is my most recent saved prediction?'; page = 'index.html' } | ConvertTo-Json -Compress)
+    body = (@{ message = 'What is my most recent saved prediction? Include its city, predicted price, amenities count, and superhost status.'; page = 'index.html' } | ConvertTo-Json -Compress)
     requestContext = @{
-        requestId = "chat-integration-$runId"
+        requestId  = "chat-integration-$runId"
         authorizer = @{ jwt = @{ claims = @{ sub = $testUserId } } }
     }
 } | ConvertTo-Json -Depth 8 -Compress
@@ -78,18 +84,26 @@ try {
     if (-not $body.reply -or $body.reply.Split(' ', [System.StringSplitOptions]::RemoveEmptyEntries).Count -gt 120) {
         throw 'Chat Lambda returned an empty or unbounded reply.'
     }
+    foreach ($expected in @('Paris', '123.45', '17')) {
+        if ($body.reply -notmatch [regex]::Escape($expected)) {
+            throw "Chat reply did not include expected DynamoDB-backed value: $expected"
+        }
+    }
+    if (-not $body.context.history_available -or [int]$body.context.saved_predictions_used -ne 1) {
+        throw 'Chat response did not report one available saved-prediction context record.'
+    }
 
     # The handler logs only the test request ID and retrieved-record count, never the prompt or record fields.
     $completion = @()
     for ($attempt = 1; $attempt -le 6 -and $completion.Count -eq 0; $attempt++) {
         $logEvents = & aws logs filter-log-events --log-group-name "/aws/lambda/$ChatFunctionName" --region $Region --filter-pattern 'chat_completed' --query 'events[].message' --output json | ConvertFrom-Json
         $completion = @($logEvents | ForEach-Object {
-            $envelope = $_ | ConvertFrom-Json
-            $message = $envelope.message | ConvertFrom-Json
-            if ($message.request_id -eq "chat-integration-$runId" -and $message.history_record_count -eq 1) {
-                $message
-            }
-        })
+                $envelope = $_ | ConvertFrom-Json
+                $message = $envelope.message | ConvertFrom-Json
+                if ($message.request_id -eq "chat-integration-$runId" -and $message.history_record_count -eq 1) {
+                    $message
+                }
+            })
         if ($completion.Count -eq 0) {
             Start-Sleep -Seconds 5
         }
@@ -98,8 +112,9 @@ try {
         throw 'The expected one-record chat completion telemetry was not found.'
     }
 
-    Write-Output "Chat integration passed: Bedrock returned a bounded reply after the Lambda retrieved 1 isolated DynamoDB record."
-} finally {
+    Write-Output "Chat integration passed: Bedrock returned Paris, 123.45, and 17 amenities after the Lambda retrieved 1 isolated DynamoDB record."
+}
+finally {
     if ($recordCreated) {
         & aws dynamodb delete-item --table-name $TableName --region $Region --key "file://$keyFile" | Out-Null
     }

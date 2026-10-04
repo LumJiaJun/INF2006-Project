@@ -530,6 +530,100 @@ function predictionPayload(form) {
   };
 }
 
+function wait(milliseconds) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+async function requestPrediction(route, headers, payload, onWarmup) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const response = await fetch(`${apiBaseUrl}/${route}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (attempt === 0 && [502, 503, 504].includes(response.status)) {
+      onWarmup?.();
+      await wait(1500);
+      continue;
+    }
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Prediction failed");
+    }
+    return result;
+  }
+  throw new Error("The prediction model is still warming up. Please try again shortly.");
+}
+
+function buildWhatIfPanel(baselinePayload, baselineResult) {
+  const panel = document.createElement("section");
+  panel.className = "what-if-panel";
+  const heading = document.createElement("strong");
+  heading.textContent = "Predictive what-if analysis";
+  const note = document.createElement("p");
+  note.textContent = "Change one supported input and rerun the same model. This is scenario analysis, not a future-price forecast.";
+  const actions = document.createElement("div");
+  actions.className = "what-if-actions";
+  const output = document.createElement("p");
+  output.className = "what-if-output";
+  output.textContent = "Choose one change to compare with this estimate.";
+  const scenarios = [
+    {
+      label: "+5 amenities",
+      change: (payload) => {
+        payload.amenities_count = Math.min(200, payload.amenities_count + 5);
+      },
+    },
+    {
+      label: "+1 guest",
+      change: (payload) => {
+        payload.accommodates = Math.min(16, payload.accommodates + 1);
+      },
+    },
+    {
+      label: "Toggle superhost",
+      change: (payload) => {
+        payload.host_is_superhost = !payload.host_is_superhost;
+      },
+    },
+  ];
+  scenarios.forEach((scenario) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = scenario.label;
+    button.addEventListener("click", async () => {
+      const scenarioPayload = { ...baselinePayload };
+      scenario.change(scenarioPayload);
+      Array.from(actions.children).forEach((action) => {
+        action.disabled = true;
+      });
+      output.textContent = `Testing ${scenario.label.toLowerCase()}...`;
+      try {
+        const result = await requestPrediction(
+          "predict",
+          { "content-type": "application/json" },
+          scenarioPayload,
+          () => {
+            output.textContent = "The model is warming up. Retrying this scenario once...";
+          },
+        );
+        const difference = result.estimated_nightly_price - baselineResult.estimated_nightly_price;
+        const direction = difference >= 0 ? "above" : "below";
+        output.textContent = `${scenario.label}: ${result.currency} ${result.estimated_nightly_price.toLocaleString()} (${result.currency} ${Math.abs(difference).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${direction} this estimate).`;
+      } catch (error) {
+        output.textContent = error.message || "This scenario could not be estimated.";
+      } finally {
+        Array.from(actions.children).forEach((action) => {
+          action.disabled = false;
+        });
+      }
+    });
+    actions.append(button);
+  });
+  panel.append(heading, note, actions, output);
+  return panel;
+}
+
 function showPredictionResult(content, isError = false) {
   predictionResult.replaceChildren(content);
   predictionResult.hidden = false;
@@ -664,15 +758,9 @@ predictionForm.addEventListener("submit", async (event) => {
       headers.authorization = `Bearer ${idToken}`;
       headers["Idempotency-Key"] = crypto.randomUUID();
     }
-    const response = await fetch(`${apiBaseUrl}/${route}`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
+    const result = await requestPrediction(route, headers, payload, () => {
+      predictionSubmit.textContent = "Warming model and retrying...";
     });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error?.message || "Prediction failed");
-    }
 
     const content = document.createElement("div");
     const price = document.createElement("strong");
@@ -732,7 +820,7 @@ predictionForm.addEventListener("submit", async (event) => {
       },
       { once: true },
     );
-    content.append(compareButton);
+    content.append(buildWhatIfPanel(payload, result), compareButton);
     showPredictionResult(content);
     plannerRate = result.estimated_nightly_price;
     plannerCurrency = result.currency;

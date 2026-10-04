@@ -183,7 +183,14 @@ class PredictionHandlerTests(unittest.TestCase):
         self.assertEqual(response["statusCode"], 200)
         self.assertTrue(body["saved"])
         self.assertEqual(len(self.history_table.items), 1)
-        self.assertEqual(self.history_table.items[0]["user_id"], "authenticated-user")
+        saved = self.history_table.items[0]
+        self.assertEqual(saved["user_id"], "authenticated-user")
+        self.assertEqual(saved["amenities_count"], 8)
+        self.assertEqual(saved["host_total_listings_count"], 1)
+        self.assertTrue(saved["instant_bookable"])
+        self.assertFalse(saved["host_is_superhost"])
+        self.assertTrue(saved["host_identity_verified"])
+        self.assertEqual(saved["review_scores_rating"], 95)
 
     def test_authenticated_prediction_requires_idempotency_key(self):
         event = {

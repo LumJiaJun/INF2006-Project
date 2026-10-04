@@ -8,7 +8,7 @@ project:
   problem_statement: "Help prospective and existing Airbnb hosts compare listing configurations, estimate a reasonable nightly price, and understand surrounding historical market conditions before deciding whether hosting may suit a property."
   cloud_provider: "AWS"
   # A commit cannot contain its own hash, so this records the reviewed predecessor.
-  repository_commit: "4e927d7"
+  repository_commit: "fc77e3f"
 
 team:
   members:
@@ -62,6 +62,7 @@ architecture:
     - "GitHub Actions CI/CD"
 
 evidence:
+  live_review: "evidence/application-live-review-2026-10-03.md"
   functional_test: "evidence/test-functional.md"
   security_test: "evidence/test-security.md"
   data_ai_test: "evidence/test-data-ai.md"

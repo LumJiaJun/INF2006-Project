@@ -42,6 +42,8 @@ class FakeHistoryTable:
             "Items": [
                 {
                     "city": "Singapore",
+                    "amenities_count": Decimal("12"),
+                    "host_is_superhost": True,
                     "predicted_price": Decimal("125.50"),
                     "currency": "SGD",
                 }
@@ -81,8 +83,12 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertIn("lacks purchase prices", fake.request["system"][0]["text"])
         self.assertIn("Never describe an estimated nightly price as revenue", fake.request["system"][0]["text"])
         self.assertIn('"city":"Singapore"', fake.request["messages"][0]["content"][0]["text"])
+        self.assertIn('"amenities_count":"12"', fake.request["messages"][0]["content"][0]["text"])
+        self.assertIn('"host_is_superhost":true', fake.request["messages"][0]["content"][0]["text"])
         self.assertEqual(chat_handler._history_table.request["Limit"], 10)
         self.assertTrue(chat_handler._history_table.request["ConsistentRead"])
+        self.assertTrue(body["context"]["history_available"])
+        self.assertEqual(body["context"]["saved_predictions_used"], 1)
 
     def test_truncates_model_reply_to_safe_word_limit(self):
         chat_handler._bedrock = FakeBedrock(reply="word " * 140)

@@ -98,7 +98,10 @@ def recent_prediction_context(event):
             ConsistentRead=True,
             ProjectionExpression=(
                 "created_at, city, neighbourhood, property_type, room_type, "
-                "accommodates, bedrooms, minimum_nights, predicted_price, currency, model_version"
+                "accommodates, bedrooms, minimum_nights, amenities_count, "
+                "host_total_listings_count, instant_bookable, host_is_superhost, "
+                "host_identity_verified, review_scores_rating, predicted_price, "
+                "currency, model_version"
             ),
             ScanIndexForward=False,
             Limit=10,
@@ -192,7 +195,17 @@ def lambda_handler(event, context):
                 }
             )
         )
-        return response(200, {"reply": reply, "model": "Claude Haiku 4.5"})
+        return response(
+            200,
+            {
+                "reply": reply,
+                "model": "Claude Haiku 4.5",
+                "context": {
+                    "history_available": history_record_count is not None,
+                    "saved_predictions_used": history_record_count or 0,
+                },
+            },
+        )
     except Exception:
         logger.exception("chat_failed")
         return response(

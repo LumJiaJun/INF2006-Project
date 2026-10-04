@@ -197,12 +197,19 @@ def persist_prediction(user_id, model_input, result):
         "room_type": model_input["room_type"],
         "accommodates": Decimal(str(model_input["accommodates"])),
         "minimum_nights": Decimal(str(model_input["minimum_nights"])),
+        "amenities_count": Decimal(str(model_input["amenities_count"])),
+        "host_total_listings_count": Decimal(str(model_input["host_total_listings_count"])),
+        "instant_bookable": model_input["instant_bookable"] == "t",
+        "host_is_superhost": model_input["host_is_superhost"] == "t",
+        "host_identity_verified": model_input["host_identity_verified"] == "t",
         "predicted_price": Decimal(str(result["estimated_nightly_price"])),
         "currency": result["currency"],
         "model_version": result["model_version"],
     }
     if model_input.get("bedrooms") is not None:
         item["bedrooms"] = Decimal(str(model_input["bedrooms"]))
+    if model_input.get("review_scores_rating") is not None:
+        item["review_scores_rating"] = Decimal(str(model_input["review_scores_rating"]))
 
     history_table().put_item(
         Item=item,

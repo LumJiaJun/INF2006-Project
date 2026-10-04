@@ -100,7 +100,7 @@ The job is limited to two `G.1X` workers, a ten-minute timeout, and no retries. 
 
 ## Monitoring
 
-CloudWatch alarms track API 5xx responses, prediction/analytics/chat Lambda errors, and health throttles. The dashboard gives the chat Lambda its own duration and error series so AI latency can be reviewed independently. Their SNS topic uses a rotating customer-managed KMS key whose policy permits only this account's named CloudWatch alarms to publish. No subscription is committed because recipient addresses are personal deployment configuration. Add and confirm an operator endpoint separately before treating the topic as a complete notification channel.
+CloudWatch alarms track API 5xx responses, prediction/analytics/chat Lambda errors, and health throttles. The dashboard gives the chat Lambda its own duration and error series so AI latency can be reviewed independently. Their SNS topic uses a rotating customer-managed KMS key whose policy permits only this account's named CloudWatch alarms to publish. Email actions run only when an alarm enters `ALARM`, avoiding routine recovery messages when it returns to `OK`. No subscription is committed because recipient addresses are personal deployment configuration. Add and confirm an operator endpoint separately before treating the topic as a complete notification channel.
 
 To provision an optional email subscription without storing the address in Git, apply with `-var='alert_email=operator@example.com'`. AWS sends a confirmation email; the endpoint is not active until the recipient confirms it. Omitting the variable keeps the topic without a subscription.
 
@@ -111,7 +111,7 @@ The development account now has an approved Lambda concurrency quota of 1,000. T
 Run from the repository root after recreating `analytics/artifacts/airbnb_price_model.joblib`:
 
 ```powershell
-$imageTag = "1.0.5"
+$imageTag = "1.0.6"
 $repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
 $registry = $repositoryUrl.Split('/')[0]
 
