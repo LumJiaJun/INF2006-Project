@@ -9,6 +9,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | architecture-detailed.svg | Editable source for the detailed enterprise architecture diagram |
 | architecture.svg | Editable source for the current numbered architecture diagram |
 | architecture-security-audit-2026-09-28.md | Architecture and security audit findings |
+| cloud-verification-2026-10-04.md | Redacted zero-drift, deployed workflow, Lambda, monitoring, recovery, Glue, S3, WAF, and SNS verification |
 | verification-2026-09-30.txt | Redacted terminal transcript for current validation, live smoke checks, Terraform state, alarms, GitHub Actions, and DAST summary |
 | verification-2026-10-01.txt | Redacted deployment and validation transcript for the contributor navigation integration |
 | encryption-review-2026-10-01.md | Live encryption, public-access, recovery, and sensitive-logging verification |

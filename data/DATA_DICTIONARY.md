@@ -27,7 +27,7 @@ Definitions below are taken from the data dictionaries supplied with the archive
 | `room_type` | category | Airbnb room type | 4 observed values |
 | `accommodates` | integer | Guest capacity | Required in observed data |
 | `bedrooms` | numeric | Bedroom count | 10.5% missing |
-| `amenities` | string/list | Amenities included | Serialized list, not yet modelled |
+| `amenities` | string/list | Amenities included | Serialized list; transformed into the derived `amenities_count` model feature |
 | `price` | numeric | Nightly price in the city's local currency | Prediction target |
 | `minimum_nights` | integer | Minimum nights per booking | Required in observed data |
 | `maximum_nights` | integer | Maximum nights per booking | Required in observed data |
@@ -39,6 +39,12 @@ Definitions below are taken from the data dictionaries supplied with the archive
 | `review_scores_location` | numeric | Location score out of 10 | Nullable |
 | `review_scores_value` | numeric | Value score out of 10 | Nullable and potentially target-related |
 | `instant_bookable` | boolean-like | Whether the listing can be booked instantly | Stored as `t` or `f` |
+
+### Derived model fields
+
+| Field | Type | Derivation | Use |
+|-------|------|------------|-----|
+| `amenities_count` | integer | Number of parsed entries in the source `amenities` list | Numeric model input; the original amenity names are not retained |
 
 ## Reviews.csv
 

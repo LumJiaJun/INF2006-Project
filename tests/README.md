@@ -34,6 +34,16 @@ The server opens `http://127.0.0.1:8000` and uses the same frontend and
 prediction handler as the cloud design. Local mode uses deterministic synthetic
 data and deliberately disables Cognito-dependent history and Bedrock access.
 
+When the complete CC0 source file is available, replay the published model and
+require exact agreement with every committed candidate metric and model hash:
+
+```bash
+python tests/verify_full_model.py \
+  --listings "data/raw/Airbnb Data/Listings.csv"
+```
+
+The generated model and metrics are written below ignored `tmp/` storage.
+
 ```bash
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
@@ -45,6 +55,20 @@ $frontendUrl = terraform -chdir=src/infrastructure output -raw frontend_url
 $apiBaseUrl = (terraform -chdir=src/infrastructure output -raw health_url) -replace '/health$', ''
 ./tests/smoke_api.ps1 -FrontendUrl $frontendUrl -ApiBaseUrl $apiBaseUrl
 ```
+
+Run the complete redacted cloud verification only against an AWS account you
+are authorized to inspect:
+
+```powershell
+./tests/verify_cloud.ps1 `
+  -EvidencePath "tmp/cloud-verification.md" `
+  -IConfirmAuthorizedTarget
+```
+
+If the deployed stack includes an SNS email subscription, also supply
+`-AlertEmail` so the no-drift Terraform plan retains that operator-managed
+configuration. The generated Markdown records statuses and counts but excludes
+account IDs, resource IDs, URLs, email addresses, tokens, and credentials.
 
 Run the bounded live health check only against an environment you own:
 

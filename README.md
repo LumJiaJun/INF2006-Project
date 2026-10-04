@@ -21,7 +21,7 @@ through Terraform on 2026-10-04 after the 41-test local preflight passed, loaded
 with the real listings dataset, and retested with a no-change Terraform plan.
 Use `terraform -chdir=src/infrastructure output -raw frontend_url` to obtain the
 current CloudFront address. See `evidence/chatbot-accuracy-2026-10-04.md` and
-`evidence/application-live-review-2026-10-03.md`.
+`evidence/cloud-verification-2026-10-04.md`.
 
 ## Quickstart commands
 
@@ -50,6 +50,13 @@ terraform output frontend_url
 terraform output health_url
 terraform output analytics_url
 ```
+
+For an authorized deployed account, `tests/verify_cloud.ps1` repeats Terraform
+formatting and validation, requires a zero-drift plan, runs the public smoke
+workflow, and checks Lambda state, private-subnet attachment, alarms,
+CloudTrail, DynamoDB recovery, Glue, S3 public-access blocks, CloudFront WAF,
+and SNS subscription status. Its generated Markdown omits cloud identifiers,
+URLs, operator addresses, tokens, and credentials.
 
 ### Local website mode
 

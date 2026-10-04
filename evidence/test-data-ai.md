@@ -47,6 +47,26 @@
 - **Setup:** Pinned test dependencies and the committed 500-row deterministic synthetic sample.
 - **Command / steps:** Run `python tests/local_preflight.py --include-ml` from the repository root.
 - **Expected result:** Unit tests, source checks, manifest validation, Terraform validation where initialized, and synthetic end-to-end model training all complete successfully.
-- **Actual result:** Passed. All 37 unit tests passed, 12 manifest paths resolved, frontend syntax and Terraform checks passed, and histogram gradient boosting was selected from 390 scoped training rows and 98 test rows. The synthetic score is deliberately excluded from real-world quality claims.
-- **Date:** 2026-10-02
+- **Actual result:** Passed again on 2026-10-04. All 46 unit tests passed, 15 manifest paths resolved, frontend syntax and Terraform checks passed, and histogram gradient boosting was selected from 390 scoped training rows and 98 test rows. The synthetic score is deliberately excluded from real-world quality claims.
+- **Date:** 2026-10-04
 - **Artefact path:** `tests/local_preflight.py`, `analytics/generate_sample_data.py`, `data/sample/listings_synthetic.csv`, and `evidence/rubric-gap-review-2026-10-02.md`
+
+## Submitted artefact consistency
+
+- **Objective:** Prevent silent disagreement between the profiled source, evaluated model, model-selection rule, frontend validation options, synthetic sample, and data dictionary.
+- **Setup:** Committed JSON artefacts, frontend model options, data documentation, and deterministic sample generator.
+- **Command / steps:** Run `python -m unittest discover -s tests -p "test_submission_data.py" -v`.
+- **Expected result:** Source hashes match; the declared model has the lowest recorded selection metric; every frontend city, neighbourhood, coordinate range and price boundary matches the evaluation; the synthetic sample regenerates byte-for-byte with 50 rows for each city; and every model input is documented.
+- **Actual result:** Passed all five consistency tests on 2026-10-04.
+- **Date:** 2026-10-04
+- **Artefact path:** `tests/test_submission_data.py`, `analytics/artifacts/data_profile.json`, `analytics/artifacts/model_evaluation.json`, `src/frontend/model-options.json`, and `data/DATA_DICTIONARY.md`
+
+## Full-dataset deterministic replay
+
+- **Objective:** Verify that the supplied full-data training command reproduces the committed evaluation and deployable model rather than only completing successfully.
+- **Setup:** The hash-verified 279,712-row `Listings.csv`, pinned analytics dependencies, and ignored temporary output paths.
+- **Command / steps:** Run `python tests/verify_full_model.py --listings "data/raw/Airbnb Data/Listings.csv"`.
+- **Expected result:** Every compared value matches exactly.
+- **Actual result:** Passed on 2026-10-04. All seven comparisons matched exactly, including every candidate metric and the exported model hash.
+- **Date:** 2026-10-04
+- **Artefact path:** `tests/verify_full_model.py`, `analytics/train_model.py`, `analytics/artifacts/model_evaluation.json`, and `data/README.md`

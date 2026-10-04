@@ -50,3 +50,13 @@
 - **Actual result:** Passed. The live route returned ten city summaries and the expanded smoke script completed successfully.
 - **Date:** 2026-09-23
 - **Artefact path:** `evidence/data-pipeline.md`, `src/backend/analytics/handler.py`, and `tests/smoke_api.ps1`
+
+## Full deployed configuration verification
+
+- **Objective:** Confirm that the current Terraform state still matches configuration and that the application workflow and principal managed-service controls remain operational.
+- **Setup:** Authorized AWS credentials, initialized remote Terraform state, and the deployed development stack in `ap-southeast-1`.
+- **Command / steps:** Run `./tests/verify_cloud.ps1 -EvidencePath "evidence/cloud-verification-2026-10-04.md" -IConfirmAuthorizedTarget`.
+- **Expected result:** Terraform returns detailed exit code 0, the complete public smoke workflow passes, five Lambdas are active across two private subnets, all five alarms are OK, CloudTrail is logging, DynamoDB recovery is enabled, the latest Glue run succeeded, both S3 public-access blocks are enabled, and WAF remains attached to CloudFront.
+- **Actual result:** Passed. Terraform reported no drift across 147 managed resources. Health, frontend assets and headers, prediction, ten-city analytics, protected-route rejection, and malformed-input validation passed. All listed service-control checks also passed. The SNS topic had no confirmed subscription in this deployment, so active email delivery is not claimed.
+- **Date:** 2026-10-04
+- **Artefact path:** `evidence/cloud-verification-2026-10-04.md` and `tests/verify_cloud.ps1`
