@@ -1,0 +1,46 @@
+INF2006 bounded load and overload-control test
+Date: 2026-10-04
+Target: team-owned development API; hostname and identifiers redacted
+
+Objective
+Verify that a bounded 100-request burst is handled by successful responses or
+explicit API Gateway throttling without API 5xx responses, Lambda errors, or
+Lambda throttles.
+
+Command
+python tests/load_health.py --url <health-url> --requests 100 --concurrency 10 --allowed-host <api-host> --confirm-authorized-target
+
+Expected result
+All requests return HTTP 200 or HTTP 429. API Gateway 5xx, health Lambda errors,
+and health Lambda throttles remain zero. Project alarms remain OK.
+
+Raw load-tool output
+{
+  "concurrency": 10,
+  "elapsed_seconds": 3.339,
+  "latency_ms": {
+    "maximum": 793.25,
+    "median": 274.17,
+    "minimum": 108.1
+  },
+  "requests": 100,
+  "requests_per_second": 29.95,
+  "status_counts": {
+    "200": 32,
+    "429": 68
+  }
+}
+
+CloudWatch observation
+Window: 2026-10-04T11:57:15Z to 2026-10-04T12:14:15Z
+API Gateway 5xx sum: 0
+Health Lambda errors sum: 0
+Health Lambda throttles sum: 0
+Alarm states: five OK, zero ALARM
+
+Actual result
+Passed. The bounded burst produced only HTTP 200 and controlled HTTP 429
+responses. No backend 5xx response, Lambda error, or Lambda throttle was
+observed in the matching CloudWatch window, and all five project alarms were
+OK. This does not prove unlimited capacity, production-scale performance, or
+DDoS resistance.

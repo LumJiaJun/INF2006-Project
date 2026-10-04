@@ -16,7 +16,28 @@ docker build --platform linux/amd64 --provenance=false `
   -t airbnb-prediction:1.0.3 .
 ```
 
-The complete model artifact must first exist at `analytics/artifacts/airbnb_price_model.joblib`.
+The complete model artifact must first exist at
+`analytics/artifacts/airbnb_price_model.joblib`. It is intentionally excluded
+from Git and must be reproduced from the CC0 source data or downloaded from the
+authorized deployment artefact location.
+
+For a clean-checkout container smoke build, first generate a non-production
+model from the committed synthetic sample:
+
+```powershell
+python -m pip install -r tests/requirements.txt
+python analytics/train_model.py `
+  --listings data/sample/listings_synthetic.csv `
+  --model-output analytics/artifacts/airbnb_price_model.joblib `
+  --metrics-output tmp/sample-container-metrics.json
+docker build --platform linux/amd64 --provenance=false `
+  -f src/backend/predict/Dockerfile `
+  -t airbnb-prediction:sample-smoke .
+```
+
+This proves that the Lambda image can be assembled with the same pipeline
+shape. The synthetic model is not the evaluated deployment model and its
+metrics must not be reported as real-world performance.
 
 ## Request contract
 

@@ -8,48 +8,64 @@ Prospective and existing Airbnb hosts lack a simple way to estimate an appropria
 
 | Name | Student ID | Role |
 |------|-----------|------|
-| Lum Jia Jun | 2500022 | |
+| Lum Jia Jun | 2500022 | Cloud Alternatives and Portability Reviewer |
 | Nixon Lee Disheng | 2500594 | Infrastructure and Cloud Deployment Lead |
-| Madugula Adheesh | 2500670 | |
-| Leow Yi Hao Ignatius | 2501538 | |
-| Wong Zhen Ho Brendan | 2503427 | |
+| Madugula Adheesh | 2500670 | Application and Data Prototype Contributor |
+| Leow Yi Hao Ignatius | 2501538 | Application QA and Presentation Reviewer |
+| Wong Zhen Ho Brendan | 2503427 | Frontend Navigation and Test Contributor |
 
 ## Deployment status
 
-The development stack is currently deployed in `ap-southeast-1`. It was rebuilt
-through Terraform on 2026-10-04 after the 41-test local preflight passed, loaded
-with the real listings dataset, and retested with a no-change Terraform plan.
-Use `terraform -chdir=src/infrastructure output -raw frontend_url` to obtain the
-current CloudFront address. See `evidence/chatbot-accuracy-2026-10-04.md` and
-`evidence/cloud-verification-2026-10-04.md`.
+The development stack was rebuilt and verified in `ap-southeast-1` on
+2026-10-04 after the 46-test local preflight passed, then decommissioned that
+evening to stop temporary project costs. The final destroy-only plan contained
+no create/update actions, the application state is empty, and post-destroy AWS
+checks found no matching application resources. The separate encrypted remote
+Terraform backend was retained for controlled recreation. See
+`evidence/cloud-verification-2026-10-04.md`,
+`evidence/chatbot-accuracy-2026-10-04.md`, and
+`evidence/teardown-2026-10-04.md`.
 
 ## Quickstart commands
 
 For the full team handoff, shared Terraform workflow, cleanup safety, and
 remaining workstreams, see `TEAM_WORK_GUIDE.md`.
 
+For the offline submission path, install Python 3.11 or newer, Node.js 24, and
+Terraform 1.10 or newer. The local website and synthetic model require no AWS
+account and have no cloud cost. Cloud deployment additionally requires AWS CLI
+v2, Docker, an AWS account with permission to create the declared resources,
+the external full dataset described in `data/README.md`, and an initialized
+Terraform backend. The original low-traffic core estimate was USD 4-7 per
+month, but the assessed two-AZ interface endpoints and WAF add fixed charges;
+review `evidence/cost-estimate.md` and current AWS pricing before deployment,
+then destroy temporary resources promptly.
+
 ```bash
-# 1. Run the complete offline preflight, including synthetic ML training
+# 1. Install the pinned local test and ML dependencies
+python -m pip install -r tests/requirements.txt
+
+# 2. Initialise Terraform providers without a cloud backend
+terraform -chdir=src/infrastructure init -backend=false
+
+# 3. Run the complete offline preflight, including synthetic ML training
 python tests/local_preflight.py --include-ml
 
-# 2. Run the website and representative APIs locally
+# 4. Run the website and representative APIs locally
 python src/local_server.py
 
-# 3. Initialise and validate Terraform
+# 5. Validate Terraform independently
 cd src/infrastructure
-terraform init -backend=false
 terraform fmt -check
 terraform validate
 
-# 4. Review and deploy the infrastructure
+# 6. Optional authorized cloud review; this requires AWS credentials
 terraform plan
-terraform apply
-
-# 5. Show the deployed endpoints
-terraform output frontend_url
-terraform output health_url
-terraform output analytics_url
 ```
+
+Do not apply from the `-backend=false` initialization above. For an authorized
+deployment, create the ignored `backend.hcl`, reinitialize the encrypted shared
+backend, review the plan, and apply by following `src/infrastructure/README.md`.
 
 For an authorized deployed account, `tests/verify_cloud.ps1` repeats Terraform
 formatting and validation, requires a zero-drift plan, runs the public smoke
@@ -98,7 +114,7 @@ Cognito uses email verification, a strong password policy, authorization-code fl
 - Identity and data: branded Cognito Managed Login v2 and encrypted Amazon DynamoDB prediction history
 - Data engineering: private Amazon S3 data lake, AWS Glue, Parquet, Glue Data Catalog, and Amazon Athena
 - Operations: CloudWatch structured logs, metrics, dashboard and alarms with an encrypted SNS action topic
-- Delivery: GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, and a manually approved OIDC deployment workflow
+- Delivery: GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, and a manual-dispatch OIDC deployment workflow designed for environment approval
 - Analytics / AI-ML: reproducible scikit-learn price regression pipeline plus a bounded Amazon Bedrock Claude Haiku 4.5 assistant
 - Application: HTML, CSS, JavaScript, and Python
 
@@ -145,9 +161,11 @@ the application and analytics requirements plus Bandit Python static analysis;
 CodeQL SAST covers Python and JavaScript. Deployment is manual,
 requires typing `DEPLOY`, and is gated by the GitHub `development` environment.
 The `Deploy development` workflow accepts only `main` or `nixon`, repeats the
-application and Terraform validation before assuming AWS access, then requires
-the protected `development` environment before it can apply the reviewed plan.
-It uses GitHub OIDC rather than stored AWS access keys.
+application and Terraform validation before assuming AWS access, and targets
+the GitHub `development` environment before it can apply the reviewed plan.
+Required reviewers must be configured in the repository environment settings
+before claiming human approval enforcement. The workflow uses GitHub OIDC
+rather than stored AWS access keys.
 
 After a successful deployment, OWASP ZAP DAST performs a passive baseline scan.
 It can also be started manually. The scan accepts only HTTPS and requires the
@@ -177,6 +195,21 @@ certificate. ACM becomes useful only after the team owns a custom domain and
 can complete DNS validation, so a custom certificate remains pending until
 those domain details are supplied.
 
+## Submission packaging
+
+After committing the reviewed final files, create the marker ZIP from tracked
+content rather than compressing the working directory. This excludes ignored
+Terraform state, credentials, raw data, local caches, logs, and test output:
+
+```bash
+git archive --format=zip --output=../Group_G014_INF2006_Project.zip HEAD
+```
+
+Open the ZIP before submission and confirm that `README.md`,
+`project_manifest.yaml`, `report.pdf`, `src/`, `data/`, `analytics/`,
+`evidence/`, `tests/`, `TEAM_CONTRIBUTIONS.md`, and
+`AI_USE_DECLARATION.md` are directly under the ZIP root.
+
 ## Known limitations
 
 - A consented single-account browser journey covering sign-up, verification, TOTP MFA, prediction save, history retrieval, and protected chat is recorded in `evidence/test-functional.md`; a separate multi-user browser isolation test remains future work.
@@ -187,7 +220,7 @@ those domain details are supplied.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory in the initial manual check. A first request immediately after the 2026-10-03 clean rebuild exceeded the API response window, returned HTTP 503, and then completed in Lambda; the browser now retries one transient 502/503/504 response while showing a model-warming state.
 - The development AWS account Lambda concurrency quota is now 1,000. API Gateway still throttles excess traffic, and bounded stress results are recorded in `evidence/test-resilience.md`.
 - Authenticated prediction retries now use a server-side idempotency key; a separate cross-region recovery exercise remains future work.
-- The SNS alert topic supports an operator-managed email subscription through the Terraform `alert_email` variable. The temporary 2026-10-04 accuracy-test deployment omitted that variable to avoid alert noise; a future operator endpoint must be confirmed before email delivery is active.
+- The SNS alert topic supports an operator-managed email subscription through the Terraform `alert_email` variable. The final live deployment omitted that variable to avoid alert noise, and the stack is now decommissioned; a future deployment must configure and confirm an operator endpoint before claiming active email delivery.
 - The chatbot's 16-scenario evaluation checks known factual, history, arithmetic, privacy, injection, and scope cases but does not prove correctness for every possible question. Exact live analytics values remain on the Markets page rather than in assistant context.
 - Cloud deployment requires an AWS account and may incur a small cost.
 - Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`.

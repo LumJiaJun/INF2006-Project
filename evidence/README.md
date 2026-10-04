@@ -22,6 +22,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | chatbot-accuracy-2026-10-04.md | Grounded prompt design, local and deployed 16-scenario evaluation, DynamoDB isolation, Cognito enforcement, and residual AI limits |
 | owasp-top-10-2025-review.md | Current OWASP Top 10 awareness-category control and residual-risk mapping |
 | teardown-2026-10-02.md | Reviewed application teardown, recovery procedure, verification, and remaining FinOps baseline |
+| teardown-2026-10-04.md | Final reviewed destroy-only plan, interrupted-apply recovery, zero-state check, and AWS absence verification |
 | rubric-gap-review-2026-10-02.md | Rubric criterion mapping, local preflight result, and remaining submission risks |
 | iam-rbac-review-2026-10-02.md | User authorization, workload IAM, network scope, and regression-test review |
 | local-development-2026-10-02.md | Loopback frontend, analytics, schema, and model-backed prediction verification |
@@ -31,6 +32,7 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | data-pipeline.md | Measured Glue, Parquet, and Athena pipeline evidence |
 | test-resilience.md | Scalability / resilience / recovery test |
 | test-load-safety-2026-09-28.md | Safe load-test guardrails and authorization controls |
+| load-test-2026-10-04.txt | Redacted raw bounded-load output, matching CloudWatch metrics, and alarm states |
 | test-web-load.md | Browser/static web-load test |
 | prediction-runtime.md | Model container and Lambda runtime evidence |
 | monitoring.md | Logging / monitoring evidence |

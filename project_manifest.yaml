@@ -8,25 +8,25 @@ project:
   problem_statement: "Help prospective and existing Airbnb hosts compare listing configurations, estimate a reasonable nightly price, and understand surrounding historical market conditions before deciding whether hosting may suit a property."
   cloud_provider: "AWS"
   # A commit cannot contain its own hash, so this records the reviewed predecessor.
-  repository_commit: "83ad399"
+  repository_commit: "72d5c3e"
 
 team:
   members:
     - name: "Lum Jia Jun"
       student_id: "2500022"
-      role: ""
+      role: "Cloud Alternatives and Portability Reviewer"
     - name: "Nixon Lee Disheng"
       student_id: "2500594"
       role: "Infrastructure and Cloud Deployment Lead"
     - name: "Madugula Adheesh"
       student_id: "2500670"
-      role: ""
+      role: "Application and Data Prototype Contributor"
     - name: "Leow Yi Hao Ignatius"
       student_id: "2501538"
-      role: ""
+      role: "Application QA and Presentation Reviewer"
     - name: "Wong Zhen Ho Brendan"
       student_id: "2503427"
-      role: ""
+      role: "Frontend Navigation and Test Contributor"
 
 architecture:
   diagram: "evidence/architecture-current.png"
@@ -63,6 +63,7 @@ architecture:
 
 evidence:
   cloud_verification: "evidence/cloud-verification-2026-10-04.md"
+  final_teardown: "evidence/teardown-2026-10-04.md"
   live_review: "evidence/application-live-review-2026-10-03.md"
   chatbot_accuracy: "evidence/chatbot-accuracy-2026-10-04.md"
   functional_test: "evidence/test-functional.md"
@@ -74,9 +75,9 @@ evidence:
 data_ai:
   dataset: "data/README.md"
   method: "City-stratified price regression with log target transformation and histogram gradient boosting selected against median and ridge baselines"
-  evaluation: "Held-out MAE 191.836, RMSE 629.762 and R-squared 0.644 in pooled local-currency units; log-price R-squared 0.850; see per-city metrics and limitations"
-  reproducible_command: "python analytics/train_model.py --listings \"data/raw/Airbnb Data/Listings.csv\" --model-output analytics/artifacts/airbnb_price_model.joblib --metrics-output analytics/artifacts/model_evaluation.json"
-  offline_reproducible_command: "python tests/local_preflight.py --include-ml"
+  evaluation: "Selected median city-normalized MAE 0.592; pooled held-out MAE 191.836, RMSE 629.762 and R-squared 0.644 in mixed local-currency units; log-price R-squared 0.850; see per-city metrics and limitations"
+  reproducible_command: "python tests/local_preflight.py --include-ml"
+  full_dataset_reproducible_command: "python analytics/train_model.py --listings \"data/raw/Airbnb Data/Listings.csv\" --model-output analytics/artifacts/airbnb_price_model.joblib --metrics-output analytics/artifacts/model_evaluation.json"
   cloud_pipeline_evidence: "evidence/data-pipeline.md"
 
 security:
@@ -88,15 +89,19 @@ security:
 run:
   prerequisites:
     - "Python 3.11 or newer"
+    - "Node.js 24 for frontend syntax validation"
     - "Terraform 1.10 or newer"
-    - "AWS credentials with permission to provision the declared resources"
+    - "AWS CLI v2, Docker, and authorized AWS credentials only for cloud deployment"
+  local_expected_cost: "USD 0; the synthetic-data website and test path require no cloud account"
+  cloud_expected_cost: "The original low-traffic core estimate is USD 4-7 per month; two-AZ interface endpoints and WAF add fixed charges, so review evidence/cost-estimate.md and current AWS pricing before deployment"
   commands:
+    - "python -m pip install -r tests/requirements.txt"
+    - "terraform -chdir=src/infrastructure init -backend=false"
     - "python tests/local_preflight.py --include-ml"
     - "python src/local_server.py"
     - "python -m unittest discover -s tests -p test_*.py -v"
-    - "cd src/infrastructure && terraform init -backend=false"
-    - "cd src/infrastructure && terraform validate"
-    - "cd src/infrastructure && terraform plan"
+    - "terraform -chdir=src/infrastructure validate"
+    - "terraform -chdir=src/infrastructure plan"
 
 declarations:
   ai_use: "AI_USE_DECLARATION.md"

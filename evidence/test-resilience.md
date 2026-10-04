@@ -17,7 +17,10 @@
 - **Setup:** AWS Lambda account quota of 1,000 in `ap-southeast-1`; HTTPS API Gateway endpoints; 100 requests with concurrency 10 against `/health` and `/predict`. This is an authorized application stress test, not a DDoS test.
 - **Actual result on 2026-09-29:** Health returned 53 HTTP 200 and 47 HTTP 429 responses at 33.95 requests/second. Prediction returned 62 HTTP 200 and 38 HTTP 429 responses at 18.91 requests/second. No HTTP 5xx responses occurred. CloudWatch showed zero Lambda errors and zero Lambda throttles for the health function; the prediction function remained `Active` with a successful update state and no Lambda-level errors or throttles reported for the observation window.
 - **Interpretation:** API Gateway route throttling rejected excess traffic before it became a Lambda failure. The result demonstrates controlled overload handling at this test size, but it does not prove production-scale capacity or DDoS protection.
-- **Artefact path:** `tests/load_health.py` and the 2026-09-29 terminal run output.
+- **Artefact path:** `tests/load_health.py` and this dated result record in
+  `evidence/test-resilience.md`. A separate raw terminal capture from this run
+  was not retained, so the result is treated as a summarized observation rather
+  than independently replayable raw output.
 
 ### Bounded denial-of-service control retest
 
@@ -27,6 +30,12 @@
 - **Expected result:** Responses are HTTP 200 or controlled HTTP 429 only; there are no API 5xx, Lambda errors, or Lambda throttles; the normal frontend returns HTTP 200; the managed-rule probe returns HTTP 403; WAF records a sampled common-rule request; and all alarms remain OK.
 - **Actual result:** Passed on 2026-10-04. The bounded burst returned 60 HTTP 200 and 40 HTTP 429 responses at 27.89 requests per second. Median latency was 311.93 ms and maximum latency was 967.88 ms. API 5xx, health Lambda errors, and health Lambda throttles were all zero in the observation window. The normal frontend returned HTTP 200, the XSS probe returned HTTP 403, the WAF common-rule sample count was one, and all five alarms remained OK.
 - **Interpretation:** API Gateway throttling controlled the direct API burst. The CloudFront WAF protects the frontend distribution, not the public API Gateway hostname, and its 2,000-request rate rule was deliberately not saturated. This result does not claim DDoS certification, unlimited scale, volumetric-attack resistance, or validation of the WAF rate-limit threshold.
+- **Fresh raw artefact:** A second bounded 100-request run on 2026-10-04
+  returned 32 HTTP 200 and 68 HTTP 429 responses at 29.95 requests per second,
+  with 274.17 ms median and 793.25 ms maximum latency. Matching CloudWatch
+  sums for API 5xx, health Lambda errors, and health Lambda throttles were zero;
+  all five alarms were OK. The redacted command output is retained at
+  `evidence/load-test-2026-10-04.txt`.
 - **Date:** 2026-10-04
 - **Artefact path:** `tests/load_health.py`, `src/infrastructure/api.tf`, `src/infrastructure/security_edge.tf`, and `src/infrastructure/monitoring.tf`
 
