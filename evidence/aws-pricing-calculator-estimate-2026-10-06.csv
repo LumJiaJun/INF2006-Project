@@ -1,0 +1,29 @@
+group,service,usage_type,quantity,unit,monthly_cost_usd,source
+network,Amazon VPC,APS1-VpcEndpoint-Hours,4380,Hrs,56.940000,AWS Pricing Calculator API
+network,Amazon VPC,APS1-VpcEndpoint-Bytes,1,GB,0.010000,AWS Pricing Calculator API
+security,AWS WAF,APS1-WebACLV2,1,Month,5.000000,AWS Pricing Calculator API
+security,AWS WAF,APS1-RuleV2,3,Month,3.000000,AWS Pricing Calculator API
+security,AWS WAF,APS1-RequestV2-Tier1,60000,Request,0.036000,AWS Pricing Calculator API
+security,AWS KMS,ap-southeast-1-KMS-Keys,2,Keys,2.000000,AWS Pricing Calculator API
+security,AWS KMS,ap-southeast-1-KMS-Requests,10000,Requests,0.030000,AWS Pricing Calculator API
+operations,Amazon CloudWatch,DashboardsUsageHour-Basic,1,Dashboards,3.000000,AWS Pricing Calculator API
+operations,Amazon CloudWatch,APS1-CW:AlarmMonitorUsage,5,Alarms,0.500000,AWS Pricing Calculator API
+operations,Amazon CloudWatch,APS1-DataProcessing-Bytes,1,GB,0.700000,AWS Pricing Calculator API
+delivery,Amazon CloudFront,US-DataTransfer-Out-Bytes,2.5,GB,0.212500,AWS Pricing Calculator API
+delivery,Amazon CloudFront,EU-DataTransfer-Out-Bytes,2.5,GB,0.212500,AWS Pricing Calculator API
+delivery,Amazon CloudFront,US-Requests-Tier2-HTTPS,30000,Requests,0.030000,AWS Pricing Calculator API
+delivery,Amazon CloudFront,EU-Requests-Tier2-HTTPS,30000,Requests,0.036000,AWS Pricing Calculator API
+delivery,Amazon ECR,APS1-TimedStorage-ByteHrs,1,GB-Mo,0.100000,AWS Pricing Calculator API
+identity,Amazon Cognito,APS1-CognitoEssentialsMAU,10,CognitoUserPoolsMAU,0.150000,AWS Pricing Calculator API
+analytics,AWS Glue,APS1-ETL-DPU-Hour,0.05,DPU-Hour,0.022000,AWS Pricing Calculator API
+analytics,Amazon Athena,APS1-DataScannedInTB,0.01,Terabytes,0.050000,AWS Pricing Calculator API
+data,Amazon S3,APS1-TimedStorage-ByteHrs,1,GB-Mo,0.025000,AWS Pricing Calculator API
+data,Amazon S3,APS1-Requests-Tier1,2000,Requests,0.010000,AWS Pricing Calculator API
+data,Amazon S3,APS1-Requests-Tier2,10000,Requests,0.004000,AWS Pricing Calculator API
+data,Amazon DynamoDB,APS1-ReadRequestUnits,5000,ReadRequestUnits,0.000713,AWS Pricing Calculator API
+data,Amazon DynamoDB,APS1-WriteRequestUnits,5000,WriteRequestUnits,0.003550,AWS Pricing Calculator API
+compute,AWS Lambda,APS1-Lambda-GB-Second,1700,Lambda-GB-Second,0.028333,AWS Pricing Calculator API
+compute,AWS Lambda,APS1-Request,10000,Request,0.002000,AWS Pricing Calculator API
+compute,Amazon API Gateway,APS1-ApiGatewayHttpRequest,10000,Requests,0.012500,AWS Pricing Calculator API
+ai,Claude Haiku 4.5 global inference,input 0.3M and output 0.1M tokens,1,monthly scenario,0.800000,AWS Bedrock published rate
+total,Planning total,before discounts and tax,1,month,72.915096,Calculator subtotal plus Bedrock published rate

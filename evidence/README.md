@@ -38,6 +38,9 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | prediction-runtime.md | Model container and Lambda runtime evidence |
 | monitoring.md | Logging / monitoring evidence |
 | cost-estimate.md | Cost assumptions and FinOps review |
+| aws-pricing-calculator-2026-10-06.md | Saved AWS Pricing Calculator workload estimate, assumptions, interpretation, and verification status |
+| aws-pricing-calculator-estimate-2026-10-06.csv | Redacted line-item export from the AWS Pricing Calculator workload estimate |
+| cloud-verification-2026-10-06.md | Live zero-drift, functional, data-pipeline, security-control, image-scan, and chat verification |
 | threat-control-map.md | Threat-to-control mapping + secrets handling |
 | serverless-zero-trust-review.md | Serverless Lens and Zero Trust design review |
 | ci-cd.md | GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, and encrypted shared-state validation |

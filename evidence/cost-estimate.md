@@ -1,6 +1,6 @@
 # Monthly Cost Estimate
 
-**Estimate date:** 2026-09-24
+**Estimate date:** 2026-10-06
 
 **Region:** Asia Pacific (Singapore)
 
@@ -17,18 +17,55 @@
 - About 5 GB of monthly internet delivery, less than 1 GB of application storage, and low log volume.
 - Free-tier credits are excluded from the main comparison because account eligibility varies.
 
-## Serverless estimate
+## Current deployed estimate
+
+An official AWS Pricing Calculator workload estimate named
+`INF2006-Airbnb-2026-10-06` was created through the
+`bcm-pricing-calculator` API and returned a valid before-discounts subtotal of
+**$72.12 per continuously deployed month**. Adding the separately calculated
+global Claude Haiku 4.5 token scenario produces a planning total of
+**$72.92/month** before tax, credits, discounts, and Free Tier.
+
+| Component group | Monthly estimate | Basis |
+|---|---:|---|
+| VPC interface endpoints | $56.95 | Three interface endpoint services in two AZs: 4,380 endpoint-hours plus 1 GB processed |
+| WAF and KMS | $10.07 | One web ACL, three rules, 60,000 requests, two keys, and 10,000 KMS requests |
+| CloudWatch | $4.20 | One dashboard, five alarms, and 1 GB logs |
+| CloudFront and ECR | $0.59 | 5 GB delivery, 60,000 HTTPS requests, and 1 GB image storage |
+| Cognito | $0.15 | 10 monthly active users at the calculator's before-discounts rate |
+| Glue and Athena | $0.07 | 0.05 DPU-hours and 0.01 TB scanned |
+| S3, DynamoDB, Lambda, and API Gateway | $0.09 | Low storage, request, and compute volume |
+| AWS Pricing Calculator subtotal | **$72.12** | Saved valid workload estimate |
+| Claude Haiku 4.5 | $0.80 | 0.3M global input tokens at $1/M and 0.1M output tokens at $5/M |
+| **Planning total** | **$72.92/month** | About **$2.40/day** while continuously deployed |
+
+The redacted calculator line items, assumptions, expiry, and verification
+status are in `evidence/aws-pricing-calculator-2026-10-06.md` and
+`evidence/aws-pricing-calculator-estimate-2026-10-06.csv`. The calculator
+workload API could not unambiguously map the third-party Marketplace model
+line, so Bedrock is shown separately rather than assigned an incorrect generic
+foundation-model rate.
+
+## Historical pre-VPC serverless baseline
+
+The table below is retained as design-history evidence. It predates the
+two-AZ interface endpoints, WAF, and CloudWatch dashboard and is **not** the
+current full-architecture estimate.
 
 | Component | Monthly estimate | Basis |
 |---|---:|---|
-| Claude Haiku 4.5 | $0.88 | 0.3M input tokens at $1.10/M plus 0.1M output tokens at $5.50/M |
+| Claude Haiku 4.5 | $0.80 | 0.3M global input tokens at $1/M plus 0.1M output tokens at $5/M |
 | KMS customer-managed keys | $2.00 | One operational-alert key and one shared-state key |
 | Glue ETL | $0.02 | Two DPUs for about 1.5 minutes at $0.44/DPU-hour |
 | CloudFront, S3 and ECR | $0.75 | Small static site, about 5 GB delivery, and one prediction image |
 | API Gateway, Lambda, DynamoDB, Athena, Cognito and CloudWatch | $1.25 | Low request, compute, scan and log volume with a contingency allowance |
-| **Estimated total** | **about $4.90/month** | Reasonable range: **$4 to $7/month** at these assumptions |
+| **Historical estimated total** | **about $4.82/month** | Superseded by the current calculator result above |
 
-At 10,000 AI questions with the same token shape, Bedrock rises from about $0.88 to about $8.80, producing an estimated serverless total near $13/month. The application therefore requires Cognito on `/chat`, limits messages to 500 characters, caps responses at 220 tokens, and throttles this route to one request per second.
+At 10,000 AI questions with the same token shape, Bedrock rises from about
+$0.80 to about $8.00, producing a historical pre-VPC total near $12/month. The
+application therefore requires Cognito on `/chat`, limits messages to 500
+characters, caps responses at 220 tokens, and throttles this route to one
+request per second.
 
 ## Comparable EC2 baselines
 
@@ -44,7 +81,13 @@ These EC2 figures intentionally keep Cognito, Bedrock, DynamoDB and analytical s
 
 ## Interpretation
 
-For this low-volume, uneven university workload, serverless avoids roughly $21 to $113 of idle monthly infrastructure compared with the three EC2 baselines. EC2 can become competitive for consistently high utilization or specialized long-running workloads, but the measured workload does not justify always-on instances. Actual spend must be checked in AWS Cost Explorer after deployment.
+For this low-volume, uneven university workload, the compute and data path
+remain cheaper than continuously running EC2. However, the assessed private
+network design has a fixed endpoint-hour floor, so it is no longer accurate to
+describe the complete stack as a $4-$7 monthly deployment. Compared with the
+private two-instance EC2 baseline, the current planning estimate remains about
+$44/month lower while avoiding server patching and reverse-proxy operations.
+Actual spend must be checked in AWS Cost Explorer after deployment.
 
 ## Pricing sources
 
@@ -55,8 +98,9 @@ For this low-volume, uneven university workload, serverless avoids roughly $21 t
 
 ## FinOps review after VPC, WAF, and CloudTrail
 
-The original estimate predates the private Lambda VPC, CloudFront WAF, and
-CloudTrail additions. The most important change is six interface endpoint
+The original estimate predated the private Lambda VPC, CloudFront WAF, and
+CloudTrail additions. The current calculator result now includes the dominant
+fixed controls. The most important change is six interface endpoint
 network interfaces: Logs, Athena, and Bedrock Runtime are each provisioned in
 two availability zones. AWS PrivateLink charges for interface endpoints by
 endpoint-hour in each AZ and also charges for data processed, so this fixed
@@ -107,3 +151,10 @@ available. See the [ACM pricing page](https://aws.amazon.com/certificate-manager
 7. Review Cost Explorer by `Project` and `Environment` tags after 24-48 hours;
    the endpoint, WAF, Bedrock, Glue, and CloudTrail line items should be
    checked separately rather than hidden in a single serverless estimate.
+
+## Verification statement
+
+Nixon Lee Disheng created and reconciled the saved calculator workload estimate
+against Terraform on 6 October 2026. Group-wide verification is pending and is
+not claimed until the other members review the redacted line items and record
+their names and dates.

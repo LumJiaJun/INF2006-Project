@@ -16,15 +16,16 @@ Prospective and existing Airbnb hosts lack a simple way to estimate an appropria
 
 ## Deployment status
 
-The development stack was rebuilt and verified in `ap-southeast-1` on
-2026-10-04 after the 46-test local preflight passed, then decommissioned that
-evening to stop temporary project costs. The final destroy-only plan contained
-no create/update actions, the application state is empty, and post-destroy AWS
-checks found no matching application resources. The separate encrypted remote
-Terraform backend was retained for controlled recreation. See
-`evidence/cloud-verification-2026-10-04.md`,
-`evidence/chatbot-accuracy-2026-10-04.md`, and
-`evidence/teardown-2026-10-04.md`.
+The development stack was rebuilt in `ap-southeast-1` on 2026-10-06 from a
+reviewed Terraform plan containing 124 creates, 0 changes, and 0 destroys. The
+full-data model replay matched exactly, the Glue transform succeeded, the
+redacted cloud verifier passed across 148 Terraform resources with zero drift,
+and a live bounded Claude Haiku call returned HTTP 200. Run
+`terraform -chdir=src/infrastructure output -raw frontend_url` for the current
+public URL. The SNS email subscription is pending confirmation, so active alarm
+email delivery is not yet claimed. See
+`evidence/cloud-verification-2026-10-06.md` and
+`evidence/aws-pricing-calculator-2026-10-06.md`.
 
 ## Documentation map
 
@@ -42,8 +43,8 @@ complete instructions behind each workflow:
 | Trace claims to dated artefacts | `evidence/README.md` and `project_manifest.yaml` |
 
 The offline path is the default for marking. Cloud steps are optional,
-authorized-operator procedures because the assessed stack is decommissioned
-and recreating it incurs cost.
+authorized-operator procedures because cloud recreation and continued uptime
+incur cost.
 
 ## Reproduce from a clean machine
 
@@ -136,15 +137,19 @@ is the only unavoidable prerequisite for the full-data replay.
 
 ### 5. Recreate the AWS environment only when authorized
 
-The assessed application stack is currently decommissioned to stop cost. An
-authorized team operator can recreate it by following the ordered state,
-model-image, deployment, data-pipeline, verification, and cleanup commands in
-`src/infrastructure/README.md`. Never commit credentials, `backend.hcl`, plan
-files, Terraform state, the raw dataset, or generated model artefacts.
+The assessed application stack is currently live from the verified 6 October
+deployment. An authorized team operator can recreate it by following the
+ordered state, model-image, deployment, data-pipeline, verification, and cleanup
+commands in `src/infrastructure/README.md`. Never commit credentials,
+`backend.hcl`, plan files, Terraform state, the raw dataset, or generated model
+artefacts.
 
-Cloud recreation can incur charges, particularly for the two-AZ interface
-endpoints and WAF. Review `evidence/cost-estimate.md` and current AWS pricing
-before applying, configure a budget, and destroy temporary resources promptly.
+Cloud operation incurs charges, particularly for the two-AZ interface
+endpoints and WAF. The saved AWS Pricing Calculator workload estimate is about
+$72.12 per continuously deployed month before discounts and tax; the planning
+total is about $72.92 after the stated Haiku token scenario. Review
+`evidence/aws-pricing-calculator-2026-10-06.md`, configure a budget, and destroy
+temporary resources promptly.
 For team handoff and state safety, also read `TEAM_WORK_GUIDE.md`.
 
 After deployment, `tests/verify_cloud.ps1` performs a zero-drift plan, public
@@ -312,8 +317,8 @@ Open the ZIP before submission and confirm that `README.md`,
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory in the initial manual check. A first request immediately after the 2026-10-03 clean rebuild exceeded the API response window, returned HTTP 503, and then completed in Lambda; the browser now retries one transient 502/503/504 response while showing a model-warming state.
 - The development AWS account Lambda concurrency quota is now 1,000. API Gateway still throttles excess traffic, and bounded stress results are recorded in `evidence/test-resilience.md`.
 - Authenticated prediction retries now use a server-side idempotency key; a separate cross-region recovery exercise remains future work.
-- The SNS alert topic supports an operator-managed email subscription through the Terraform `alert_email` variable. The final live deployment omitted that variable to avoid alert noise, and the stack is now decommissioned; a future deployment must configure and confirm an operator endpoint before claiming active email delivery.
+- The SNS alert topic supports an operator-managed email subscription through the Terraform `alert_email` variable. The 6 October deployment created the subscription, but it remains pending confirmation; active email delivery is not claimed.
 - The chatbot's 16-scenario evaluation checks known factual, history, arithmetic, privacy, injection, and scope cases but does not prove correctness for every possible question. Exact live analytics values remain on the Markets page rather than in assistant context.
-- Cloud deployment requires an AWS account and may incur a small cost.
+- Cloud deployment requires an AWS account. The current full architecture is estimated at about $72.92 per continuously deployed month before discounts and tax, dominated by two-AZ interface endpoint hours.
 - Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`.
-- The original low-traffic estimate predates the two-AZ interface endpoints and WAF; the post-deployment FinOps addendum documents their fixed and variable costs.
+- The historical $4-$7 estimate predates the two-AZ interface endpoints and WAF and is not the current full-stack estimate. The saved calculator result and redacted line items are documented in `evidence/aws-pricing-calculator-2026-10-06.md`.

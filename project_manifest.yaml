@@ -8,7 +8,7 @@ project:
   problem_statement: "Help prospective and existing Airbnb hosts compare listing configurations, estimate a reasonable nightly price, and understand surrounding historical market conditions before deciding whether hosting may suit a property."
   cloud_provider: "AWS"
   # A commit cannot contain its own hash, so this records the reviewed predecessor.
-  repository_commit: "58d3dad"
+  repository_commit: "d7fb1bd"
 
 team:
   members:
@@ -62,7 +62,8 @@ architecture:
     - "GitHub Actions CI/CD"
 
 evidence:
-  cloud_verification: "evidence/cloud-verification-2026-10-04.md"
+  cloud_verification: "evidence/cloud-verification-2026-10-06.md"
+  pricing_calculator: "evidence/aws-pricing-calculator-2026-10-06.md"
   final_teardown: "evidence/teardown-2026-10-04.md"
   live_review: "evidence/application-live-review-2026-10-03.md"
   chatbot_accuracy: "evidence/chatbot-accuracy-2026-10-04.md"
@@ -93,7 +94,7 @@ run:
     - "Terraform 1.10 or newer"
     - "AWS CLI v2, Docker, and authorized AWS credentials only for cloud deployment"
   local_expected_cost: "USD 0; the synthetic-data website and test path require no cloud account"
-  cloud_expected_cost: "The original low-traffic core estimate is USD 4-7 per month; two-AZ interface endpoints and WAF add fixed charges, so review evidence/cost-estimate.md and current AWS pricing before deployment"
+  cloud_expected_cost: "About USD 72.92 per continuously deployed month before discounts and tax under the documented low-traffic assumptions; two-AZ interface endpoint hours dominate. See evidence/aws-pricing-calculator-2026-10-06.md"
   commands:
     - "python -m pip install -r tests/requirements.txt"
     - "terraform -chdir=src/infrastructure init -backend=false"
