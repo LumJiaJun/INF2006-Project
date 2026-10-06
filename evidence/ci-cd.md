@@ -6,6 +6,8 @@
 
 **DAST remediation commit:** `395c79b`
 
+**Latest workflow verification:** `evidence/github-security-runs-2026-10-06.md`
+
 ## GitHub Actions results
 
 - CI completed successfully: https://github.com/LumJiaJun/INF2006-Project/actions/runs/36418939012
@@ -42,9 +44,14 @@ reviewed dispositions in `.zap/rules.tsv`.
 Terraform applied the remediation with 0 resources added, 4 changed in place,
 and 0 destroyed. After CloudFront deployment and invalidation, the same pinned
 scan with the repository policy crawled 175 URLs and returned exit code 0 with
-0 failed rules, 0 warnings, 63 passed rules, and 4 reviewed ignored rules. The
-GitHub workflow must still be rerun from the corrected commit; a passing GitHub
-run is not yet claimed.
+0 failed rules, 0 warnings, 63 passed rules, and 4 reviewed ignored rules.
+
+The corrected hosted workflow was also run successfully as GitHub Actions run
+`36699009812`. Target validation, reachability, the pinned passive scan, report
+upload, and the overall `DAST baseline scan` job succeeded. The fail-closed
+enforcement step was skipped because the scan step succeeded. The public run
+and artefact metadata are recorded in
+`evidence/github-security-runs-2026-10-06.md`.
 
 The first CI run exposed that `boto3` was available on the deployment computer
 but missing from a clean runner. `tests/requirements.txt` now declares it

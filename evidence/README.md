@@ -40,7 +40,8 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | cost-estimate.md | Cost assumptions and FinOps review |
 | threat-control-map.md | Threat-to-control mapping + secrets handling |
 | serverless-zero-trust-review.md | Serverless Lens and Zero Trust design review |
-| ci-cd.md | GitHub Actions and encrypted shared-state validation |
+| ci-cd.md | GitHub Actions CI/CD, CodeQL SAST, OWASP ZAP DAST, and encrypted shared-state validation |
+| github-security-runs-2026-10-06.md | Public GitHub CI, CodeQL, security-gate, and successful hosted ZAP DAST run verification |
 | ../.github/workflows/security.yml | Pinned dependency and Python static-security gates |
 | aws-serverless-reference-review-2026-09-28.md | Official AWS pattern comparison and VPC decision |
 | vpc-deployment-2026-09-29.md | Two-AZ private Lambda VPC deployment and verification |
