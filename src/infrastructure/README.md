@@ -41,6 +41,14 @@ $env:TF_VAR_alert_email = "<confirmed operator email>"
 terraform plan
 ```
 
+For a new authorized AWS account with no existing project backend, first run
+`terraform init -backend=false`, `terraform plan`, and `terraform apply` inside
+`src/infrastructure/bootstrap`. Copy its `state_bucket_name` and
+`state_kms_key_arn` outputs into ignored copies of the relevant
+`backend.hcl.example` files, then follow `bootstrap/README.md` to migrate the
+bootstrap state before initializing this application root. Do not recreate the
+backend when using the team's retained backend.
+
 Before applying, compare `terraform state list` with the AWS account. Never
 apply if AWS contains an existing application stack that is absent from state;
 import those resources first. State, plan, backend configuration, account IDs,
@@ -57,10 +65,50 @@ $env:TF_VAR_alert_email = "<confirmed operator email>"
 terraform plan
 ```
 
-## Deploy
+## Prepare the prediction image
 
-```bash
-terraform apply
+The full-data model is deliberately excluded from Git. From the repository
+root, reproduce it from the verified CC0 listing source, copy the matching
+artefact into the Docker build context, create only the empty ECR repository,
+then build and push an immutable image:
+
+```powershell
+python tests/verify_full_model.py `
+  --listings "data/raw/Airbnb Data/Listings.csv"
+Copy-Item `
+  "tmp/full-model-verification/airbnb_price_model.joblib" `
+  "analytics/artifacts/airbnb_price_model.joblib"
+
+terraform -chdir=src/infrastructure apply `
+  -target=aws_ecr_repository.prediction
+
+$imageTag = (git rev-parse --short=12 HEAD)
+$repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
+$registry = $repositoryUrl.Split('/')[0]
+
+docker build --platform linux/amd64 --provenance=false `
+  -f src/backend/predict/Dockerfile `
+  -t "${repositoryUrl}:$imageTag" .
+aws ecr get-login-password --region ap-southeast-1 |
+  docker login --username AWS --password-stdin $registry
+docker push "${repositoryUrl}:$imageTag"
+```
+
+The targeted apply is only a bootstrap step for the otherwise empty ECR
+repository. Review its plan before approval. Provenance is disabled because
+Lambda requires a single-architecture image manifest. ECR tags are immutable,
+so use a new tag whenever image content changes.
+
+## Plan and deploy
+
+From `src/infrastructure`, create and review a saved plan that references the
+image tag pushed above. Set `TF_VAR_alert_email` only when an operator wants to
+create and confirm an email subscription.
+
+```powershell
+terraform plan -var="prediction_image_tag=$imageTag" -out=deployment.tfplan
+terraform show deployment.tfplan
+terraform apply deployment.tfplan
 terraform output frontend_url
 terraform output health_url
 terraform output prediction_ecr_repository_url
@@ -105,27 +153,6 @@ CloudWatch alarms track API 5xx responses, prediction/analytics/chat Lambda erro
 To provision an optional email subscription without storing the address in Git, apply with `-var='alert_email=operator@example.com'`. AWS sends a confirmation email; the endpoint is not active until the recipient confirms it. Omitting the variable keeps the topic without a subscription.
 
 The development account now has an approved Lambda concurrency quota of 1,000. The API stage intentionally retains a conservative two-request burst and two-request-per-second limit to bound cost and reject excess traffic before it reaches Lambda. See `evidence/test-resilience.md` for both the historical quota-10 result and the approved-quota retest.
-
-## Build prediction image
-
-Run from the repository root after recreating `analytics/artifacts/airbnb_price_model.joblib`:
-
-```powershell
-$imageTag = "1.0.6"
-$repositoryUrl = terraform -chdir=src/infrastructure output -raw prediction_ecr_repository_url
-$registry = $repositoryUrl.Split('/')[0]
-
-docker build --platform linux/amd64 --provenance=false `
-  -f src/backend/predict/Dockerfile `
-  -t "airbnb-prediction:$imageTag" .
-
-aws ecr get-login-password --region ap-southeast-1 |
-  docker login --username AWS --password-stdin $registry
-docker tag "airbnb-prediction:$imageTag" "${repositoryUrl}:$imageTag"
-docker push "${repositoryUrl}:$imageTag"
-```
-
-Provenance is disabled because Lambda requires a single-architecture image manifest. ECR tags are immutable, so use a new tag whenever image content changes.
 
 ## Cleanup
 

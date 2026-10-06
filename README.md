@@ -26,66 +26,113 @@ Terraform backend was retained for controlled recreation. See
 `evidence/chatbot-accuracy-2026-10-04.md`, and
 `evidence/teardown-2026-10-04.md`.
 
-## Quickstart commands
+## Reproduce from a clean machine
 
-For the full team handoff, shared Terraform workflow, cleanup safety, and
-remaining workstreams, see `TEAM_WORK_GUIDE.md`.
+The marker-friendly path below reproduces the application, tests, sample ML
+pipeline, and Terraform validation without an AWS account. It uses committed
+synthetic data, creates only ignored local files, has no cloud cost, and does
+not require any credentials.
 
-For the offline submission path, install Python 3.11 or newer, Node.js 24, and
-Terraform 1.10 or newer. The local website and synthetic model require no AWS
-account and have no cloud cost. Cloud deployment additionally requires AWS CLI
-v2, Docker, an AWS account with permission to create the declared resources,
-the external full dataset described in `data/README.md`, and an initialized
-Terraform backend. The original low-traffic core estimate was USD 4-7 per
-month, but the assessed two-AZ interface endpoints and WAF add fixed charges;
-review `evidence/cost-estimate.md` and current AWS pricing before deployment,
-then destroy temporary resources promptly.
+### Prerequisites
+
+| Path | Requirements |
+|------|--------------|
+| Complete offline reproduction | Git, Python 3.11 or newer, Node.js 24, and Terraform 1.10 or newer |
+| Optional full-data model replay | The CC0 `Listings.csv` source described in `data/README.md` |
+| Optional AWS recreation | AWS CLI v2, Docker, authorized AWS credentials, the full model artefact, and the encrypted Terraform backend |
+
+Internet access is needed on a new machine to clone the repository, install
+Python packages, and download Terraform providers. The application itself does
+not make an external request during the offline preflight.
+
+### 1. Clone and prepare
 
 ```bash
-# 1. Install the pinned local test and ML dependencies
-python -m pip install -r tests/requirements.txt
-
-# 2. Initialise Terraform providers without a cloud backend
-terraform -chdir=src/infrastructure init -backend=false
-
-# 3. Run the complete offline preflight, including synthetic ML training
-python tests/local_preflight.py --include-ml
-
-# 4. Run the website and representative APIs locally
-python src/local_server.py
-
-# 5. Validate Terraform independently
-cd src/infrastructure
-terraform fmt -check
-terraform validate
-
-# 6. Optional authorized cloud review; this requires AWS credentials
-terraform plan
+git clone https://github.com/LumJiaJun/INF2006-Project.git
+cd INF2006-Project
+python -m venv .venv
 ```
 
-Do not apply from the `-backend=false` initialization above. For an authorized
-deployment, create the ignored `backend.hcl`, reinitialize the encrypted shared
-backend, review the plan, and apply by following `src/infrastructure/README.md`.
+Activate the environment with `.\.venv\Scripts\Activate.ps1` in PowerShell or
+`source .venv/bin/activate` on macOS/Linux, then run:
 
-For an authorized deployed account, `tests/verify_cloud.ps1` repeats Terraform
-formatting and validation, requires a zero-drift plan, runs the public smoke
-workflow, and checks Lambda state, private-subnet attachment, alarms,
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r tests/requirements.txt
+terraform -chdir=src/infrastructure init -backend=false
+```
+
+`-backend=false` downloads the pinned providers for validation without reading
+or creating cloud state. Do not run `terraform apply` from this initialization.
+
+### 2. Run the automated offline reproduction
+
+```bash
+python tests/local_preflight.py --include-ml
+```
+
+A successful run:
+
+1. Executes the Python unit suite.
+2. Compiles the Python source and validates every manifest path.
+3. Syntax-checks the frontend JavaScript with Node.js.
+4. Runs `terraform fmt -check -recursive` and `terraform validate`.
+5. Trains and evaluates a deterministic model on the committed 500-row sample.
+6. Starts an ephemeral local server and verifies the frontend, health,
+   analytics, model-schema, and prediction routes over HTTP.
+
+The final line must be `Local preflight completed successfully.` The last
+recorded clean run passed 46 tests and validated 16 manifest paths. Generated
+models, metrics, caches, and Terraform provider files remain in ignored paths.
+
+### 3. Inspect the application locally
+
+```bash
+python src/local_server.py
+```
+
+Open `http://127.0.0.1:8000`, confirm that the header says `Local demo`, view
+the dashboard and market analytics, submit one estimator scenario, and compare
+the returned estimate and scenario cards. Stop the server with `Ctrl+C`.
+
+Local mode serves the real frontend and prediction handler with deterministic
+synthetic data. Cognito sign-in, private DynamoDB history, Bedrock chat,
+CloudFront, WAF, VPC endpoints, alarms, and other managed-service controls are
+deliberately disabled rather than falsely simulated.
+
+### 4. Replay the full-data model when the source is available
+
+Download the CC0 dataset from the source in `data/README.md`, place its listing
+file at `data/raw/Airbnb Data/Listings.csv`, verify the documented SHA-256, and
+run:
+
+```bash
+python tests/verify_full_model.py --listings "data/raw/Airbnb Data/Listings.csv"
+```
+
+Success means the selected model, candidate metrics, dataset counts, model
+size, and model SHA-256 exactly match the committed evaluation. The raw dataset
+and generated model stay outside Git because of their size; this external file
+is the only unavoidable prerequisite for the full-data replay.
+
+### 5. Recreate the AWS environment only when authorized
+
+The assessed application stack is currently decommissioned to stop cost. An
+authorized team operator can recreate it by following the ordered state,
+model-image, deployment, data-pipeline, verification, and cleanup commands in
+`src/infrastructure/README.md`. Never commit credentials, `backend.hcl`, plan
+files, Terraform state, the raw dataset, or generated model artefacts.
+
+Cloud recreation can incur charges, particularly for the two-AZ interface
+endpoints and WAF. Review `evidence/cost-estimate.md` and current AWS pricing
+before applying, configure a budget, and destroy temporary resources promptly.
+For team handoff and state safety, also read `TEAM_WORK_GUIDE.md`.
+
+After deployment, `tests/verify_cloud.ps1` performs a zero-drift plan, public
+smoke workflow, and checks of Lambda state, private-subnet attachment, alarms,
 CloudTrail, DynamoDB recovery, Glue, S3 public-access blocks, CloudFront WAF,
-and SNS subscription status. Its generated Markdown omits cloud identifiers,
+and SNS subscription status. Its generated Markdown excludes cloud identifiers,
 URLs, operator addresses, tokens, and credentials.
-
-### Local website mode
-
-Install `tests/requirements.txt`, then run `python src/local_server.py` from the
-repository root. The command prepares the deterministic sample model when
-needed, opens `http://127.0.0.1:8000`, and serves the real frontend with local
-health, analytics, model-schema, and prediction routes. No AWS credentials are
-required. Stop it with `Ctrl+C`.
-
-Local mode is intentionally labelled in the navigation and uses synthetic
-data. Cognito sign-in, private history, Bedrock chat, WAF, CloudFront, VPC
-endpoints, alarms, and other managed-service controls remain AWS integration
-tests rather than local simulations.
 
 ## Architecture
 
