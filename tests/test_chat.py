@@ -86,6 +86,12 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertIn("Be proactive and direct", fake.request["system"][0]["text"])
         self.assertIn("lacks purchase prices", fake.request["system"][0]["text"])
         self.assertIn("Never describe an estimated nightly price as revenue", fake.request["system"][0]["text"])
+        self.assertIn("positive whole number from 1 to 365", fake.request["system"][0]["text"])
+        self.assertIn("never proof that a listing feature causes", fake.request["system"][0]["text"])
+        self.assertIn("Do not claim to store or link to actual Airbnb listings", fake.request["system"][0]["text"])
+        self.assertIn("Never invent intermediate labels", fake.request["system"][0]["text"])
+        self.assertIn("Do not say sign-in or MFA is required for the public estimator", fake.request["system"][0]["text"])
+        self.assertIn("explicitly mention Cognito, email verification, and required TOTP", fake.request["system"][0]["text"])
         self.assertIn("records_newest_first", fake.request["system"][0]["text"])
         self.assertIn('"listings":279712', fake.request["messages"][0]["content"][0]["text"])
         self.assertIn('"city":"Singapore"', fake.request["messages"][0]["content"][0]["text"])
@@ -115,6 +121,21 @@ class ChatHandlerTests(unittest.TestCase):
         body = json.loads(result["body"])
 
         self.assertEqual(body["reply"], "Result Use Paris or open the estimator.")
+
+    def test_rewrites_promotional_financial_phrases(self):
+        chat_handler._bedrock = FakeBedrock(
+            reply="Use the estimate as gross nightly income and estimated revenue potential."
+        )
+
+        result = chat_handler.lambda_handler(
+            self.event({"message": "Should I invest?"}), None
+        )
+        reply = json.loads(result["body"])["reply"].lower()
+
+        self.assertNotIn("gross nightly income", reply)
+        self.assertNotIn("estimated revenue", reply)
+        self.assertNotIn("revenue potential", reply)
+        self.assertIn("nightly stay-cost estimate", reply)
 
     def test_rejects_empty_message(self):
         result = chat_handler.lambda_handler(self.event({"message": "  "}), None)

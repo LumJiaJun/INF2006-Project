@@ -72,19 +72,19 @@
 
   <rect x="350" y="215" width="500" height="535" class="zone" rx="18"/>
   <text x="375" y="248" class="zone-title">Edge, identity, and API ingress</text>
-  <rect x="385" y="280" width="190" height="88" class="service security"/>
+  <rect x="385" y="280" width="190" height="88" class="service security"/><image href="aws-icons/Arch_AWS-WAF_64.svg" x="393" y="286" width="24" height="24"/>
   <text x="480" y="315" class="label">AWS WAF</text>
   <text x="480" y="340" class="small">Managed rules + rate limit</text>
-  <rect x="625" y="280" width="190" height="88" class="service edge"/>
+  <rect x="625" y="280" width="190" height="88" class="service edge"/><image href="aws-icons/Arch_Amazon-CloudFront_64.svg" x="633" y="286" width="24" height="24"/>
   <text x="720" y="315" class="label">CloudFront</text>
   <text x="720" y="340" class="small">TLS + security headers</text>
-  <rect x="625" y="410" width="190" height="88" class="service data"/>
+  <rect x="625" y="410" width="190" height="88" class="service data"/><image href="aws-icons/Arch_Amazon-Simple-Storage-Service_64.svg" x="633" y="416" width="24" height="24"/>
   <text x="720" y="445" class="label">Private S3 origin</text>
   <text x="720" y="470" class="small">OAC + public block</text>
-  <rect x="385" y="410" width="190" height="88" class="service identity"/>
+  <rect x="385" y="410" width="190" height="88" class="service identity"/><image href="aws-icons/Arch_Amazon-Cognito_64.svg" x="393" y="416" width="24" height="24"/>
   <text x="480" y="445" class="label">Amazon Cognito</text>
   <text x="480" y="470" class="small">JWT + required TOTP MFA</text>
-  <rect x="385" y="545" width="430" height="105" class="service edge"/>
+  <rect x="385" y="545" width="430" height="105" class="service edge"/><image href="aws-icons/Arch_Amazon-API-Gateway_64.svg" x="400" y="575" width="45" height="45"/>
   <text x="600" y="580" class="label">API Gateway HTTP API</text>
   <text x="600" y="606" class="small">CORS allowlist, request throttling, JWT authorizer</text>
   <text x="600" y="630" class="tiny">Public: health, predict, analytics | Protected: predictions, history, chat</text>
@@ -92,7 +92,7 @@
   <text x="402" y="706" class="callout-text">Zero Trust decision point: authenticate protected routes, then authorize per request.</text>
 
   <rect x="880" y="215" width="920" height="690" class="zone" rx="18"/>
-  <text x="905" y="248" class="zone-title">VPC 10.20.0.0/16 | Private Lambda network attachment</text>
+  <image href="aws-icons/Arch_Amazon-Virtual-Private-Cloud_64.svg" x="897" y="218" width="38" height="38"/><text x="945" y="248" class="zone-title">VPC 10.20.0.0/16 | Private Lambda network attachment</text>
   <text x="905" y="270" class="zone-note">No public subnets, internet gateway, or NAT Gateway</text>
   <rect x="915" y="300" width="300" height="530" class="az" rx="16"/>
   <text x="1065" y="332" class="label">Private subnet A</text>
@@ -103,15 +103,15 @@
   <rect x="950" y="385" width="550" height="365" class="callout"/>
   <text x="1225" y="416" class="label">Lambda functions configured for both subnets</text>
   <text x="1225" y="440" class="tiny">AWS selects healthy subnet capacity; functions are not pinned to one AZ</text>
-  <rect x="980" y="475" width="145" height="82" class="service compute"/>
+  <rect x="980" y="475" width="145" height="82" class="service compute"/><image href="aws-icons/Arch_AWS-Lambda_64.svg" x="986" y="481" width="20" height="20"/>
   <text x="1052" y="507" class="label">Health</text><text x="1052" y="534" class="small">GET /health</text>
-  <rect x="1152" y="475" width="145" height="82" class="service compute"/>
+  <rect x="1152" y="475" width="145" height="82" class="service compute"/><image href="aws-icons/Arch_AWS-Lambda_64.svg" x="1158" y="481" width="20" height="20"/>
   <text x="1224" y="507" class="label">Prediction</text><text x="1224" y="534" class="small">Public + saved</text>
-  <rect x="1324" y="475" width="145" height="82" class="service compute"/>
+  <rect x="1324" y="475" width="145" height="82" class="service compute"/><image href="aws-icons/Arch_AWS-Lambda_64.svg" x="1330" y="481" width="20" height="20"/>
   <text x="1396" y="507" class="label">Analytics</text><text x="1396" y="534" class="small">Fixed Athena SQL</text>
-  <rect x="1066" y="595" width="145" height="82" class="service compute"/>
+  <rect x="1066" y="595" width="145" height="82" class="service compute"/><image href="aws-icons/Arch_AWS-Lambda_64.svg" x="1072" y="601" width="20" height="20"/>
   <text x="1138" y="627" class="label">History</text><text x="1138" y="654" class="small">User-scoped read</text>
-  <rect x="1238" y="595" width="145" height="82" class="service compute"/>
+  <rect x="1238" y="595" width="145" height="82" class="service compute"/><image href="aws-icons/Arch_AWS-Lambda_64.svg" x="1244" y="601" width="20" height="20"/>
   <text x="1310" y="627" class="label">Chat</text><text x="1310" y="654" class="small">Bounded AI context</text>
   <text x="1225" y="716" class="tiny">Separate least-privilege IAM role per function | Lambda security group allows outbound TCP 443</text>
 
@@ -133,35 +133,35 @@
 
   <rect x="1830" y="215" width="500" height="690" class="zone" rx="18"/>
   <text x="1855" y="248" class="zone-title">AWS managed service plane</text>
-  <rect x="1865" y="295" width="200" height="100" class="service data"/>
+  <rect x="1865" y="295" width="200" height="100" class="service data"/><image href="aws-icons/Arch_Amazon-DynamoDB_64.svg" x="1873" y="302" width="24" height="24"/>
   <text x="1965" y="330" class="label">DynamoDB</text>
   <text x="1965" y="356" class="small">History + idempotency</text>
   <text x="1965" y="378" class="tiny">User key, KMS, PITR</text>
-  <rect x="2090" y="295" width="200" height="100" class="service ops"/>
+  <rect x="2090" y="295" width="200" height="100" class="service ops"/><image href="aws-icons/Arch_Amazon-Elastic-Container-Registry_64.svg" x="2098" y="302" width="24" height="24"/>
   <text x="2190" y="330" class="label">Amazon ECR</text>
   <text x="2190" y="356" class="small">Prediction image</text>
   <text x="2190" y="378" class="tiny">Immutable tag + scan</text>
-  <rect x="1865" y="440" width="200" height="100" class="service data"/>
+  <rect x="1865" y="440" width="200" height="100" class="service data"/><image href="aws-icons/Arch_Amazon-Simple-Storage-Service_64.svg" x="1873" y="447" width="24" height="24"/>
   <text x="1965" y="475" class="label">S3 data lake</text>
   <text x="1965" y="501" class="small">Raw / processed / model</text>
   <text x="1965" y="523" class="tiny">Private + encrypted</text>
-  <rect x="2090" y="440" width="200" height="100" class="service data"/>
+  <rect x="2090" y="440" width="200" height="100" class="service data"/><image href="aws-icons/Arch_Amazon-Athena_64.svg" x="2098" y="447" width="24" height="24"/>
   <text x="2190" y="475" class="label">Amazon Athena</text>
   <text x="2190" y="501" class="small">Approved aggregate query</text>
   <text x="2190" y="523" class="tiny">Isolated workgroup</text>
-  <rect x="1865" y="585" width="200" height="100" class="service identity"/>
+  <rect x="1865" y="585" width="200" height="100" class="service identity"/><image href="aws-icons/Arch_Amazon-Bedrock_64.svg" x="1873" y="592" width="24" height="24"/>
   <text x="1965" y="620" class="label">Amazon Bedrock</text>
   <text x="1965" y="646" class="small">Claude Haiku 4.5</text>
   <text x="1965" y="668" class="tiny">No generic agent runtime</text>
-  <rect x="2090" y="585" width="200" height="100" class="service ops"/>
+  <rect x="2090" y="585" width="200" height="100" class="service ops"/><image href="aws-icons/Arch_Amazon-CloudWatch_64.svg" x="2098" y="592" width="24" height="24"/>
   <text x="2190" y="620" class="label">CloudWatch</text>
   <text x="2190" y="646" class="small">Logs, metrics, dashboard</text>
   <text x="2190" y="668" class="tiny">Alarms to encrypted SNS</text>
-  <rect x="1865" y="730" width="200" height="100" class="service ops"/>
+  <rect x="1865" y="730" width="200" height="100" class="service ops"/><image href="aws-icons/Arch_Amazon-Simple-Notification-Service_64.svg" x="1873" y="737" width="20" height="20"/><image href="aws-icons/Arch_AWS-Key-Management-Service_64.svg" x="1893" y="737" width="20" height="20"/>
   <text x="1965" y="765" class="label">SNS + KMS</text>
   <text x="1965" y="791" class="small">Confirmed email alert</text>
   <text x="1965" y="813" class="tiny">Operator-managed endpoint</text>
-  <rect x="2090" y="730" width="200" height="100" class="service security"/>
+  <rect x="2090" y="730" width="200" height="100" class="service security"/><image href="aws-icons/Arch_AWS-CloudTrail_64.svg" x="2098" y="737" width="24" height="24"/>
   <text x="2190" y="765" class="label">CloudTrail</text>
   <text x="2190" y="791" class="small">Management events</text>
   <text x="2190" y="813" class="tiny">Validated audit S3 bucket</text>
@@ -184,11 +184,11 @@
   <rect x="880" y="930" width="1450" height="135" class="zone" rx="18"/>
   <text x="905" y="961" class="lane-title">Offline data engineering and analytics flow</text>
   <rect x="925" y="982" width="180" height="58" class="service data"/><text x="1015" y="1017" class="label">Airbnb CSV</text>
-  <rect x="1150" y="982" width="180" height="58" class="service data"/><text x="1240" y="1007" class="label">S3 raw</text><text x="1240" y="1027" class="tiny">Versioned object</text>
-  <rect x="1375" y="982" width="180" height="58" class="service compute"/><text x="1465" y="1007" class="label">AWS Glue</text><text x="1465" y="1027" class="tiny">Clean + Parquet</text>
-  <rect x="1600" y="982" width="180" height="58" class="service data"/><text x="1690" y="1007" class="label">S3 processed</text><text x="1690" y="1027" class="tiny">City partitions</text>
-  <rect x="1825" y="982" width="180" height="58" class="service data"/><text x="1915" y="1007" class="label">Glue Catalog</text><text x="1915" y="1027" class="tiny">Typed schema</text>
-  <rect x="2050" y="982" width="180" height="58" class="service data"/><text x="2140" y="1007" class="label">Athena</text><text x="2140" y="1027" class="tiny">Fixed SQL</text>
+  <rect x="1150" y="982" width="180" height="58" class="service data"/><image href="aws-icons/Arch_Amazon-Simple-Storage-Service_64.svg" x="1158" y="997" width="28" height="28"/><text x="1240" y="1007" class="label">S3 raw</text><text x="1240" y="1027" class="tiny">Versioned object</text>
+  <rect x="1375" y="982" width="180" height="58" class="service compute"/><image href="aws-icons/Arch_AWS-Glue_64.svg" x="1383" y="997" width="28" height="28"/><text x="1465" y="1007" class="label">AWS Glue</text><text x="1465" y="1027" class="tiny">Clean + Parquet</text>
+  <rect x="1600" y="982" width="180" height="58" class="service data"/><image href="aws-icons/Arch_Amazon-Simple-Storage-Service_64.svg" x="1608" y="997" width="28" height="28"/><text x="1690" y="1007" class="label">S3 processed</text><text x="1690" y="1027" class="tiny">City partitions</text>
+  <rect x="1825" y="982" width="180" height="58" class="service data"/><image href="aws-icons/Arch_AWS-Glue_64.svg" x="1833" y="997" width="28" height="28"/><text x="1915" y="1007" class="label">Glue Catalog</text><text x="1915" y="1027" class="tiny">Typed schema</text>
+  <rect x="2050" y="982" width="180" height="58" class="service data"/><image href="aws-icons/Arch_Amazon-Athena_64.svg" x="2058" y="997" width="28" height="28"/><text x="2140" y="1007" class="label">Athena</text><text x="2140" y="1027" class="tiny">Fixed SQL</text>
 
   <rect x="315" y="1150" width="2050" height="285" class="zone" rx="20"/>
   <text x="340" y="1184" class="zone-title">Delivery and control plane</text>

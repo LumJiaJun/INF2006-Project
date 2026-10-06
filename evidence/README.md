@@ -20,7 +20,9 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | repository-audit-2026-10-02.md | Final tracked-repository, local runtime, security-gate, branch, and submission-risk audit |
 | deployment-security-retest-2026-10-03.md | Full redeployment, functional/security/load retest, discovered fixes, and verified teardown |
 | application-live-review-2026-10-03.md | Local-first redeployment, real-data pipeline, application improvements, DynamoDB-backed chat proof, and final live controls |
-| chatbot-accuracy-2026-10-04.md | Grounded prompt design, local and deployed 16-scenario evaluation, DynamoDB isolation, Cognito enforcement, and residual AI limits |
+| chatbot-accuracy-2026-10-04.md | Grounded prompt design, expanded local and deployed 24-scenario evaluation, DynamoDB isolation, Cognito enforcement, and residual AI limits |
+| chatbot-evaluation-local-2026-10-06.json | Raw synthetic local Bedrock results for all 24 chatbot scenarios |
+| chatbot-evaluation-deployed-2026-10-06.json | Raw deployed Lambda results for all 24 scenarios, user-partition isolation, and anonymous API rejection |
 | owasp-top-10-2025-review.md | Current OWASP Top 10 awareness-category control and residual-risk mapping |
 | teardown-2026-10-02.md | Reviewed application teardown, recovery procedure, verification, and remaining FinOps baseline |
 | teardown-2026-10-04.md | Final reviewed destroy-only plan, interrupted-apply recovery, zero-state check, and AWS absence verification |

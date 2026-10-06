@@ -138,8 +138,10 @@ python tests/evaluate_deployed_chatbot.py `
   --i-confirm-authorized-target
 ```
 
-Both evaluators cover 16 factual, history, arithmetic, currency, privacy,
-prompt-injection, and scope scenarios. The deployed evaluator inserts two
-isolated synthetic records, deletes them in `finally`, and requires the public
-API to reject an unauthenticated chat request with HTTP 401. Passing these
-bounded cases does not prove correctness for every possible question.
+Both evaluators cover 24 factual, history, date, arithmetic, currency,
+authentication, privacy, prompt-injection, causal-boundary, transaction, and
+scope scenarios. The deployed evaluator creates an exact disposable DynamoDB
+fixture for each scenario, verifies an owner sees one record while another
+synthetic identity sees zero, deletes every fixture in `finally`, and requires
+the public API to reject an unauthenticated chat request with HTTP 401. Passing
+these bounded cases does not prove correctness for every possible question.

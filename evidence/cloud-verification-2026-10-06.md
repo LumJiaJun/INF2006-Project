@@ -42,9 +42,9 @@ credentials.
 - A direct live chat Lambda invocation with verified claims returned HTTP 200,
   a bounded Claude Haiku 4.5 answer, and used zero saved history records for
   the synthetic verification subject.
-- The SNS email subscription was created but remained `PendingConfirmation`.
-  Alarm email delivery is not active until the operator confirms the new
-  subscription email.
+- At the initial deployment check, the SNS email subscription had been created
+  but remained `PendingConfirmation`. The later same-day verification below
+  confirmed that the operator completed the subscription.
 
 ## Commands
 
@@ -57,10 +57,13 @@ terraform -chdir=src/infrastructure apply <reviewed-plan>
 
 ## Interpretation
 
-This proves the dated single-account deployment and control checks. It does
-not prove unlimited scale, zero vulnerabilities, cross-Region failover,
-multi-user browser isolation, future drift-free operation, or confirmed email
-delivery. The public frontend URL is obtained from
+This proves the dated single-account deployment and control checks. A later
+same-day AWS query reported the operator-managed SNS email subscription as
+confirmed, and the expanded deployed chatbot evaluator proved owner-versus-
+other-user DynamoDB partition isolation with synthetic identities. It does not
+prove unlimited scale, zero vulnerabilities, cross-Region failover, a full
+two-browser Cognito isolation journey, or future drift-free operation. The
+public frontend URL is obtained from
 `terraform -chdir=src/infrastructure output -raw frontend_url` rather than
 stored in evidence.
 

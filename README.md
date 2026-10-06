@@ -22,8 +22,9 @@ full-data model replay matched exactly, the Glue transform succeeded, the
 redacted cloud verifier passed across 148 Terraform resources with zero drift,
 and a live bounded Claude Haiku call returned HTTP 200. Run
 `terraform -chdir=src/infrastructure output -raw frontend_url` for the current
-public URL. The SNS email subscription is pending confirmation, so active alarm
-email delivery is not yet claimed. See
+public URL. AWS now reports the operator-managed SNS email subscription as
+confirmed; the recipient address remains deployment configuration rather than
+source-controlled data. See
 `evidence/cloud-verification-2026-10-06.md` and
 `evidence/aws-pricing-calculator-2026-10-06.md`.
 
@@ -102,7 +103,7 @@ A successful run:
    analytics, model-schema, and prediction routes over HTTP.
 
 The final line must be `Local preflight completed successfully.` The last
-recorded clean run passed 46 tests and validated 16 manifest paths. Generated
+recorded clean run passed 47 tests and validated 17 manifest paths. Generated
 models, metrics, caches, and Terraform provider files remain in ignored paths.
 
 ### 3. Inspect the application locally
@@ -309,16 +310,13 @@ Open the ZIP before submission and confirm that `README.md`,
 
 ## Known limitations
 
-- A consented single-account browser journey covering sign-up, verification, TOTP MFA, prediction save, history retrieval, and protected chat is recorded in `evidence/test-functional.md`; a separate multi-user browser isolation test remains future work.
-- Analytics now reports an average-to-median market-shape ratio so users can compare within-city price skew without pretending local-currency prices are globally comparable. User-currency conversion is intentionally not enabled because the dataset has no timestamped exchange-rate source.
-- The city analytics use different local currencies and must not be compared as if they shared one currency.
+- A consented single-account browser journey covering sign-up, verification, TOTP MFA, prediction save, history retrieval, and protected chat is recorded in `evidence/test-functional.md`. The deployed chatbot evaluator now proves owner-versus-other-user DynamoDB partition isolation with two synthetic identities, but a full two-browser Cognito journey remains future work.
+- Analytics reports an average-to-median market-shape ratio for within-city price skew. Cities retain their different local currencies and must not be ranked on one currency scale. User-currency conversion is intentionally disabled because the dataset has no timestamped exchange-rate source.
 - The dataset is a cross-sectional listings snapshot, not a price or demand time series. It supports listing-price estimation, descriptive summaries, and bounded diagnostic associations, not causal conclusions, future-price forecasting, or condition monitoring.
 - The evaluated model has material error and supports only the typical 99% price range learned per city.
 - A prediction cold start was measured at approximately 3.3 seconds with 2 GB Lambda memory in the initial manual check. A first request immediately after the 2026-10-03 clean rebuild exceeded the API response window, returned HTTP 503, and then completed in Lambda; the browser now retries one transient 502/503/504 response while showing a model-warming state.
 - The development AWS account Lambda concurrency quota is now 1,000. API Gateway still throttles excess traffic, and bounded stress results are recorded in `evidence/test-resilience.md`.
 - Authenticated prediction retries now use a server-side idempotency key; a separate cross-region recovery exercise remains future work.
-- The SNS alert topic supports an operator-managed email subscription through the Terraform `alert_email` variable. The 6 October deployment created the subscription, but it remains pending confirmation; active email delivery is not claimed.
-- The chatbot's 16-scenario evaluation checks known factual, history, arithmetic, privacy, injection, and scope cases but does not prove correctness for every possible question. Exact live analytics values remain on the Markets page rather than in assistant context.
+- The chatbot's 24-scenario local and deployed evaluations check factual grounding, exact history and dates, arithmetic, currency handling, authentication boundaries, privacy, injection, causal overclaiming, unsupported transactions, and scope. They do not prove correctness for every possible question or future managed-model revision. Exact live analytics values remain on the Markets page rather than in assistant context.
 - Cloud deployment requires an AWS account. The current full architecture is estimated at about $72.92 per continuously deployed month before discounts and tax, dominated by two-AZ interface endpoint hours.
-- Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`.
-- The historical $4-$7 estimate predates the two-AZ interface endpoints and WAF and is not the current full-stack estimate. The saved calculator result and redacted line items are documented in `evidence/aws-pricing-calculator-2026-10-06.md`.
+- Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`. The historical $4-$7 estimate predates the two-AZ interface endpoints and WAF and is not the current full-stack estimate; the saved calculator result and redacted line items are in `evidence/aws-pricing-calculator-2026-10-06.md`.

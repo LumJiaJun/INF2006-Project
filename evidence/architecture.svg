@@ -77,23 +77,23 @@
   <circle cx="352" cy="237" r="21" class="step-circle"/><text x="352" y="244" class="step">2</text>
   <text x="385" y="244" class="section-title">Secure web delivery</text>
   <rect x="365" y="275" width="270" height="90" class="card security"/>
-  <rect x="365" y="275" width="65" height="90" fill="#d7263d" rx="10"/><text x="397" y="326" class="service-tag">WAF</text>
+  <rect x="365" y="275" width="65" height="90" fill="#d7263d" rx="10"/><image href="aws-icons/Arch_AWS-WAF_64.svg" x="378" y="295" width="40" height="40"/>
   <text x="535" y="311" class="label">AWS WAF</text><text x="535" y="337" class="small">Managed rules + rate rule</text>
   <rect x="365" y="395" width="270" height="100" class="card edge"/>
-  <rect x="365" y="395" width="65" height="100" fill="#6d28d9" rx="10"/><text x="397" y="450" class="service-tag">CF</text>
+  <rect x="365" y="395" width="65" height="100" fill="#6d28d9" rx="10"/><image href="aws-icons/Arch_Amazon-CloudFront_64.svg" x="378" y="425" width="40" height="40"/>
   <text x="535" y="430" class="label">Amazon CloudFront</text><text x="535" y="455" class="small">HTTPS + security headers</text><text x="535" y="478" class="tiny">AWS-managed default certificate</text>
   <rect x="365" y="530" width="270" height="115" class="card data"/>
-  <rect x="365" y="530" width="65" height="115" fill="#15945b" rx="10"/><text x="397" y="593" class="service-tag">S3</text>
+  <rect x="365" y="530" width="65" height="115" fill="#15945b" rx="10"/><image href="aws-icons/Arch_Amazon-Simple-Storage-Service_64.svg" x="378" y="568" width="40" height="40"/>
   <text x="535" y="565" class="label">Private frontend bucket</text><text x="535" y="590" class="small">Origin Access Control</text><text x="535" y="613" class="tiny">Block Public Access + encryption</text><text x="535" y="634" class="tiny">Direct S3 access denied</text>
 
   <rect x="710" y="205" width="410" height="490" class="section"/>
   <circle cx="742" cy="237" r="21" class="step-circle"/><text x="742" y="244" class="step">3</text>
   <text x="775" y="244" class="section-title">Identity and API ingress</text>
   <rect x="755" y="275" width="320" height="105" class="card identity"/>
-  <rect x="755" y="275" width="70" height="105" fill="#7c3aed" rx="10"/><text x="790" y="332" class="service-tag">ID</text>
+  <rect x="755" y="275" width="70" height="105" fill="#7c3aed" rx="10"/><image href="aws-icons/Arch_Amazon-Cognito_64.svg" x="770" y="307" width="40" height="40"/>
   <text x="950" y="308" class="label">Amazon Cognito</text><text x="950" y="333" class="small">Verification + TOTP MFA</text><text x="950" y="356" class="tiny">Authorization code + PKCE</text>
   <rect x="755" y="410" width="320" height="235" class="card edge"/>
-  <rect x="755" y="410" width="70" height="235" fill="#d7266f" rx="10"/><text x="790" y="532" class="service-tag">API</text>
+  <rect x="755" y="410" width="70" height="235" fill="#d7266f" rx="10"/><image href="aws-icons/Arch_Amazon-API-Gateway_64.svg" x="768" y="505" width="44" height="44"/>
   <text x="950" y="445" class="label">API Gateway HTTP API</text>
   <text x="850" y="480" class="note-title">Public</text>
   <text x="850" y="505" class="note">GET /health</text><text x="850" y="528" class="note">POST /predict</text><text x="850" y="551" class="note">GET /analytics</text>
@@ -103,7 +103,7 @@
 
   <rect x="1150" y="205" width="680" height="610" class="vpc"/>
   <circle cx="1182" cy="237" r="21" class="step-circle"/><text x="1182" y="244" class="step">4</text>
-  <text x="1215" y="244" class="section-title">Private Lambda VPC 10.20.0.0/16</text>
+  <image href="aws-icons/Arch_Amazon-Virtual-Private-Cloud_64.svg" x="1208" y="211" width="38" height="38"/><text x="1255" y="244" class="section-title">Private Lambda VPC 10.20.0.0/16</text>
   <text x="1215" y="267" class="note">No public subnet | No internet gateway | No NAT Gateway</text>
   <rect x="1190" y="295" width="280" height="205" class="az"/>
   <text x="1210" y="325" class="note-title">Private subnet A - AZ 1</text>
@@ -116,7 +116,7 @@
   <rect x="1540" y="380" width="220" height="85" class="card network"/>
   <text x="1650" y="413" class="label">Endpoint ENIs</text><text x="1650" y="438" class="small">Logs / Athena / Bedrock</text>
   <rect x="1220" y="535" width="540" height="155" class="card compute"/>
-  <rect x="1220" y="535" width="75" height="155" fill="#ea580c" rx="10"/><text x="1257" y="618" class="service-tag">LAMBDA</text>
+  <rect x="1220" y="535" width="75" height="155" fill="#ea580c" rx="10"/><image href="aws-icons/Arch_AWS-Lambda_64.svg" x="1235" y="588" width="45" height="45"/>
   <text x="1525" y="570" class="label">Five focused Lambda functions</text>
   <text x="1525" y="599" class="small">Health | Prediction | History | Analytics | Chat</text>
   <text x="1525" y="626" class="small">Each function is configured with both private subnets</text>
@@ -130,19 +130,19 @@
   <text x="1925" y="244" class="section-title">Regional managed services</text>
   <text x="1925" y="267" class="note">Data services are outside customer subnets and use endpoints</text>
   <rect x="1905" y="295" width="375" height="150" class="card data"/>
-  <rect x="1905" y="295" width="75" height="150" fill="#2563eb" rx="10"/><text x="1942" y="374" class="service-tag">DDB</text>
+  <rect x="1905" y="295" width="75" height="150" fill="#2563eb" rx="10"/><image href="aws-icons/Arch_Amazon-DynamoDB_64.svg" x="1920" y="347" width="45" height="45"/>
   <text x="2125" y="330" class="label">Amazon DynamoDB</text><text x="2125" y="356" class="small">Prediction history + idempotency</text><text x="2125" y="381" class="small">Two logical tables, on-demand capacity</text><text x="2125" y="406" class="tiny">Service replicates across 3 AZs</text><text x="2125" y="428" class="tiny">History PITR | Idempotency TTL</text>
   <circle cx="1892" cy="500" r="21" class="step-circle"/><text x="1892" y="507" class="step">6</text>
   <text x="1925" y="507" class="section-title">Data lake and analytics</text>
-  <rect x="1905" y="535" width="170" height="100" class="card data"/>
-  <text x="1990" y="570" class="label">Amazon S3</text><text x="1990" y="595" class="small">Raw + processed</text><text x="1990" y="617" class="tiny">Private data lake</text>
-  <rect x="2110" y="535" width="170" height="100" class="card data"/>
-  <text x="2195" y="570" class="label">AWS Glue</text><text x="2195" y="595" class="small">Clean + Parquet</text><text x="2195" y="617" class="tiny">Catalog metadata</text>
-  <rect x="1905" y="670" width="170" height="100" class="card data"/>
-  <text x="1990" y="705" class="label">Athena</text><text x="1990" y="730" class="small">Fixed aggregate SQL</text><text x="1990" y="752" class="tiny">1 GiB scan cutoff</text>
-  <rect x="2110" y="670" width="170" height="100" class="card neutral"/>
-  <text x="2195" y="705" class="label">Bedrock</text><text x="2195" y="730" class="small">Bounded assistant</text><text x="2195" y="752" class="tiny">Supporting feature only</text>
-  <rect x="1905" y="805" width="375" height="105" class="card compute"/>
+  <rect x="1905" y="535" width="170" height="100" class="card data"/><image href="aws-icons/Arch_Amazon-Simple-Storage-Service_64.svg" x="1913" y="542" width="24" height="24"/>
+  <text x="2005" y="570" class="label">Amazon S3</text><text x="2005" y="595" class="small">Raw + processed</text><text x="2005" y="617" class="tiny">Private data lake</text>
+  <rect x="2110" y="535" width="170" height="100" class="card data"/><image href="aws-icons/Arch_AWS-Glue_64.svg" x="2118" y="542" width="24" height="24"/>
+  <text x="2210" y="570" class="label">AWS Glue</text><text x="2210" y="595" class="small">Clean + Parquet</text><text x="2210" y="617" class="tiny">Catalog metadata</text>
+  <rect x="1905" y="670" width="170" height="100" class="card data"/><image href="aws-icons/Arch_Amazon-Athena_64.svg" x="1913" y="677" width="24" height="24"/>
+  <text x="2005" y="705" class="label">Athena</text><text x="2005" y="730" class="small">Fixed aggregate SQL</text><text x="2005" y="752" class="tiny">1 GiB scan cutoff</text>
+  <rect x="2110" y="670" width="170" height="100" class="card neutral"/><image href="aws-icons/Arch_Amazon-Bedrock_64.svg" x="2118" y="677" width="24" height="24"/>
+  <text x="2210" y="705" class="label">Bedrock</text><text x="2210" y="730" class="small">Bounded assistant</text><text x="2210" y="752" class="tiny">Supporting feature only</text>
+  <rect x="1905" y="805" width="375" height="105" class="card compute"/><image href="aws-icons/Arch_Amazon-Elastic-Container-Registry_64.svg" x="1920" y="833" width="48" height="48"/>
   <text x="2092" y="840" class="label">Amazon ECR</text><text x="2092" y="865" class="small">Immutable prediction image</text><text x="2092" y="888" class="tiny">Scan on push | Keep three images</text>
   <rect x="1905" y="940" width="375" height="80" class="card neutral"/>
   <text x="2092" y="971" class="label">Availability boundary</text><text x="2092" y="996" class="small">Multi-AZ in one Region; no cross-Region failover</text>
@@ -150,11 +150,11 @@
   <rect x="320" y="845" width="720" height="265" class="section"/>
   <circle cx="352" cy="877" r="21" class="step-circle"/><text x="352" y="884" class="step">7</text>
   <text x="385" y="884" class="section-title">Monitoring, alerting, and audit</text>
-  <rect x="365" y="920" width="195" height="120" class="card ops"/>
+  <rect x="365" y="920" width="195" height="120" class="card ops"/><image href="aws-icons/Arch_Amazon-CloudWatch_64.svg" x="374" y="927" width="24" height="24"/>
   <text x="462" y="955" class="label">CloudWatch</text><text x="462" y="980" class="small">Logs + metrics</text><text x="462" y="1003" class="tiny">Dashboard + 5 alarms</text><text x="462" y="1025" class="tiny">14-day logs</text>
-  <rect x="585" y="920" width="195" height="120" class="card ops"/>
-  <text x="682" y="955" class="label">SNS + KMS</text><text x="682" y="980" class="small">Encrypted alert topic</text><text x="682" y="1003" class="tiny">ALARM actions only</text><text x="682" y="1025" class="tiny">Operator confirms email</text>
-  <rect x="805" y="920" width="195" height="120" class="card ops"/>
+  <rect x="585" y="920" width="195" height="120" class="card ops"/><image href="aws-icons/Arch_Amazon-Simple-Notification-Service_64.svg" x="593" y="928" width="20" height="20"/><image href="aws-icons/Arch_AWS-Key-Management-Service_64.svg" x="613" y="928" width="20" height="20"/>
+  <text x="704" y="955" class="label">SNS + KMS</text><text x="704" y="980" class="small">Encrypted alert topic</text><text x="704" y="1003" class="tiny">ALARM actions only</text><text x="704" y="1025" class="tiny">Operator confirms email</text>
+  <rect x="805" y="920" width="195" height="120" class="card ops"/><image href="aws-icons/Arch_AWS-CloudTrail_64.svg" x="814" y="927" width="24" height="24"/>
   <text x="902" y="955" class="label">CloudTrail</text><text x="902" y="980" class="small">Management events</text><text x="902" y="1003" class="tiny">Validated log files</text><text x="902" y="1025" class="tiny">90-day S3 lifecycle</text>
 
   <rect x="1070" y="845" width="760" height="265" class="section"/>
