@@ -4,11 +4,12 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 
 | File | Purpose |
 |------|---------|
-| architecture-current.png | Numbered Terraform-defined architecture showing WAF, CloudFront, Cognito, two-AZ Lambda VPC, endpoints, data stores, operations, and CI/CD |
+| architecture-current.png | Numbered final architecture showing request, identity, data, operations, CI/CD, multi-AZ controls, and the single-Region recovery boundary |
 | architecture-detailed.png | Detailed enterprise view of trust boundaries, routes, private networking, managed services, data engineering, monitoring, and delivery flows |
 | architecture-detailed.svg | Editable source for the detailed enterprise architecture diagram |
 | architecture.svg | Editable source for the current numbered architecture diagram |
 | architecture-security-audit-2026-09-28.md | Architecture and security audit findings |
+| availability-review-2026-10-06.md | In-Region high-availability mechanisms, DynamoDB replication clarification, and regional recovery limitation |
 | cloud-verification-2026-10-04.md | Redacted zero-drift, deployed workflow, Lambda, monitoring, recovery, Glue, S3, WAF, and SNS verification |
 | verification-2026-09-30.txt | Redacted terminal transcript for current validation, live smoke checks, Terraform state, alarms, GitHub Actions, and DAST summary |
 | verification-2026-10-01.txt | Redacted deployment and validation transcript for the contributor navigation integration |

@@ -1,107 +1,197 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1150" viewBox="0 0 1800 1150">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1400" viewBox="0 0 2400 1400">
   <defs>
     <style>
-      .title { font: 700 36px Arial, sans-serif; fill: #10231e; }
-      .subtitle { font: 18px Arial, sans-serif; fill: #60716b; }
-      .step { font: 700 18px Arial, sans-serif; fill: #ffffff; text-anchor: middle; }
-      .boundary { fill: #f7faf7; stroke: #91a69d; stroke-width: 2; stroke-dasharray: 10 8; }
-      .boundary-label { font: 700 20px Arial, sans-serif; fill: #174f42; }
-      .box { fill: #ffffff; stroke: #174f42; stroke-width: 2; rx: 16; }
-      .edge { fill: #edf5ff; stroke: #2563eb; }
-      .compute { fill: #fff4e9; stroke: #ea580c; }
-      .data { fill: #eefaf3; stroke: #16945c; }
-      .identity { fill: #f8f0ff; stroke: #8436bd; }
-      .ops { fill: #fff9dd; stroke: #b17c00; }
+      .title { font: 700 38px Arial, sans-serif; fill: #10264a; }
+      .subtitle { font: 18px Arial, sans-serif; fill: #52647a; }
+      .section { fill: #ffffff; stroke: #2f6ea3; stroke-width: 2; rx: 14; }
+      .boundary { fill: #f8fbff; stroke: #2386c8; stroke-width: 2; stroke-dasharray: 8 6; rx: 18; }
+      .vpc { fill: #fbf8ff; stroke: #7c3aed; stroke-width: 2.5; stroke-dasharray: 9 6; rx: 16; }
+      .az { fill: #f3fbff; stroke: #22a1c4; stroke-width: 2; stroke-dasharray: 7 5; rx: 12; }
+      .card { fill: #ffffff; stroke: #9aabba; stroke-width: 1.7; rx: 10; }
+      .edge { fill: #edf4ff; stroke: #2563eb; }
+      .security { fill: #fff0f2; stroke: #d7263d; }
+      .identity { fill: #f8efff; stroke: #7c3aed; }
+      .compute { fill: #fff3e8; stroke: #ea580c; }
+      .data { fill: #eefaf3; stroke: #15945b; }
       .network { fill: #edfafa; stroke: #008b8b; }
-      .label { font: 700 19px Arial, sans-serif; fill: #172033; text-anchor: middle; }
-      .small { font: 15px Arial, sans-serif; fill: #475569; text-anchor: middle; }
-      .tiny { font: 13px Arial, sans-serif; fill: #475569; text-anchor: middle; }
-      .arrow { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
-      .green-arrow { stroke: #16945c; stroke-width: 3; fill: none; marker-end: url(#greenhead); }
-      .purple-arrow { stroke: #8436bd; stroke-width: 3; fill: none; marker-end: url(#purplehead); }
-      .step-circle { fill: #e26345; stroke: #ffffff; stroke-width: 3; }
-      .legend { font: 14px Arial, sans-serif; fill: #475569; }
+      .ops { fill: #fff8dd; stroke: #b77900; }
+      .neutral { fill: #f5f7fa; stroke: #75879a; }
+      .section-title { font: 700 20px Arial, sans-serif; fill: #164f82; }
+      .boundary-title { font: 700 21px Arial, sans-serif; fill: #174f82; }
+      .label { font: 700 17px Arial, sans-serif; fill: #172033; text-anchor: middle; }
+      .small { font: 14px Arial, sans-serif; fill: #46566b; text-anchor: middle; }
+      .tiny { font: 12px Arial, sans-serif; fill: #5b6778; text-anchor: middle; }
+      .left { text-anchor: start; }
+      .note-title { font: 700 15px Arial, sans-serif; fill: #24364b; }
+      .note { font: 13px Arial, sans-serif; fill: #526070; }
+      .step-circle { fill: #e45f3f; stroke: #ffffff; stroke-width: 3; }
+      .step { font: 700 17px Arial, sans-serif; fill: #ffffff; text-anchor: middle; }
+      .arrow { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .auth-arrow { stroke: #7c3aed; stroke-width: 3; fill: none; marker-end: url(#auth); }
+      .data-arrow { stroke: #15945b; stroke-width: 3; fill: none; marker-end: url(#data); }
+      .ops-arrow { stroke: #b77900; stroke-width: 3; fill: none; marker-end: url(#ops); }
+      .deploy-arrow { stroke: #2563eb; stroke-width: 3; stroke-dasharray: 8 5; fill: none; marker-end: url(#deploy); }
+      .service-tag { font: 700 12px Arial, sans-serif; fill: #ffffff; text-anchor: middle; }
     </style>
-    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#334155"/></marker>
-    <marker id="greenhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#16945c"/></marker>
-    <marker id="purplehead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#8436bd"/></marker>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#334155"/></marker>
+    <marker id="auth" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#7c3aed"/></marker>
+    <marker id="data" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#15945b"/></marker>
+    <marker id="ops" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#b77900"/></marker>
+    <marker id="deploy" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#2563eb"/></marker>
   </defs>
 
-  <rect width="1800" height="1150" fill="#ffffff"/>
-  <text x="70" y="58" class="title">INF2006 Airbnb Pricing and Market Intelligence Platform</text>
-  <text x="70" y="90" class="subtitle">Terraform-defined and previously verified architecture | ap-southeast-1 | Two-AZ Lambda VPC, WAF, CloudTrail, Cognito, and GitHub CI/CD</text>
+  <rect width="2400" height="1400" fill="#ffffff"/>
+  <text x="42" y="52" class="title">INF2006 - Airbnb Pricing and Market Intelligence Platform</text>
+  <text x="42" y="84" class="subtitle">Terraform-defined final architecture | AWS ap-southeast-1 | Verified before teardown | In-Region multi-AZ availability, single-Region recovery boundary</text>
 
-  <rect x="45" y="130" width="250" height="790" class="boundary" rx="22"/>
-  <text x="70" y="165" class="boundary-label">Public internet</text>
-  <rect x="325" y="130" width="1430" height="790" class="boundary" rx="22"/>
-  <text x="350" y="165" class="boundary-label">AWS account | ap-southeast-1</text>
+  <rect x="1780" y="20" width="575" height="82" class="card neutral"/>
+  <text x="1800" y="43" class="note-title">Flow legend</text>
+  <line x1="1805" y1="65" x2="1855" y2="65" class="arrow"/><text x="1865" y="70" class="note">Request</text>
+  <line x1="1940" y1="65" x2="1990" y2="65" class="auth-arrow"/><text x="2000" y="70" class="note">Identity</text>
+  <line x1="2085" y1="65" x2="2135" y2="65" class="data-arrow"/><text x="2145" y="70" class="note">Data</text>
+  <line x1="2220" y1="65" x2="2270" y2="65" class="deploy-arrow"/><text x="2280" y="70" class="note">Deploy</text>
 
-  <circle cx="85" cy="245" r="24" class="step-circle"/><text x="85" y="252" class="step">1</text>
-  <rect x="115" y="205" width="150" height="88" class="box"/>
-  <text x="190" y="240" class="label">User browser</text><text x="190" y="266" class="small">HTTPS client</text>
+  <rect x="30" y="125" width="235" height="1025" class="boundary"/>
+  <text x="50" y="158" class="boundary-title">Public client</text>
+  <text x="50" y="183" class="note">Untrusted network</text>
+  <circle cx="63" cy="268" r="22" class="step-circle"/><text x="63" y="275" class="step">1</text>
+  <rect x="83" y="220" width="145" height="110" class="card edge"/>
+  <rect x="83" y="220" width="145" height="25" fill="#2563eb" rx="10"/><text x="155" y="238" class="service-tag">CLIENT</text>
+  <text x="155" y="275" class="label">User browser</text>
+  <text x="155" y="300" class="small">HTTPS web app</text>
+  <text x="155" y="321" class="tiny">No AWS credentials</text>
+  <rect x="55" y="885" width="185" height="205" class="card neutral"/>
+  <text x="72" y="915" class="note-title">Zero Trust client rules</text>
+  <text x="72" y="943" class="note">- Browser is untrusted</text>
+  <text x="72" y="968" class="note">- JWT only on protected routes</text>
+  <text x="72" y="993" class="note">- User ID comes from JWT sub</text>
+  <text x="72" y="1018" class="note">- No secrets in frontend</text>
+  <text x="72" y="1043" class="note">- Input validated twice</text>
+  <text x="72" y="1068" class="note">- HTTPS only</text>
 
-  <circle cx="365" cy="245" r="24" class="step-circle"/><text x="365" y="252" class="step">2</text>
-  <rect x="400" y="195" width="225" height="105" class="box edge"/>
-  <text x="512" y="235" class="label">AWS WAF</text><text x="512" y="262" class="small">Managed rules + rate limit</text><text x="512" y="284" class="tiny">CloudFront protection</text>
-  <rect x="400" y="335" width="225" height="92" class="box edge"/>
-  <text x="512" y="372" class="label">CloudFront</text><text x="512" y="399" class="small">HTTPS edge + headers</text>
-  <rect x="400" y="460" width="225" height="92" class="box data"/>
-  <text x="512" y="497" class="label">Private S3 frontend</text><text x="512" y="524" class="small">OAC, public access blocked</text>
+  <rect x="290" y="125" width="2075" height="1025" class="boundary"/>
+  <text x="315" y="158" class="boundary-title">AWS account boundary</text>
+  <text x="315" y="183" class="note">Region: ap-southeast-1 (Singapore) | CloudFront and WAF operate at the AWS edge</text>
 
-  <circle cx="690" cy="245" r="24" class="step-circle"/><text x="690" y="252" class="step">3</text>
-  <rect x="725" y="195" width="235" height="105" class="box identity"/>
-  <text x="842" y="235" class="label">Amazon Cognito</text><text x="842" y="262" class="small">Managed login + JWT</text><text x="842" y="284" class="tiny">Sign-up, verification, MFA</text>
-  <rect x="725" y="335" width="235" height="92" class="box edge"/>
-  <text x="842" y="372" class="label">API Gateway</text><text x="842" y="399" class="small">JWT, CORS, throttling</text>
+  <rect x="320" y="205" width="360" height="490" class="section"/>
+  <circle cx="352" cy="237" r="21" class="step-circle"/><text x="352" y="244" class="step">2</text>
+  <text x="385" y="244" class="section-title">Secure web delivery</text>
+  <rect x="365" y="275" width="270" height="90" class="card security"/>
+  <rect x="365" y="275" width="65" height="90" fill="#d7263d" rx="10"/><text x="397" y="326" class="service-tag">WAF</text>
+  <text x="535" y="311" class="label">AWS WAF</text><text x="535" y="337" class="small">Managed rules + rate rule</text>
+  <rect x="365" y="395" width="270" height="100" class="card edge"/>
+  <rect x="365" y="395" width="65" height="100" fill="#6d28d9" rx="10"/><text x="397" y="450" class="service-tag">CF</text>
+  <text x="535" y="430" class="label">Amazon CloudFront</text><text x="535" y="455" class="small">HTTPS + security headers</text><text x="535" y="478" class="tiny">AWS-managed default certificate</text>
+  <rect x="365" y="530" width="270" height="115" class="card data"/>
+  <rect x="365" y="530" width="65" height="115" fill="#15945b" rx="10"/><text x="397" y="593" class="service-tag">S3</text>
+  <text x="535" y="565" class="label">Private frontend bucket</text><text x="535" y="590" class="small">Origin Access Control</text><text x="535" y="613" class="tiny">Block Public Access + encryption</text><text x="535" y="634" class="tiny">Direct S3 access denied</text>
 
-  <circle cx="1025" cy="245" r="24" class="step-circle"/><text x="1025" y="252" class="step">4</text>
-  <rect x="1060" y="180" width="355" height="480" class="boundary" rx="20"/>
-  <text x="1085" y="212" class="boundary-label">VPC 10.20.0.0/16</text>
-  <text x="1237" y="645" class="tiny">All functions attach to both subnets; AWS placement is not pinned to one AZ</text>
-  <rect x="1085" y="235" width="145" height="385" class="network" rx="14"/>
-  <text x="1157" y="267" class="label">Private AZ-a</text><text x="1157" y="290" class="tiny">10.20.1.0/24</text>
-  <rect x="1100" y="320" width="115" height="95" class="box compute"/><text x="1157" y="357" class="label">Lambda</text><text x="1157" y="382" class="tiny">health / predict</text>
-  <rect x="1100" y="450" width="115" height="95" class="box compute"/><text x="1157" y="487" class="label">Lambda</text><text x="1157" y="512" class="tiny">history / chat</text>
-  <rect x="1245" y="235" width="145" height="385" class="network" rx="14"/>
-  <text x="1317" y="267" class="label">Private AZ-b</text><text x="1317" y="290" class="tiny">10.20.2.0/24</text>
-  <rect x="1260" y="320" width="115" height="95" class="box compute"/><text x="1317" y="357" class="label">Lambda</text><text x="1317" y="382" class="tiny">analytics</text>
-  <rect x="1260" y="450" width="115" height="95" class="box network"/><text x="1317" y="487" class="label">Endpoints</text><text x="1317" y="512" class="tiny">no NAT gateway</text>
+  <rect x="710" y="205" width="410" height="490" class="section"/>
+  <circle cx="742" cy="237" r="21" class="step-circle"/><text x="742" y="244" class="step">3</text>
+  <text x="775" y="244" class="section-title">Identity and API ingress</text>
+  <rect x="755" y="275" width="320" height="105" class="card identity"/>
+  <rect x="755" y="275" width="70" height="105" fill="#7c3aed" rx="10"/><text x="790" y="332" class="service-tag">ID</text>
+  <text x="950" y="308" class="label">Amazon Cognito</text><text x="950" y="333" class="small">Verification + TOTP MFA</text><text x="950" y="356" class="tiny">Authorization code + PKCE</text>
+  <rect x="755" y="410" width="320" height="235" class="card edge"/>
+  <rect x="755" y="410" width="70" height="235" fill="#d7266f" rx="10"/><text x="790" y="532" class="service-tag">API</text>
+  <text x="950" y="445" class="label">API Gateway HTTP API</text>
+  <text x="850" y="480" class="note-title">Public</text>
+  <text x="850" y="505" class="note">GET /health</text><text x="850" y="528" class="note">POST /predict</text><text x="850" y="551" class="note">GET /analytics</text>
+  <text x="950" y="480" class="note-title">JWT protected</text>
+  <text x="950" y="505" class="note">POST /predictions</text><text x="950" y="528" class="note">GET /history</text><text x="950" y="551" class="note">POST /chat</text>
+  <text x="950" y="603" class="small">CORS + route throttles</text><text x="950" y="625" class="tiny">No arbitrary SQL or user ID input</text>
 
-  <circle cx="1455" cy="245" r="24" class="step-circle"/><text x="1455" y="252" class="step">5</text>
-  <rect x="1490" y="195" width="225" height="105" class="box network"/>
-  <text x="1602" y="235" class="label">VPC endpoints</text><text x="1602" y="262" class="small">S3 + DynamoDB gateway</text><text x="1602" y="284" class="tiny">Logs, Athena, Bedrock interface</text>
+  <rect x="1150" y="205" width="680" height="610" class="vpc"/>
+  <circle cx="1182" cy="237" r="21" class="step-circle"/><text x="1182" y="244" class="step">4</text>
+  <text x="1215" y="244" class="section-title">Private Lambda VPC 10.20.0.0/16</text>
+  <text x="1215" y="267" class="note">No public subnet | No internet gateway | No NAT Gateway</text>
+  <rect x="1190" y="295" width="280" height="205" class="az"/>
+  <text x="1210" y="325" class="note-title">Private subnet A - AZ 1</text>
+  <text x="1210" y="348" class="note">10.20.1.0/24</text>
+  <rect x="1220" y="380" width="220" height="85" class="card network"/>
+  <text x="1330" y="413" class="label">Endpoint ENIs</text><text x="1330" y="438" class="small">Logs / Athena / Bedrock</text>
+  <rect x="1510" y="295" width="280" height="205" class="az"/>
+  <text x="1530" y="325" class="note-title">Private subnet B - AZ 2</text>
+  <text x="1530" y="348" class="note">10.20.2.0/24</text>
+  <rect x="1540" y="380" width="220" height="85" class="card network"/>
+  <text x="1650" y="413" class="label">Endpoint ENIs</text><text x="1650" y="438" class="small">Logs / Athena / Bedrock</text>
+  <rect x="1220" y="535" width="540" height="155" class="card compute"/>
+  <rect x="1220" y="535" width="75" height="155" fill="#ea580c" rx="10"/><text x="1257" y="618" class="service-tag">LAMBDA</text>
+  <text x="1525" y="570" class="label">Five focused Lambda functions</text>
+  <text x="1525" y="599" class="small">Health | Prediction | History | Analytics | Chat</text>
+  <text x="1525" y="626" class="small">Each function is configured with both private subnets</text>
+  <text x="1525" y="651" class="tiny">Purpose-specific IAM roles + restricted HTTPS egress</text>
+  <text x="1525" y="674" class="tiny">Lambda selects an available subnet; functions are not pinned to one AZ</text>
+  <rect x="1220" y="720" width="540" height="60" class="card network"/>
+  <text x="1490" y="745" class="label">Gateway endpoints: S3 + DynamoDB</text><text x="1490" y="766" class="tiny">Both private route tables | Traffic stays on AWS network</text>
 
-  <circle cx="365" cy="690" r="24" class="step-circle"/><text x="365" y="697" class="step">6</text>
-  <rect x="400" y="640" width="280" height="125" class="box data"/>
-  <text x="540" y="680" class="label">Application records</text><text x="540" y="707" class="small">DynamoDB history + idempotency</text><text x="540" y="733" class="tiny">KMS encryption + PITR</text>
-  <rect x="720" y="640" width="280" height="125" class="box data"/>
-  <text x="860" y="680" class="label">Data lake</text><text x="860" y="707" class="small">S3 raw / processed / models</text><text x="860" y="733" class="tiny">Glue ETL + Parquet + Catalog</text>
-  <rect x="1040" y="800" width="245" height="75" class="box identity"/>
-  <text x="1162" y="832" class="label">Bedrock Claude Haiku</text><text x="1162" y="857" class="small">Bounded protected chat</text>
-  <rect x="1325" y="640" width="195" height="125" class="box data"/>
-  <text x="1422" y="680" class="label">Athena</text><text x="1422" y="707" class="small">Approved analytics SQL</text><text x="1422" y="733" class="tiny">No arbitrary user queries</text>
+  <rect x="1860" y="205" width="465" height="845" class="section"/>
+  <circle cx="1892" cy="237" r="21" class="step-circle"/><text x="1892" y="244" class="step">5</text>
+  <text x="1925" y="244" class="section-title">Regional managed services</text>
+  <text x="1925" y="267" class="note">Data services are outside customer subnets and use endpoints</text>
+  <rect x="1905" y="295" width="375" height="150" class="card data"/>
+  <rect x="1905" y="295" width="75" height="150" fill="#2563eb" rx="10"/><text x="1942" y="374" class="service-tag">DDB</text>
+  <text x="2125" y="330" class="label">Amazon DynamoDB</text><text x="2125" y="356" class="small">Prediction history + idempotency</text><text x="2125" y="381" class="small">Two logical tables, on-demand capacity</text><text x="2125" y="406" class="tiny">Service replicates across 3 AZs</text><text x="2125" y="428" class="tiny">History PITR | Idempotency TTL</text>
+  <circle cx="1892" cy="500" r="21" class="step-circle"/><text x="1892" y="507" class="step">6</text>
+  <text x="1925" y="507" class="section-title">Data lake and analytics</text>
+  <rect x="1905" y="535" width="170" height="100" class="card data"/>
+  <text x="1990" y="570" class="label">Amazon S3</text><text x="1990" y="595" class="small">Raw + processed</text><text x="1990" y="617" class="tiny">Private data lake</text>
+  <rect x="2110" y="535" width="170" height="100" class="card data"/>
+  <text x="2195" y="570" class="label">AWS Glue</text><text x="2195" y="595" class="small">Clean + Parquet</text><text x="2195" y="617" class="tiny">Catalog metadata</text>
+  <rect x="1905" y="670" width="170" height="100" class="card data"/>
+  <text x="1990" y="705" class="label">Athena</text><text x="1990" y="730" class="small">Fixed aggregate SQL</text><text x="1990" y="752" class="tiny">1 GiB scan cutoff</text>
+  <rect x="2110" y="670" width="170" height="100" class="card neutral"/>
+  <text x="2195" y="705" class="label">Bedrock</text><text x="2195" y="730" class="small">Bounded assistant</text><text x="2195" y="752" class="tiny">Supporting feature only</text>
+  <rect x="1905" y="805" width="375" height="105" class="card compute"/>
+  <text x="2092" y="840" class="label">Amazon ECR</text><text x="2092" y="865" class="small">Immutable prediction image</text><text x="2092" y="888" class="tiny">Scan on push | Keep three images</text>
+  <rect x="1905" y="940" width="375" height="80" class="card neutral"/>
+  <text x="2092" y="971" class="label">Availability boundary</text><text x="2092" y="996" class="small">Multi-AZ in one Region; no cross-Region failover</text>
 
-  <circle cx="1555" cy="690" r="24" class="step-circle"/><text x="1555" y="697" class="step">7</text>
-  <rect x="1585" y="640" width="130" height="125" class="box ops"/>
-  <text x="1650" y="680" class="label">CloudWatch</text><text x="1650" y="707" class="tiny">Logs, metrics</text><text x="1650" y="730" class="tiny">alarms + SNS</text>
+  <rect x="320" y="845" width="720" height="265" class="section"/>
+  <circle cx="352" cy="877" r="21" class="step-circle"/><text x="352" y="884" class="step">7</text>
+  <text x="385" y="884" class="section-title">Monitoring, alerting, and audit</text>
+  <rect x="365" y="920" width="195" height="120" class="card ops"/>
+  <text x="462" y="955" class="label">CloudWatch</text><text x="462" y="980" class="small">Logs + metrics</text><text x="462" y="1003" class="tiny">Dashboard + 5 alarms</text><text x="462" y="1025" class="tiny">14-day logs</text>
+  <rect x="585" y="920" width="195" height="120" class="card ops"/>
+  <text x="682" y="955" class="label">SNS + KMS</text><text x="682" y="980" class="small">Encrypted alert topic</text><text x="682" y="1003" class="tiny">ALARM actions only</text><text x="682" y="1025" class="tiny">Operator confirms email</text>
+  <rect x="805" y="920" width="195" height="120" class="card ops"/>
+  <text x="902" y="955" class="label">CloudTrail</text><text x="902" y="980" class="small">Management events</text><text x="902" y="1003" class="tiny">Validated log files</text><text x="902" y="1025" class="tiny">90-day S3 lifecycle</text>
 
-  <rect x="325" y="950" width="1430" height="135" class="boundary" rx="20"/>
-  <circle cx="365" cy="1018" r="24" class="step-circle"/><text x="365" y="1025" class="step">8</text>
-  <rect x="405" y="980" width="270" height="75" class="box ops"/><text x="540" y="1012" class="label">GitHub Actions</text><text x="540" y="1038" class="small">SAST, DAST, tests, OIDC</text>
-  <rect x="720" y="980" width="270" height="75" class="box ops"/><text x="855" y="1012" class="label">Terraform</text><text x="855" y="1038" class="small">Plan, review, apply</text>
-  <rect x="1035" y="980" width="270" height="75" class="box ops"/><text x="1170" y="1012" class="label">ECR</text><text x="1170" y="1038" class="small">Prediction image scan</text>
-  <rect x="1350" y="980" width="365" height="75" class="box ops"/><text x="1532" y="1012" class="label">CloudTrail</text><text x="1532" y="1038" class="small">Regional management events + validation</text>
+  <rect x="1070" y="845" width="760" height="265" class="section"/>
+  <circle cx="1102" cy="877" r="21" class="step-circle"/><text x="1102" y="884" class="step">8</text>
+  <text x="1135" y="884" class="section-title">Secure CI/CD and infrastructure delivery</text>
+  <rect x="1115" y="920" width="190" height="120" class="card neutral"/>
+  <text x="1210" y="955" class="label">GitHub</text><text x="1210" y="980" class="small">Source + Actions</text><text x="1210" y="1003" class="tiny">Protected environment</text><text x="1210" y="1025" class="tiny">No long-lived AWS keys</text>
+  <rect x="1330" y="920" width="210" height="120" class="card security"/>
+  <text x="1435" y="955" class="label">Quality gates</text><text x="1435" y="980" class="small">Tests + CodeQL</text><text x="1435" y="1003" class="tiny">Terraform checks + ZAP</text><text x="1435" y="1025" class="tiny">Build fails on gate error</text>
+  <rect x="1565" y="920" width="220" height="120" class="card edge"/>
+  <text x="1675" y="955" class="label">OIDC + Terraform</text><text x="1675" y="980" class="small">Short-lived deploy role</text><text x="1675" y="1003" class="tiny">Plan then reviewed apply</text><text x="1675" y="1025" class="tiny">Encrypted remote state</text>
 
-  <path d="M265 250 L400 245" class="arrow"/><path d="M512 300 L512 335" class="arrow"/><path d="M512 427 L512 460" class="arrow"/>
-  <path d="M625 380 L725 380" class="arrow"/><path d="M960 380 L1085 380" class="arrow"/>
-  <path d="M960 395 L1100 500" class="arrow"/>
-  <path d="M1215 370 L1260 370" class="arrow"/>
-  <path d="M1390 500 L1490 250" class="green-arrow"/>
-  <path d="M1157 545 L540 640" class="green-arrow"/><path d="M1317 545 L860 640" class="green-arrow"/>
-  <path d="M1215 520 L1215 800" class="purple-arrow"/><path d="M1000 702 L1325 702" class="green-arrow"/>
-  <path d="M1415 765 L1570 765" class="arrow"/>
-  <path d="M675 1018 L720 1018" class="arrow"/><path d="M990 1018 L1035 1018" class="arrow"/><path d="M1305 1018 L1350 1018" class="arrow"/>
+  <rect x="320" y="1175" width="2005" height="170" class="card neutral"/>
+  <text x="350" y="1208" class="note-title">Availability and recovery summary</text>
+  <text x="350" y="1237" class="note">IN-REGION HA: CloudFront/WAF edge delivery; managed regional API and identity services; every Lambda configured with two AZ subnets; interface endpoint ENIs in both AZs; DynamoDB and S3 managed multi-AZ durability.</text>
+  <text x="350" y="1267" class="note">RECOVERY: DynamoDB history point-in-time recovery, versioned S3, immutable ECR images, Terraform recreation, alarms, logs, and dated deployment evidence.</text>
+  <text x="350" y="1297" class="note">RESIDUAL RISK: The application is single-Region. A full ap-southeast-1 outage requires regional recreation; DynamoDB global tables and a secondary regional stack are documented future options, not deployed claims.</text>
+  <text x="350" y="1327" class="note">FINOPS: No NAT Gateway, no EC2/RDS idle fleet, DynamoDB on-demand, fixed Athena SQL and scan cutoff, bounded Glue workers, bounded AI route, explicit teardown.</text>
 
-  <rect x="55" y="1020" width="220" height="90" class="box"/>
-  <text x="165" y="1050" class="label">Legend</text><text x="165" y="1075" class="legend">Solid: request / telemetry</text><text x="165" y="1097" class="legend">Green: data flow</text>
+  <path d="M228 275 L365 320" class="arrow"/>
+  <path d="M500 365 L500 395" class="arrow"/>
+  <path d="M500 495 L500 530" class="arrow"/>
+  <path d="M635 445 L755 500" class="arrow"/>
+  <path d="M915 380 L915 410" class="auth-arrow"/>
+  <path d="M1075 525 L1220 610" class="arrow"/>
+  <path d="M1380 535 L1330 465" class="arrow"/>
+  <path d="M1600 535 L1650 465" class="arrow"/>
+  <path d="M1760 610 L1905 370" class="data-arrow"/>
+  <path d="M1760 640 L1905 585" class="data-arrow"/>
+  <path d="M2075 585 L2110 585" class="data-arrow"/>
+  <path d="M2195 635 L1990 670" class="data-arrow"/>
+  <path d="M1760 660 L1905 720" class="data-arrow"/>
+  <path d="M1760 680 L2110 720" class="data-arrow"/>
+  <path d="M1220 650 L1020 820 L462 820 L462 920" class="ops-arrow"/>
+  <path d="M560 980 L585 980" class="ops-arrow"/>
+  <path d="M780 980 L805 980" class="ops-arrow"/>
+  <path d="M1305 980 L1330 980" class="deploy-arrow"/>
+  <path d="M1540 980 L1565 980" class="deploy-arrow"/>
+  <path d="M1785 980 L1905 860" class="deploy-arrow"/>
 </svg>
