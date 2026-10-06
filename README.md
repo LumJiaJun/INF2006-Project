@@ -26,6 +26,25 @@ Terraform backend was retained for controlled recreation. See
 `evidence/chatbot-accuracy-2026-10-04.md`, and
 `evidence/teardown-2026-10-04.md`.
 
+## Documentation map
+
+The root README is the marker entry point. Use the following paths for the
+complete instructions behind each workflow:
+
+| Need | Start here |
+|------|------------|
+| Reproduce and inspect the project without AWS | Steps 1-4 below |
+| Recreate, verify, and destroy the AWS environment | `src/infrastructure/README.md` |
+| Run focused local, cloud, load, security, and chatbot tests | `tests/README.md` |
+| Obtain and verify the full dataset | `data/README.md` |
+| Reproduce the analytics and ML pipeline | `analytics/README.md` |
+| Work safely with shared Terraform state | `TEAM_WORK_GUIDE.md` |
+| Trace claims to dated artefacts | `evidence/README.md` and `project_manifest.yaml` |
+
+The offline path is the default for marking. Cloud steps are optional,
+authorized-operator procedures because the assessed stack is decommissioned
+and recreating it incurs cost.
+
 ## Reproduce from a clean machine
 
 The marker-friendly path below reproduces the application, tests, sample ML
@@ -151,6 +170,32 @@ CloudFront serves a static frontend from a private S3 origin. The frontend calls
 The current Terraform design places all five Lambda functions in private subnets across two availability zones. It uses S3 and DynamoDB gateway endpoints plus private interface endpoints for CloudWatch Logs, Athena, and Bedrock Runtime. There is deliberately no NAT Gateway: the functions only require the AWS services covered by those endpoints. DynamoDB remains an AWS-managed regional service rather than a resource placed inside the customer VPC; see `evidence/aws-serverless-reference-review-2026-09-28.md`. CloudFront is protected by a global WAF ACL, and a regional management CloudTrail writes validated logs to a dedicated S3 bucket; see `evidence/edge-security-2026-09-29.md`.
 
 Cognito uses email verification, a strong password policy, authorization-code flow with PKCE, token revocation, and required TOTP authenticator-app MFA. The application never handles passwords or MFA secrets.
+
+### Database choice: DynamoDB instead of RDS
+
+The brief requires a persistent cloud storage or database layer with a defined
+data model; it does not require a relational database. The project uses each
+store for a measured access pattern rather than adding services for diagram
+complexity:
+
+| Requirement | Implemented store and reason |
+|-------------|------------------------------|
+| Save a prediction for one authenticated user | DynamoDB writes one item under the verified Cognito `sub` partition key. |
+| Retrieve that user's newest predictions | DynamoDB queries `user_id` plus the time-ordered `created_at_prediction_id` sort key without a scan or join. |
+| Deduplicate an authenticated retry | A separate DynamoDB table uses `user_id` plus `idempotency_key` and expires records through TTL. |
+| Run aggregate market SQL over the listing dataset | S3, Parquet, Glue Catalog, and Athena keep analytical queries out of the transactional history table. |
+| Handle low, uneven development traffic | DynamoDB on-demand avoids an always-running database instance and capacity planning. |
+
+RDS or Aurora would be justified if the scope added related booking, payment,
+host, property, and availability records that require joins, foreign keys, or
+multi-record ACID transactions. None of those requirements exists in the
+implemented estimator and private-history workflow. Adding RDS now would
+duplicate persistence, introduce connection and schema-migration operations,
+raise the cost floor, and weaken the purpose-built serverless rationale without
+solving a user problem. This decision follows AWS guidance to choose storage by
+access pattern; see the
+[AWS Lambda database decision guide](https://docs.aws.amazon.com/lambda/latest/dg/ddb-rds-database-decision.html)
+and the [AWS Well-Architected purpose-built data-store guidance](https://docs.aws.amazon.com/wellarchitected/latest/framework/perf_data_use_purpose_built_data_store.html).
 
 ## Technology list
 
