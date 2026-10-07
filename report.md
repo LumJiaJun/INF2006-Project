@@ -8,6 +8,8 @@ Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
 Evidence dates: 1-6 October 2026
 
+Live URL (as of 7 October 2026): https://dqvmcy3nxs3v.cloudfront.net - CloudFront assigns a new domain whenever the stack is destroyed and recreated; no custom domain is configured, so `terraform output -raw frontend_url` gives the current address.
+
 Deployment status: The stack described here was rebuilt and verified in `ap-southeast-1` on 6 October 2026 after the complete local preflight and full-data model replay passed. The reviewed Terraform plan contained 124 creates, 0 changes, and 0 destroys; the real listings data was transformed successfully, and the redacted verifier reported 148 managed resources with zero drift. The stack is live at the evidence date, while the encrypted remote Terraform backend remains available for controlled recreation.
 
 Team: Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427).

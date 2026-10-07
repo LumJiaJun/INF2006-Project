@@ -20,9 +20,9 @@ The development stack was rebuilt in `ap-southeast-1` on 2026-10-06 from a
 reviewed Terraform plan containing 124 creates, 0 changes, and 0 destroys. The
 full-data model replay matched exactly, the Glue transform succeeded, the
 redacted cloud verifier passed across 148 Terraform resources with zero drift,
-and a live bounded Claude Haiku call returned HTTP 200. Run
+and a live bounded Claude Haiku call returned HTTP 200. The live site on 7 October 2026 is https://dqvmcy3nxs3v.cloudfront.net (CloudFront domain; it stays the same across in-place `terraform apply` updates but changes if the stack is destroyed and recreated). Run
 `terraform -chdir=src/infrastructure output -raw frontend_url` for the current
-public URL. AWS now reports the operator-managed SNS email subscription as
+public URL if this link does not load. AWS now reports the operator-managed SNS email subscription as
 confirmed; the recipient address remains deployment configuration rather than
 source-controlled data. See
 `evidence/cloud-verification-2026-10-06.md` and
