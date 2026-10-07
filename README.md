@@ -163,17 +163,22 @@ URLs, operator addresses, tokens, and credentials.
 
 ![Current architecture diagram](evidence/architecture-current.png)
 
-The compact diagram above is intended for the report. A larger
+The diagram above (editable source: `evidence/architecture-full.drawio`) shows the
+global edge (WAF, CloudFront, private S3), Cognito and the API Gateway JWT
+authorizer, the five Lambda functions in two private subnets across two
+availability zones, the `lambda` and `vpc-endpoints` security groups, gateway
+and interface endpoints, DynamoDB, Bedrock, the Athena, Glue and S3 analytics
+path, observability and audit services, and the GitHub Actions CI/CD lane with
+Terraform. It deliberately does not show AgentCore, ALB, NAT Gateway, containers,
+or third-party identity services because those components are not deployed in
+this project. The earlier
 [detailed trust and service-flow diagram](evidence/architecture-detailed.png)
-shows the route authorization contract, both private subnets, Lambda VPC
-attachment, gateway and interface endpoints, managed service plane, offline
-data pipeline, monitoring, and CI/CD control plane. It deliberately does not
-show AgentCore, ALB, NAT Gateway, containers, or third-party identity services
-because those components are not deployed in this project.
+remains in the evidence folder as a supplementary view; where the two differ,
+the diagram above and the Terraform in `src/infrastructure` are authoritative.
 
 CloudFront serves a static frontend from a private S3 origin. The frontend calls an API Gateway HTTP API, which invokes focused Lambda functions. `GET /health`, `POST /predict`, and `GET /analytics` are public. Cognito protects `POST /predictions`, `GET /history`, and the Claude Haiku-backed `POST /chat` route. AI traffic uses a separate Lambda and tighter route throttle so it can be cost-controlled independently from prediction traffic. The assistant receives a compact server-controlled set of verified platform facts and only the signed-in user's ten latest DynamoDB prediction records; DynamoDB is not treated as a general knowledge base. History is explicitly ordered newest first, mixed-currency comparisons are blocked, model temperature is zero, and plain-text output is bounded to 120 words. Authenticated predictions retain the safe listing and host signals needed for useful follow-up questions while excluding coordinates. The estimator also offers bounded what-if predictions for amenities, guest capacity, and superhost status; these are model scenarios, not future-price forecasts. The evaluated model runs from an ECR-backed Lambda container. Glue converts the raw listing CSV into city-partitioned Parquet in a separate private S3 data lake, and the analytics Lambda runs a fixed aggregate query through Athena.
 
-The current Terraform design configures all five Lambda functions with private subnets across two availability zones. It uses S3 and DynamoDB gateway endpoints plus private interface endpoints for CloudWatch Logs, Athena, and Bedrock Runtime in both AZs. There is deliberately no NAT Gateway: the functions only require the AWS services covered by those endpoints. DynamoDB remains an AWS-managed regional service rather than a resource placed inside the customer VPC. The one DynamoDB service in the diagram represents two logical tables, and AWS replicates each table across three AZs in the Region; no duplicate table per subnet is required. This provides in-Region availability, not cross-Region failover. See `evidence/availability-review-2026-10-06.md` and `evidence/aws-serverless-reference-review-2026-09-28.md`. CloudFront is protected by a global WAF ACL, and a regional management CloudTrail writes validated logs to a dedicated S3 bucket; see `evidence/edge-security-2026-09-29.md`.
+The current Terraform design configures all five Lambda functions with private subnets across two availability zones. It uses S3 and DynamoDB gateway endpoints plus private interface endpoints for CloudWatch Logs, Athena, and Bedrock Runtime in both AZs. There is deliberately no NAT Gateway: the functions only require the AWS services covered by those endpoints. DynamoDB remains an AWS-managed regional service rather than a resource placed inside the customer VPC. The diagram shows the two logical DynamoDB tables (history and idempotency) as separate icons outside the AZ boxes, and AWS replicates each table across three AZs in the Region; no duplicate table per subnet is required. Each interface endpoint is drawn once at VPC level although it has a network interface in each AZ. This provides in-Region availability, not cross-Region failover. See `evidence/availability-review-2026-10-06.md` and `evidence/aws-serverless-reference-review-2026-09-28.md`. CloudFront is protected by a global WAF ACL, and a regional management CloudTrail writes validated logs to a dedicated S3 bucket; see `evidence/edge-security-2026-09-29.md`.
 
 Cognito uses email verification, a strong password policy, authorization-code flow with PKCE, token revocation, and required TOTP authenticator-app MFA. The application never handles passwords or MFA secrets.
 

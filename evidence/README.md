@@ -4,10 +4,13 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 
 | File | Purpose |
 |------|---------|
-| architecture-current.png | Numbered final architecture showing request, identity, data, operations, CI/CD, multi-AZ controls, and the single-Region recovery boundary |
+| architecture-current.png | Final architecture export: global edge, identity, two-AZ private subnets with security groups, endpoints, data and analytics services, observability, Terraform, and the GitHub Actions CI/CD lane |
+| architecture-full.drawio | Editable draw.io source for architecture-current.png |
+| architecture-full-preview.png | Earlier script-generated preview of the same layout, superseded by architecture-current.png |
+| architecture-cicd-terraform.drawio | Earlier standalone Terraform and CI/CD lane, now included in architecture-full.drawio |
 | architecture-detailed.png | Detailed enterprise view of trust boundaries, routes, private networking, managed services, data engineering, monitoring, and delivery flows |
 | architecture-detailed.svg | Editable source for the detailed enterprise architecture diagram |
-| architecture.svg | Editable source for the current numbered architecture diagram |
+| architecture.svg | Earlier SVG source for the previous numbered architecture diagram, superseded by architecture-full.drawio |
 | architecture-security-audit-2026-09-28.md | Architecture and security audit findings |
 | availability-review-2026-10-06.md | In-Region high-availability mechanisms, DynamoDB replication clarification, and regional recovery limitation |
 | cloud-verification-2026-10-04.md | Redacted zero-drift, deployed workflow, Lambda, monitoring, recovery, Glue, S3, WAF, and SNS verification |
