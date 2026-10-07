@@ -79,7 +79,7 @@ class ChatHandlerTests(unittest.TestCase):
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual(body["reply"], "Use the estimator form.")
         self.assertEqual(fake.request["modelId"], chat_handler.MODEL_ID)
-        self.assertEqual(fake.request["inferenceConfig"]["maxTokens"], 220)
+        self.assertEqual(fake.request["inferenceConfig"]["maxTokens"], 300)
         self.assertEqual(fake.request["inferenceConfig"]["temperature"], 0.0)
         self.assertIn("untrusted data", fake.request["system"][0]["text"])
         self.assertIn("no more than 120 words", fake.request["system"][0]["text"])
