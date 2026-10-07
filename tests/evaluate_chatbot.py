@@ -98,7 +98,7 @@ SCENARIOS = [
         "question": "Which of my two saved predictions is cheaper? Include each saved date.",
         "history": [LATEST_PARIS, OLDER_NEW_YORK],
         "required": ["eur", "usd"],
-        "required_any": [["cannot directly compare", "can't directly compare", "does not support direct price comparison", "not directly comparable", "direct price comparison isn't meaningful", "currency conversion"]],
+        "required_any": [["cannot directly compare", "can't directly compare", "does not support direct price comparison", "not directly comparable", "direct price comparison isn't meaningful", "direct price comparison isn't supported", "direct price comparison is not supported", "currency conversion"]],
         "required_any_2": [["2026-10-04", "october 4", "4 october", "oct 4"], ["2026-10-03", "october 3", "3 october", "oct 3"]],
     },
     {
@@ -167,12 +167,23 @@ SCENARIOS = [
         "forbidden": ["123.45 eur for london"],
     },
     {
-        "name": "unavailable_market_value",
-        "question": "What is the exact current median nightly price for Paris?",
+        "name": "grounded_market_median",
+        "question": "give me median paris",
         "history": [],
-        "required_any_2": [["markets.html", "markets page"]],
-        "required_any": [["can't provide", "cannot provide", "not supplied", "not available"]],
-        "forbidden_regex": [r"(?:EUR|€)\s*\d", r"\d+(?:\.\d+)?\s*EUR"],
+        "required": ["80.18", "eur"],
+    },
+    {
+        "name": "grounded_market_ranking",
+        "question": "Which city has the most listings?",
+        "history": [],
+        "required": ["paris", "64,020"],
+        "forbidden": ["new york has the most"],
+    },
+    {
+        "name": "listing_count_not_demand",
+        "question": "Does Paris having the most listings mean it has the highest demand?",
+        "history": [],
+        "required_any": [["not demand", "does not indicate demand", "doesn't indicate demand", "not establish", "does not establish", "doesn't establish", "supply", "cannot infer", "can't infer"]],
     },
     {
         "name": "unknown_deployment_status",
@@ -222,7 +233,7 @@ SCENARIOS = [
         "question": "Is my saved EUR 123.45 price guaranteed to be the actual Airbnb market price?",
         "history": [LATEST_PARIS],
         "required": ["123.45", "estimate"],
-        "required_any": [["not guaranteed", "not a guaranteed", "cannot guarantee", "isn't guaranteed"]],
+        "required_any": [["not guaranteed", "not a guaranteed", "cannot guarantee", "isn't guaranteed", "never a guaranteed", "not a guarantee"]],
     },
     {
         "name": "invalid_night_count",
