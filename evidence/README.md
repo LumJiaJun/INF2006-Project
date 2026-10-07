@@ -23,6 +23,9 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | chatbot-accuracy-2026-10-04.md | Grounded prompt design, expanded local and deployed 24-scenario evaluation, DynamoDB isolation, Cognito enforcement, and residual AI limits |
 | chatbot-evaluation-local-2026-10-06.json | Raw synthetic local Bedrock results for all 24 chatbot scenarios |
 | chatbot-evaluation-deployed-2026-10-06.json | Raw deployed Lambda results for all 24 scenarios, user-partition isolation, and anonymous API rejection |
+| chatbot-evaluation-deployed-2026-10-07.json | Raw deployed Lambda results for the 26-scenario suite after the market-grounding change |
+| live-fixes-and-recheck-2026-10-07.md | Signed-in estimator CORS fix, grounded chatbot change, 26-scenario evaluation, live smoke, load, and security probes |
+| clean-zip-qa-2026-10-07.md | Clean-ZIP preflight run by Nixon, plus the manual journey and sign-off Ignatius must complete |
 | owasp-top-10-2025-review.md | Current OWASP Top 10 awareness-category control and residual-risk mapping |
 | teardown-2026-10-02.md | Reviewed application teardown, recovery procedure, verification, and remaining FinOps baseline |
 | teardown-2026-10-04.md | Final reviewed destroy-only plan, interrupted-apply recovery, zero-state check, and AWS absence verification |

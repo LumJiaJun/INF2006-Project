@@ -64,7 +64,7 @@ current full-architecture estimate.
 At 10,000 AI questions with the same token shape, Bedrock rises from about
 $0.80 to about $8.00, producing a historical pre-VPC total near $12/month. The
 application therefore requires Cognito on `/chat`, limits messages to 500
-characters, caps responses at 220 tokens, and throttles this route to one
+characters, caps responses at 300 tokens, and throttles this route to one
 request per second.
 
 ## Comparable EC2 baselines
@@ -138,7 +138,7 @@ available. See the [ACM pricing page](https://aws.amazon.com/certificate-manager
    proves a lower memory size meets the latency target. Right-size the other
    functions from CloudWatch p95 duration and memory metrics instead of
    reducing them blindly.
-3. Keep chat protected by Cognito, 500-character input validation, 220-token
+3. Keep chat protected by Cognito, 500-character input validation, 300-token
    output limits, and a one-request-per-second route throttle because Bedrock
    is the variable usage cost.
 4. Keep Glue manual or data-change triggered, with two `G.1X` workers, a

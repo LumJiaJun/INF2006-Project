@@ -23,7 +23,7 @@ This review compares the deployed architecture with the supplied AWS Serverless 
 - The historical expected-load health test accepted successful `200` and controlled `429` responses. The historical stress test honestly records `503` responses caused by the then-current account concurrency quota of 10; the later 1,000-quota retest is recorded separately.
 - Athena reads processed Parquet, not the raw CSV. The recorded aggregate scanned 566,077 bytes and completed in 697 ms.
 - DynamoDB uses on-demand billing because the workload is low and unpredictable. Glue runs with two `G.1X` workers, a ten-minute timeout, and no retries.
-- Bedrock runs through a separate Lambda and protected route. Prompts are limited to 500 characters, responses to 220 tokens, and route throughput to one request per second.
+- Bedrock runs through a separate Lambda and protected route. Prompts are limited to 500 characters, responses to 300 tokens, and route throughput to one request per second.
 - Malformed input, unsupported categories, missing claims, Athena failure, model failure, and DynamoDB failure return controlled responses without stack traces. Downstream failures are logged.
 - Authenticated prediction retries are safe only when the client reuses the same idempotency key; blind retries with a new key still represent a new user request.
 

@@ -102,3 +102,7 @@ control Bedrock cost.
   `tests/evaluate_deployed_chatbot.py`, `tests/test_chat.py`,
   `evidence/chatbot-evaluation-local-2026-10-06.json`, and
   `evidence/chatbot-evaluation-deployed-2026-10-06.json`.
+
+## Update 2026-10-07
+
+The assistant now receives `market_stats` (a snapshot of the live per-city analytics plus precomputed rankings), the generation cap is 300 tokens, and the evaluator has 26 scenarios, passing 26 of 26 on two deployed runs. Details and the superseded expectations are in `live-fixes-and-recheck-2026-10-07.md`.
