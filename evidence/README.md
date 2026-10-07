@@ -21,8 +21,8 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | deployment-security-retest-2026-10-03.md | Full redeployment, functional/security/load retest, discovered fixes, and verified teardown |
 | application-live-review-2026-10-03.md | Local-first redeployment, real-data pipeline, application improvements, DynamoDB-backed chat proof, and final live controls |
 | chatbot-accuracy-2026-10-04.md | Grounded prompt design, expanded local and deployed 24-scenario evaluation, DynamoDB isolation, Cognito enforcement, and residual AI limits |
-| chatbot-evaluation-local-2026-10-06.json | Raw synthetic local Bedrock results for all 24 chatbot scenarios |
-| chatbot-evaluation-deployed-2026-10-06.json | Raw deployed Lambda results for all 24 scenarios, user-partition isolation, and anonymous API rejection |
+| chatbot-evaluation-local-2026-10-06.json | Raw synthetic local Bedrock results for the 24 chatbot scenarios of 6 October |
+| chatbot-evaluation-deployed-2026-10-06.json | Raw deployed Lambda results for the 24 scenarios of 6 October, user-partition isolation, and anonymous API rejection |
 | chatbot-evaluation-deployed-2026-10-07.json | Raw deployed Lambda results for the 26-scenario suite after the market-grounding change |
 | live-fixes-and-recheck-2026-10-07.md | Signed-in estimator CORS fix, grounded chatbot change, 26-scenario evaluation, live smoke, load, and security probes |
 | clean-zip-qa-2026-10-07.md | Clean-ZIP preflight run by Nixon, plus the manual journey and sign-off Ignatius must complete |

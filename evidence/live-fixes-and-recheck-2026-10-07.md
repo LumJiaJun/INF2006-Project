@@ -49,4 +49,4 @@ It is a snapshot; regenerate it if the analytics data changes.
 ## Not verified
 
 - A signed-in browser session (Cognito with TOTP) end to end after the CORS change.
-- SNS email subscription remains pending confirmation by the recipient.
+- Delivery of a new alarm email to the (confirmed) SNS subscription was not retested.

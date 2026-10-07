@@ -47,7 +47,7 @@
 - **Setup:** Pinned test dependencies and the committed 500-row deterministic synthetic sample.
 - **Command / steps:** Run `python tests/local_preflight.py --include-ml` from the repository root.
 - **Expected result:** Unit tests, source checks, manifest validation, Terraform validation where initialized, and synthetic end-to-end model training all complete successfully.
-- **Actual result:** Passed again on 2026-10-04. All 46 unit tests passed, 15 manifest paths resolved, frontend syntax and Terraform checks passed, and histogram gradient boosting was selected from 390 scoped training rows and 98 test rows. The synthetic score is deliberately excluded from real-world quality claims.
+- **Actual result:** Passed again on 2026-10-04. All 47 unit tests (7 October 2026 count; earlier runs recorded 46) passed, 15 manifest paths resolved, frontend syntax and Terraform checks passed, and histogram gradient boosting was selected from 390 scoped training rows and 98 test rows. The synthetic score is deliberately excluded from real-world quality claims.
 - **Date:** 2026-10-04
 - **Artefact path:** `tests/local_preflight.py`, `analytics/generate_sample_data.py`, `data/sample/listings_synthetic.csv`, and `evidence/rubric-gap-review-2026-10-02.md`
 
