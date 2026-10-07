@@ -100,7 +100,7 @@ Store dated, redacted, reproducible evidence under `evidence/`. Prefer commands,
 
 ## Git Discipline
 
-- Work on the `nixon` branch unless the user explicitly requests another branch.
+- Work on the `main` branch unless the user explicitly requests another branch.
 - Use multiple meaningful commits that reflect genuine working milestones.
 - Before each commit, inspect status, diff, staged files, test results, and possible secrets.
 - Stage explicit files. Do not use `git add .` blindly.
