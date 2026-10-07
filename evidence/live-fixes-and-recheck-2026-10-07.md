@@ -48,5 +48,5 @@ It is a snapshot; regenerate it if the analytics data changes.
 
 ## Not verified
 
-- A second-account isolation journey, fresh sign-up with TOTP MFA, and phone-width layout (see `manual-browser-verification-2026-10-07.md` for what was verified).
+- Fresh sign-up with TOTP MFA and phone-width layout were reported working by the operator without retained captures; second-account isolation was observed (see `manual-browser-verification-2026-10-07.md`).
 - Delivery of a new alarm email to the (confirmed) SNS subscription was not retested.
