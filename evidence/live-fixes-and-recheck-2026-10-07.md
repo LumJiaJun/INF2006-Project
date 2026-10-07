@@ -6,7 +6,7 @@ Region ap-southeast-1. Redacted: no account IDs, tokens, or personal data.
 
 | Defect | Cause | Fix | Check |
 |--------|-------|-----|-------|
-| Signed-in estimator showed "Failed to fetch" | The frontend sends an `Idempotency-Key` header on `POST /predictions`, but API Gateway CORS allowed only `authorization` and `content-type`, so the browser preflight failed. Signed-out `POST /predict` does not send the header and was unaffected. | Added `idempotency-key` to `allow_headers` in `src/infrastructure/api.tf` and applied a reviewed single-resource plan. | Before: preflight with `Access-Control-Request-Headers: content-type,authorization,idempotency-key` returned 204 with no CORS headers. After: it returned `access-control-allow-headers: authorization,content-type,idempotency-key`. A signed-in browser estimate was not exercised by the operator tooling. |
+| Signed-in estimator showed "Failed to fetch" | The frontend sends an `Idempotency-Key` header on `POST /predictions`, but API Gateway CORS allowed only `authorization` and `content-type`, so the browser preflight failed. Signed-out `POST /predict` does not send the header and was unaffected. | Added `idempotency-key` to `allow_headers` in `src/infrastructure/api.tf` and applied a reviewed single-resource plan. | Before: preflight with `Access-Control-Request-Headers: content-type,authorization,idempotency-key` returned 204 with no CORS headers. After: it returned `access-control-allow-headers: authorization,content-type,idempotency-key`. A signed-in browser estimate was later confirmed manually; see `manual-browser-verification-2026-10-07.md`. |
 | Chatbot could not answer market questions | The chat Lambda received no per-city values and was told to redirect users to the Markets page. | Packaged `src/backend/chat/market_stats.json` (a snapshot of the live `/analytics` response plus precomputed rankings) and instructed the model to quote it, to use the rankings for highest/lowest questions, and never to infer demand from listing counts. `maxTokens` raised from 220 to 300. | See evaluation below. |
 | Chatbot named the wrong city for "most listings" | First grounded version relied on the model scanning ten rows (New York answered, Paris correct at 64,020). | Added `market_stats.rankings`. | Redeployed answer: Paris, 64,020, described as supply not demand. |
 
@@ -48,5 +48,5 @@ It is a snapshot; regenerate it if the analytics data changes.
 
 ## Not verified
 
-- A signed-in browser session (Cognito with TOTP) end to end after the CORS change.
+- A second-account isolation journey, fresh sign-up with TOTP MFA, and phone-width layout (see `manual-browser-verification-2026-10-07.md` for what was verified).
 - Delivery of a new alarm email to the (confirmed) SNS subscription was not retested.
