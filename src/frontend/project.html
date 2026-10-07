@@ -47,7 +47,7 @@
           <div><strong>279K</strong><span>listings profiled</span></div>
           <div><strong>10</strong><span>city markets</span></div>
           <div><strong>0.850</strong><span>held-out log R<sup>2</sup></span></div>
-          <div><strong>100%</strong><span>Terraform managed</span></div>
+          <div><strong>IaC</strong><span>Terraform provisioned</span></div>
         </div>
       </header>
 
@@ -84,17 +84,17 @@
         <article class="pillar-security">
           <p class="section-label">Secure by default</p>
           <h2>Private origins and least privilege.</h2>
-          <p>S3 public access stays blocked, CloudFront uses origin access control, and each Lambda receives a narrow IAM policy.</p>
+          <p>S3 public access stays blocked, CloudFront uses origin access control behind a WAF, the Lambda functions run in private subnets across two availability zones with security groups and no NAT gateway, and each function receives a narrow IAM policy.</p>
         </article>
         <article class="pillar-observe">
           <p class="section-label">Observable in production</p>
           <h2>Metrics that show what matters.</h2>
-          <p>CloudWatch logs, alarms, and a shared operations dashboard track errors, throttles, traffic, and latency.</p>
+          <p>CloudWatch logs, alarms, and a shared operations dashboard track errors, throttles, traffic, and latency, with SNS alerts and a CloudTrail audit record.</p>
         </article>
         <article class="pillar-responsible">
           <p class="section-label">Responsible outputs</p>
           <h2>Useful estimates with clear limits.</h2>
-          <p>Validation stays inside the model's known scope, city currencies remain explicit, and every result includes a disclaimer.</p>
+          <p>Validation stays inside the model's known scope, city currencies remain explicit, every result includes a disclaimer, and the AI guide only answers questions about this platform.</p>
         </article>
       </section>
 
@@ -107,7 +107,7 @@
           <span>FaaS: Lambda</span><span>Managed PaaS: API Gateway</span><span>Managed data: S3 + DynamoDB</span>
           <span>Analytics PaaS: Glue + Athena</span><span>Identity: Cognito</span><span>Edge: CloudFront + WAF</span>
           <span>IaaS networking: VPC</span><span>Container registry: ECR</span><span>SaaS delivery: GitHub Actions</span>
-          <span>IaC: Terraform</span><span>Runtime: Python</span><span>No EC2 or CaaS runtime</span>
+          <span>IaC: Terraform</span><span>Runtime: Python</span><span>AI guide: Bedrock Claude Haiku</span><span>Alerts: CloudWatch + SNS</span><span>No EC2 or CaaS runtime</span>
         </div>
       </section>
 

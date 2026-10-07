@@ -68,7 +68,7 @@ a {
   padding: 1rem 0 2rem;
 }
 
-.page-shell > .topbar { order: 1; }
+.page-shell > .topbar { order: -1; }
 .page-shell > .hero { order: 2; }
 .page-shell > .command-center { order: 3; }
 .page-shell > #analytics { order: 4; }
