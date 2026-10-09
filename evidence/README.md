@@ -28,6 +28,8 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | chatbot-evaluation-deployed-2026-10-06.json | Raw deployed Lambda results for the 24 scenarios of 6 October, user-partition isolation, and anonymous API rejection |
 | chatbot-evaluation-deployed-2026-10-07.json | Raw deployed Lambda results for the 26-scenario suite after the market-grounding change |
 | live-fixes-and-recheck-2026-10-07.md | Signed-in estimator CORS fix, grounded chatbot change, 26-scenario evaluation, live smoke, load, and security probes |
+| live-stack-test-2026-10-09.md | Consolidated live test: zero-drift verifier, smoke, recovery, chatbot, security probes, bounded load, and DynamoDB point-in-time restore test |
+| cloud-verification-2026-10-09.md | Redacted output of the cloud verifier for the 9 October stack |
 | sanity-review-fixes-2026-10-09.md | Validation and fixes for the independent sanity review: CSV line endings, idempotent save recovery, chat input validation, report corrections, redeployment, and live checks |
 | manual-browser-verification-2026-10-07.md | Signed-in estimate, saved history, and chat recall observed in a browser after the CORS fix, with a second-account isolation observation and the checks still not verified |
 | clean-zip-qa-2026-10-07.md | Clean-ZIP preflight run by Nixon, plus the manual journey and sign-off Ignatius must complete |

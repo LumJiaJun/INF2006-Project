@@ -46,7 +46,7 @@
 - **Command / steps:** Run `aws dynamodb describe-continuous-backups --table-name <prediction-history-table>`.
 - **Expected result:** Continuous backups and point-in-time recovery report `ENABLED`.
 - **Actual result:** Passed on 2026-09-23. Both statuses were `ENABLED`.
-- **Interpretation:** PITR protects history records against accidental writes or deletion within DynamoDB's recovery window. A restore creates a separate table and was not executed because it would add cost and require application cutover.
+- **Interpretation:** PITR protects history records against accidental writes or deletion within DynamoDB's recovery window. A restore creates a separate table. It was first executed on 2026-10-09 into a temporary table and compared with the source; see `live-stack-test-2026-10-09.md`. Application cutover to a restored table was not exercised.
 - **Artefact path:** `src/infrastructure/data.tf`
 
 ## Cross-region recovery status
