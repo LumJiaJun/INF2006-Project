@@ -9,6 +9,7 @@ verification the team performed, and any licences/attribution.
 |------|-------------------|---------|
 | OpenAI Codex | `AGENTS.md`, `.gitignore`, `README.md`, `src/`, `tests/`, `evidence/`, and `project_manifest.yaml` | Repository inspection, implementation support, Terraform configuration, tests, documentation, and deployment verification. |
 | Anthropic Claude Code (Claude Sonnet 5.5) | Final cleanup on 7 October 2026: `src/infrastructure/api.tf` (CORS), `src/backend/chat/`, `tests/evaluate_chatbot.py`, `tests/test_chat.py`, `README.md`, `report.md`, `evidence/`, and the draw.io architecture diagrams | Diagnosed and fixed the signed-in estimator CORS defect, grounded the chatbot in market statistics, ran verification and security probes, drafted evidence and documentation updates, and built the draw.io diagram. |
+| OpenAI ChatGPT | Wording of `TEAM_CONTRIBUTIONS.md`, the clean-ZIP QA record, and related report and README sentences, edited by Nixon on 8 October 2026 | Softened and clarified wording of contribution and QA descriptions. It did not add completed work for any member; contribution entries remain subject to each member's own verification. |
 | Amazon Bedrock Claude Haiku 4.5 | Deployed `POST /chat` application feature | Answers authenticated, project-scoped user questions through a bounded prompt and response interface. |
 
 ## Sources and baselines

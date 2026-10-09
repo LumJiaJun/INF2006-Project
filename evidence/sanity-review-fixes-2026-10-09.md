@@ -25,8 +25,8 @@ validated against the code before changing anything.
 - Reviewed saved plan: 3 in-place changes (chat Lambda code, prediction image
   tag, `app.js` object). Applied it. A following plan reported no changes.
 - Rollback tag from the previous deployment: `d7fb1bdd1c61`.
-- When planning against this stack pass `-var="prediction_image_tag=fix-aa4fdcf"`
-  and the alert email variable; the default image tag variable is stale.
+- When planning against this stack pass `-var="prediction_image_tag=fix-libxml2"`
+  and the alert email variable; the default image tag variable is stale (see the image findings section for the current live tag).
 
 ## Live checks (direct Lambda invocation, synthetic user, records deleted afterwards)
 
@@ -63,3 +63,18 @@ headless Chrome prints it to A4. Result: 10 pages, figure legible. The supplied
 Word report is a separate artefact and still needs the same corrections applied
 by its owner. The PDF contains the facts in `report.md` as of this commit; it
 must be rebuilt if `report.md` changes again.
+
+## Image vulnerability findings (2026-10-09)
+
+The prediction image `fix-aa4fdcf` scanned at 0 CRITICAL, 0 HIGH, 6 MEDIUM and
+1 LOW findings, all in the base image's `libxml2` 2.9.1 (CVE-2026-74860,
+CVE-2026-86137 to CVE-2026-86144 range). The handler parses JSON only and the
+image does not install `lxml`, so the exposure was low, but a patched package
+(`2.9.1-6.amzn2.5.27`) was available. The Dockerfile now runs
+`yum update -y curl libcurl libxml2`. Rebuilt image `fix-libxml2` (digest
+`sha256:081bd5d0...`) scanned with no findings. It loads the model (version
+1.0.0), was deployed with a reviewed one-resource saved plan, and the live
+checks above were repeated and passed. A following plan showed no drift. The
+live image tag is now `fix-libxml2`; rollback tags are `fix-aa4fdcf` and
+`d7fb1bdd1c61`. A clean scan is a point-in-time result: new CVEs can appear
+against the same image later, so this is not a zero-vulnerability claim.
