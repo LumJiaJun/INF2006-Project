@@ -52,3 +52,14 @@ contains the key-reuse code.
   failure on the deployed stack.
 - A real signed-in browser retry after an injected failure.
 - Word report, `report.pdf`, final ZIP, and the contribution sign-offs.
+
+## Report PDF rebuild (2026-10-09)
+
+`report.pdf` was regenerated from `report.md` because the earlier PDF was stale
+(46 tests, 220 tokens, pending SNS). Recipe used: `pandoc` (bundled with Quarto
+1.8) converts `report.md` to standalone HTML with the architecture figure
+inserted before section 3 on its own landscape page and a print stylesheet, then
+headless Chrome prints it to A4. Result: 10 pages, figure legible. The supplied
+Word report is a separate artefact and still needs the same corrections applied
+by its owner. The PDF contains the facts in `report.md` as of this commit; it
+must be rebuilt if `report.md` changes again.
