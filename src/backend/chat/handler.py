@@ -205,7 +205,7 @@ def parse_request(event):
     message = message.strip()
     if len(message) > MAX_MESSAGE_LENGTH:
         raise ValueError(f"Message must be {MAX_MESSAGE_LENGTH} characters or fewer.")
-    if page not in ALLOWED_PAGES:
+    if not isinstance(page, str) or page not in ALLOWED_PAGES:
         raise ValueError("Page is not supported.")
     return message, page
 

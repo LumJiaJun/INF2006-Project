@@ -744,6 +744,17 @@ predictionForm.addEventListener("change", updateListingSnapshot);
 predictionForm.addEventListener("input", updateEstimatorReadiness);
 predictionForm.addEventListener("change", updateEstimatorReadiness);
 
+// A failed save keeps its key so resubmitting the same form cannot create a duplicate history record.
+let pendingSave = null;
+
+function idempotencyKeyFor(payload) {
+  const fingerprint = JSON.stringify(payload);
+  if (!pendingSave || pendingSave.fingerprint !== fingerprint) {
+    pendingSave = { fingerprint, key: crypto.randomUUID() };
+  }
+  return pendingSave.key;
+}
+
 predictionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   predictionSubmit.disabled = true;
@@ -756,11 +767,12 @@ predictionForm.addEventListener("submit", async (event) => {
     const headers = { "content-type": "application/json" };
     if (idToken) {
       headers.authorization = `Bearer ${idToken}`;
-      headers["Idempotency-Key"] = crypto.randomUUID();
+      headers["Idempotency-Key"] = idempotencyKeyFor(payload);
     }
     const result = await requestPrediction(route, headers, payload, () => {
       predictionSubmit.textContent = "Warming model and retrying...";
     });
+    pendingSave = null;
 
     const content = document.createElement("div");
     const price = document.createElement("strong");

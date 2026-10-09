@@ -162,6 +162,18 @@ class ChatHandlerTests(unittest.TestCase):
         )
         self.assertEqual(result["statusCode"], 400)
 
+    def test_rejects_non_string_page_values_without_calling_the_model(self):
+        for bad_page in ([], {}, None, 7, True, ["index.html"]):
+            with self.subTest(page=bad_page):
+                chat_handler._bedrock = FakeBedrock()
+                result = chat_handler.lambda_handler(
+                    self.event({"message": "hello", "page": bad_page}),
+                    None,
+                )
+                self.assertEqual(result["statusCode"], 400)
+                self.assertEqual(json.loads(result["body"])["error"]["code"], "invalid_request")
+                self.assertIsNone(chat_handler._bedrock.request)
+
     def test_returns_safe_error_when_bedrock_fails(self):
         chat_handler._bedrock = FakeBedrock(fail=True)
         result = chat_handler.lambda_handler(

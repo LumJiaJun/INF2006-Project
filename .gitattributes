@@ -15,3 +15,6 @@
 *.png binary
 *.pdf binary
 *.webp binary
+
+# Keep CSV bytes identical on every platform so hash-checked sample data survives Windows checkouts and archives.
+*.csv text eol=lf

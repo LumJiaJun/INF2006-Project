@@ -3,7 +3,7 @@ import hashlib
 import json
 import logging
 import os
-import uuid
+import time
 from datetime import UTC, datetime
 from decimal import Decimal
 
@@ -65,6 +65,9 @@ REQUIRED_FIELDS = (
     | (set(NUMERIC_BOUNDS) - OPTIONAL_NUMERIC_FIELDS)
 )
 ALLOWED_FIELDS = REQUIRED_FIELDS | OPTIONAL_NUMERIC_FIELDS
+# A request that stalls mid-way can be taken over by a retry once its lease expires.
+IDEMPOTENCY_LEASE_SECONDS = 60
+IDEMPOTENCY_RECORD_SECONDS = 86400
 
 _model_bundle = None
 _history_table = None
@@ -134,28 +137,100 @@ def request_fingerprint(payload):
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def deterministic_prediction_id(user_id, key):
+    # The same user and key always map to the same history record, so a retry cannot duplicate it.
+    return hashlib.sha256(f"{user_id}{key}".encode("utf-8")).hexdigest()[:32]
+
+
+def stored_response(existing):
+    return {
+        "statusCode": int(existing.get("response_status", 200)),
+        "headers": {"content-type": "application/json", "cache-control": "no-store"},
+        "body": existing["response_body"],
+    }
+
+
+def in_progress_response():
+    return error_response(409, "request_in_progress", "This prediction request is still being processed. Retry shortly.")
+
+
 def claim_idempotency(user_id, key, fingerprint):
+    """Return (early_response, claim). A claim carries the stable identity of the history record."""
+    now = int(time.time())
+    claim = {
+        "created_at": datetime.now(UTC).isoformat(),
+        "prediction_id": deterministic_prediction_id(user_id, key),
+    }
+    record = {
+        "user_id": user_id,
+        "idempotency_key": key,
+        "request_fingerprint": fingerprint,
+        "status": "IN_PROGRESS",
+        "created_at": claim["created_at"],
+        "prediction_id": claim["prediction_id"],
+        "lease_expires_at": now + IDEMPOTENCY_LEASE_SECONDS,
+        "expires_at": now + IDEMPOTENCY_RECORD_SECONDS,
+    }
     try:
-        idempotency_table().put_item(
-            Item={
-                "user_id": user_id,
-                "idempotency_key": key,
-                "request_fingerprint": fingerprint,
-                "status": "IN_PROGRESS",
-                "expires_at": int(datetime.now(UTC).timestamp()) + 86400,
-            },
-            ConditionExpression="attribute_not_exists(user_id)",
-        )
-        return None
+        idempotency_table().put_item(Item=record, ConditionExpression="attribute_not_exists(user_id)")
+        return None, claim
     except ClientError as error:
         if error.response.get("Error", {}).get("Code") != "ConditionalCheckFailedException":
             raise
-        existing = idempotency_table().get_item(Key={"user_id": user_id, "idempotency_key": key}).get("Item")
-        if not existing or existing.get("request_fingerprint") != fingerprint:
-            return error_response(409, "idempotency_conflict", "This idempotency key was used for another request.")
-        if existing.get("status") == "COMPLETED" and existing.get("response_body"):
-            return {"statusCode": int(existing.get("response_status", 200)), "headers": {"content-type": "application/json", "cache-control": "no-store"}, "body": existing["response_body"]}
-        return error_response(409, "request_in_progress", "This prediction request is already being processed.")
+
+    existing = idempotency_table().get_item(
+        Key={"user_id": user_id, "idempotency_key": key},
+        ConsistentRead=True,
+    ).get("Item")
+    if not existing:
+        # The record expired between the two calls; the caller can simply retry.
+        return in_progress_response(), None
+
+    if int(existing.get("expires_at", 0)) <= now:
+        # A retained record past its expiry is treated as absent and replaced atomically.
+        try:
+            idempotency_table().put_item(
+                Item=record,
+                ConditionExpression="expires_at = :old",
+                ExpressionAttributeValues={":old": existing["expires_at"]},
+            )
+            return None, claim
+        except ClientError as error:
+            if error.response.get("Error", {}).get("Code") != "ConditionalCheckFailedException":
+                raise
+            return in_progress_response(), None
+
+    if existing.get("request_fingerprint") != fingerprint:
+        return error_response(409, "idempotency_conflict", "This idempotency key was used for another request."), None
+    if existing.get("status") == "COMPLETED" and existing.get("response_body"):
+        return stored_response(existing), None
+    if int(existing.get("lease_expires_at", 0)) > now:
+        return in_progress_response(), None
+
+    # The earlier attempt stalled. Take over its lease while keeping its record identity.
+    claim = {
+        "created_at": existing.get("created_at") or claim["created_at"],
+        "prediction_id": existing.get("prediction_id") or claim["prediction_id"],
+    }
+    try:
+        idempotency_table().update_item(
+            Key={"user_id": user_id, "idempotency_key": key},
+            UpdateExpression="SET lease_expires_at = :lease, created_at = :created, prediction_id = :prediction",
+            ConditionExpression="#status = :in_progress AND (attribute_not_exists(lease_expires_at) OR lease_expires_at = :old_lease)",
+            ExpressionAttributeNames={"#status": "status"},
+            ExpressionAttributeValues={
+                ":lease": now + IDEMPOTENCY_LEASE_SECONDS,
+                ":created": claim["created_at"],
+                ":prediction": claim["prediction_id"],
+                ":in_progress": "IN_PROGRESS",
+                ":old_lease": existing.get("lease_expires_at", 0),
+            },
+        )
+    except ClientError as error:
+        if error.response.get("Error", {}).get("Code") != "ConditionalCheckFailedException":
+            raise
+        return in_progress_response(), None
+    return None, claim
 
 
 def complete_idempotency(user_id, key, result):
@@ -182,10 +257,10 @@ def authenticated_user_id(event):
     )
 
 
-def persist_prediction(user_id, model_input, result):
+def persist_prediction(user_id, model_input, result, claim):
     # Coordinates are deliberately excluded from history because they are not needed later.
-    prediction_id = str(uuid.uuid4())
-    created_at = datetime.now(UTC).isoformat()
+    prediction_id = claim["prediction_id"]
+    created_at = claim["created_at"]
     item = {
         "user_id": user_id,
         "created_at_prediction_id": f"{created_at}#{prediction_id}",
@@ -211,10 +286,15 @@ def persist_prediction(user_id, model_input, result):
     if model_input.get("review_scores_rating") is not None:
         item["review_scores_rating"] = Decimal(str(model_input["review_scores_rating"]))
 
-    history_table().put_item(
-        Item=item,
-        ConditionExpression="attribute_not_exists(created_at_prediction_id)",
-    )
+    try:
+        history_table().put_item(
+            Item=item,
+            ConditionExpression="attribute_not_exists(created_at_prediction_id)",
+        )
+    except ClientError as error:
+        # An earlier attempt with the same key already saved this exact record.
+        if error.response.get("Error", {}).get("Code") != "ConditionalCheckFailedException":
+            raise
     return prediction_id
 
 
@@ -349,10 +429,10 @@ def lambda_handler(event, context):
             key = idempotency_key(event)
             if not key:
                 return error_response(400, "missing_idempotency_key", "Authenticated predictions require an Idempotency-Key header.")
-            claim_result = claim_idempotency(user_id, key, request_fingerprint(model_input))
+            claim_result, claim = claim_idempotency(user_id, key, request_fingerprint(model_input))
             if claim_result:
                 return claim_result
-            result["prediction_id"] = persist_prediction(user_id, model_input, result)
+            result["prediction_id"] = persist_prediction(user_id, model_input, result, claim)
             result["saved"] = True
             complete_idempotency(user_id, key, result)
 
