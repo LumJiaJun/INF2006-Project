@@ -22,14 +22,14 @@ verification the team performed, and any licences/attribution.
 
 | Area | Team verification | Evidence |
 |------|-------------------|----------|
-| Repository and Terraform | Ran 47 unit tests, the loopback frontend/API smoke journey, JavaScript syntax checks, `terraform fmt -check`, `terraform validate`, and a post-apply no-change plan. | `evidence/cloud-verification-2026-10-04.md`, `evidence/chatbot-accuracy-2026-10-04.md`, `evidence/local-development-2026-10-02.md` |
+| Repository and Terraform | Ran 53 unit tests, the loopback frontend/API smoke journey, JavaScript syntax checks, `terraform fmt -check`, `terraform validate`, and a post-apply no-change plan. | `evidence/cloud-verification-2026-10-04.md`, `evidence/chatbot-accuracy-2026-10-04.md`, `evidence/local-development-2026-10-02.md` |
 | Live application | Ran the deployed smoke script for frontend assets and headers, health, prediction, ten-city analytics, anonymous authorization rejection, malformed input, bounded what-if scenarios, and responsive visual review. | `evidence/application-live-review-2026-10-03.md`, `evidence/test-functional.md` |
 | Data and model | Reproduced profiling, all full-data candidate metrics and the exported model hash, cross-checked submitted artefacts, and verified the Glue transformation, Parquet output, Athena scan size, and ten-city response. | `evidence/test-data-ai.md`, `evidence/data-pipeline.md` |
 | Authentication and AI | Completed a consented Cognito journey, a Bedrock-plus-DynamoDB integration check, and local plus deployed chatbot evaluations (16 scenarios at first, 26 deployed scenarios on 7 October) without retaining credentials, codes, tokens, production records, or prompts. | `evidence/chatbot-accuracy-2026-10-04.md`, `evidence/application-live-review-2026-10-03.md`, `evidence/test-security.md` |
 | Storage and IAM | Checked S3 public-access controls, direct-access denial, DynamoDB PITR, claim-derived history access, and selected allowed and denied IAM actions. | `evidence/test-security.md`, `evidence/threat-control-map.md` |
 | Monitoring | Triggered and reset the prediction alarm, observed successful encrypted SNS publication, and received the operator email. | `evidence/monitoring.md` |
 | Load and resilience | Retained both successful bounded tests and the earlier quota-related 503 result; the approved-quota retest produced only HTTP 200 and controlled HTTP 429 responses. | `evidence/test-web-load.md`, `evidence/test-resilience.md` |
-| CI security | Checked successful CI, CodeQL, dependency audit, Bandit, image scan-on-push, two successful pinned local ZAP runs, WAF blocking, and the OWASP Top 10:2025 control map; the GitHub DAST rerun remains explicitly unclaimed. | `evidence/deployment-security-retest-2026-10-03.md`, `evidence/owasp-top-10-2025-review.md`, `evidence/ci-cd.md` |
+| CI security | Checked successful CI, CodeQL, dependency audit, Bandit, image scan-on-push, two successful pinned local ZAP runs, WAF blocking, and the OWASP Top 10:2025 control map; a later GitHub-hosted DAST run is recorded as successful in `evidence/github-security-runs-2026-10-06.md`. | `evidence/deployment-security-retest-2026-10-03.md`, `evidence/owasp-top-10-2025-review.md`, `evidence/ci-cd.md` |
 
 The team remains responsible for reviewing generated work and validating final claims.
 

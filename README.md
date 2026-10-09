@@ -103,7 +103,7 @@ A successful run:
    analytics, model-schema, and prediction routes over HTTP.
 
 The final line must be `Local preflight completed successfully.` The last
-recorded clean run passed 47 tests and validated 17 manifest paths. Generated
+recorded clean run passed 53 tests and validated 17 manifest paths. Generated
 models, metrics, caches, and Terraform provider files remain in ignored paths.
 
 ### 3. Inspect the application locally
@@ -264,7 +264,8 @@ the application and analytics requirements plus Bandit Python static analysis;
 CodeQL SAST covers Python and JavaScript. Deployment is manual,
 requires typing `DEPLOY`, and is gated by the GitHub `development` environment.
 The `Deploy development` workflow accepts only `main` or `nixon`, repeats the
-application and Terraform validation before assuming AWS access, and targets
+application and Terraform validation before assuming AWS access (it does not
+wait for the CodeQL or security-gate workflows to pass on that revision), and targets
 the GitHub `development` environment before it can apply the reviewed plan.
 Required reviewers must be configured in the repository environment settings
 before claiming human approval enforcement. The workflow uses GitHub OIDC
@@ -325,3 +326,5 @@ Open the ZIP before submission and confirm that `README.md`,
 - The chatbot's 24-scenario local evaluation and latest 26-scenario deployed evaluation check factual grounding, exact history and dates, arithmetic, currency handling, authentication boundaries, privacy, injection, causal overclaiming, unsupported transactions, market grounding, and scope. They do not prove correctness for every possible question or future managed-model revision.
 - Cloud deployment requires an AWS account. The current full architecture is estimated at about $72.92 per continuously deployed month before discounts and tax, dominated by two-AZ interface endpoint hours.
 - Cost assumptions and EC2 comparisons are documented in `evidence/cost-estimate.md`. The historical $4-$7 estimate predates the two-AZ interface endpoints and WAF and is not the current full-stack estimate; the saved calculator result and redacted line items are in `evidence/aws-pricing-calculator-2026-10-06.md`.
+- No managed threat detection service (GuardDuty, Security Hub) is enabled. Detection relies on CloudTrail, CloudWatch alarms, and the preventive controls described above.
+- Saved-prediction retries are deduplicated only when the browser reuses the same idempotency key. A stalled attempt becomes retryable after a 60 second lease; a genuinely new submission, or a reused key after the 24 hour record expiry, creates a new history record.
