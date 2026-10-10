@@ -1,0 +1,63 @@
+name: Build submission ZIP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: submission-zip-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: Package root-layout submission
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build and inspect submission tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir submission
+          git archive --format=tar HEAD | tar -xf - -C submission
+
+          test -f submission/README.md
+          test -f submission/project_manifest.yaml
+          test -f submission/report.pdf
+          test -d submission/src
+          test -d submission/tests
+          test -d submission/evidence
+
+          if find submission -type f \( \
+            -name '*.tfstate' -o \
+            -name '*.tfstate.*' -o \
+            -name '*.tfplan' -o \
+            -name '*.joblib' -o \
+            -name '*.pem' -o \
+            -name '*.key' -o \
+            -name '.env' -o \
+            -name 'backend.hcl' \
+          \) -print -quit | grep -q .; then
+            echo 'Submission contains a forbidden generated or sensitive file.' >&2
+            exit 1
+          fi
+
+          git rev-parse HEAD > submission/SUBMISSION_COMMIT.txt
+
+      - name: Upload root-layout submission ZIP
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: Group_G014_INF2006_Project
+          path: submission/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
