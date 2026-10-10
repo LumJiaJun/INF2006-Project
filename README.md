@@ -97,7 +97,8 @@ A successful run:
 1. Executes the Python unit suite.
 2. Compiles the Python source and validates every manifest path.
 3. Syntax-checks the frontend JavaScript with Node.js.
-4. Runs `terraform fmt -check -recursive` and `terraform validate`.
+4. Runs `terraform fmt -check -recursive` and `terraform validate` inside
+   `src/infrastructure`.
 5. Trains and evaluates a deterministic model on the committed 500-row sample.
 6. Starts an ephemeral local server and verifies the frontend, health,
    analytics, model-schema, and prediction routes over HTTP.
