@@ -128,6 +128,22 @@ Responsible interpretation is central to the design. Prices are historical, city
 
 The strongest engineering lesson is that managed services do not remove the need to test boundaries. CloudFront caching initially served fallback HTML for asset paths until invalidation. A prediction deployment briefly returned `503` during transition. Load testing exposed an account quota, and alarm testing exposed an encryption-policy gap. Each issue was diagnosed with service state and logs, corrected where practical, and retained in evidence where limitations remain.
 
+## Appendices
+
+The appendices point to dated, redacted evidence in the repository. Commands and logs are preferred to screenshots, so each item names the file that holds the result.
+
+| Appendix | Contents | Evidence in the repository |
+|----------|----------|----------------------------|
+| A | Full-size architecture diagram and its editable source | `evidence/architecture-current.png`, `evidence/architecture-full.drawio` |
+| B | Cost estimate: AWS Pricing Calculator export and assumptions (an estimate, not actual charges) | `evidence/aws-pricing-calculator-2026-10-06.md`, `evidence/aws-pricing-calculator-estimate-2026-10-06.csv`, `evidence/cost-estimate.md` |
+| C | Monitoring: five alarms, dashboard design, and the 9 October verifier output showing all five alarms OK | `evidence/monitoring.md`, `evidence/cloud-verification-2026-10-09.md` |
+| D | Test evidence by category: functional, security, data and AI, scalability and resilience | `evidence/test-functional.md`, `evidence/test-security.md`, `evidence/test-data-ai.md`, `evidence/test-resilience.md` |
+| E | Latest live stack test: zero-drift verifier, recovery and validation checks, chatbot evaluation, security probes, bounded load, and the DynamoDB point-in-time restore test | `evidence/live-stack-test-2026-10-09.md`, `evidence/chatbot-evaluation-deployed-2026-10-07.json`, `evidence/manual-browser-verification-2026-10-07.md` |
+| F | Security: threat-to-control map, OWASP Top 10:2025 review, and the Terraform static scan with a reasoned disposition for each finding group | `evidence/threat-control-map.md`, `evidence/owasp-top-10-2025-review.md`, `evidence/iac-scan-triage-2026-10-10.md` |
+| G | Model evaluation: per-city metrics and the data dictionary and pipeline | `analytics/artifacts/model_evaluation.json`, `data/DATA_DICTIONARY.md`, `evidence/data-pipeline.md` |
+| H | Delivery pipeline: GitHub Actions results and the review and fix record of 9 October | `evidence/ci-cd.md`, `evidence/github-security-runs-2026-10-06.md`, `evidence/sanity-review-fixes-2026-10-09.md` |
+| I | Declarations: AI use and team contributions | `AI_USE_DECLARATION.md`, `TEAM_CONTRIBUTIONS.md` |
+
 ## References
 
 1. INF2006 Cloud Computing and Big Data, Team Project 1 brief, 2026.
