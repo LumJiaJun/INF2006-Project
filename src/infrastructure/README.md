@@ -122,7 +122,7 @@ terraform output operations_dashboard_name
 terraform output operational_alerts_topic_arn
 ```
 
-The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`. Signed-in prediction requests include an `Idempotency-Key`, which is stored with a 24-hour TTL so a retry replays the original result instead of creating a duplicate history item. Signed-in users can call `/chat`; the separate AI Lambda uses the global Claude Haiku 4.5 inference profile, a 220-token output cap, and a tighter one-request-per-second API route limit.
+The browser uses Cognito's authorization-code flow with PKCE. Public predictions use `/predict`; signed-in predictions use `/predictions` and are saved to DynamoDB for retrieval from `/history`. Signed-in prediction requests include an `Idempotency-Key`, which is stored with a 24-hour TTL so a retry replays the original result instead of creating a duplicate history item. Signed-in users can call `/chat`; the separate AI Lambda uses the global Claude Haiku 4.5 inference profile, a 300-token output cap, and a tighter one-request-per-second API route limit.
 
 After changing frontend files, invalidate CloudFront so cached objects are refreshed:
 
