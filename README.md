@@ -315,6 +315,15 @@ Open the ZIP before submission and confirm that `README.md`,
 `evidence/`, `tests/`, `TEAM_CONTRIBUTIONS.md`, and
 `AI_USE_DECLARATION.md` are directly under the ZIP root.
 
+GitHub's "Download ZIP" button is not a substitute for this command. It wraps
+every file in a folder named after the repository and branch
+(`INF2006-Project-main/`), so the required files are not at the ZIP root. If a
+ZIP must be made from that download, extract it, open the inner folder, select
+everything inside it, and compress that selection into a new ZIP named
+`Group_G014_INF2006_Project.zip`. On 2026-10-10 the downloaded content was
+checked file by file against `git archive HEAD` (190 files, identical bytes), and
+all 53 tests and the full preflight passed from inside the wrapper folder.
+
 ## Known limitations
 
 - A consented single-account browser journey covering sign-up, verification, TOTP MFA, prediction save, history retrieval, and protected chat is recorded in `evidence/test-functional.md`. The deployed chatbot evaluator now proves owner-versus-other-user DynamoDB partition isolation with two synthetic identities, but a full two-browser Cognito journey remains future work.
