@@ -51,3 +51,25 @@
 - **2026-09-29 retest:** The prediction-error alarm was set to `ALARM`, the school mailbox received the SNS notification, SNS action history reported `Successfully executed action`, and the alarm was reset to `OK`.
 - **Date:** 2026-09-23
 - **Artefact path:** `src/infrastructure/monitoring.tf`
+
+## 2026-10-03 alarm notification emails (earlier deployment)
+
+Three SNS notification emails received on 3 October 2026 are kept as redacted
+screenshots (account ID, ARNs, recipient name, and the retired API ID are
+covered):
+
+- `appendix-c-alarm-email-insufficient-to-ok-2026-10-03-redacted.png`: the API
+  5xx alarm moved from INSUFFICIENT_DATA to OK at 13:21:19 UTC.
+- `appendix-c-alarm-email-ok-to-alarm-2026-10-03-redacted.png`: the same alarm
+  moved from OK to ALARM at 13:27:19 UTC because a 5xx datapoint of 1.0 was
+  recorded at 13:22:00 UTC (threshold 1.0, period 300 seconds).
+- `appendix-c-sns-alarm-email-2026-10-03-redacted.png`: the chat-errors alarm
+  moved from INSUFFICIENT_DATA to OK at 13:19:53 UTC.
+
+The ALARM was not triggered artificially (the same-day review records that no
+artificial alarm transition was set). The 5xx datapoint is consistent with the
+transient HTTP 503 recorded for the first request after that day's clean
+rebuild in `application-live-review-2026-10-03.md`; the exact request was not
+separately traced. These emails show the alarm to SNS to email path working on
+the earlier deployment. That deployment was later destroyed and rebuilt, and
+delivery to the rebuilt stack's subscription was not retested.

@@ -28,6 +28,8 @@ Named, dated evidence artefacts cited by `project_manifest.yaml`.
 | chatbot-evaluation-deployed-2026-10-06.json | Raw deployed Lambda results for the 24 scenarios of 6 October, user-partition isolation, and anonymous API rejection |
 | chatbot-evaluation-deployed-2026-10-07.json | Raw deployed Lambda results for the 26-scenario suite after the market-grounding change |
 | live-fixes-and-recheck-2026-10-07.md | Signed-in estimator CORS fix, grounded chatbot change, 26-scenario evaluation, live smoke, load, and security probes |
+| appendix-c-alarm-email-ok-to-alarm-2026-10-03-redacted.png | Redacted SNS email for the API 5xx alarm entering ALARM at 13:27:19 UTC on 2026-10-03 (earlier deployment) |
+| appendix-c-alarm-email-insufficient-to-ok-2026-10-03-redacted.png | Redacted SNS email for the API 5xx alarm entering OK at 13:21:19 UTC on 2026-10-03 |
 | appendix-c-sns-alarm-email-2026-10-03-redacted.png | Redacted CloudWatch alarm notification email delivered through SNS on 2026-10-03 (earlier deployment), with the account ID, ARNs and recipient name covered |
 | iac-scan-triage-2026-10-10.md | Checkov scan of the Terraform (393 passed, 84 failed), with a reasoned disposition for every finding group |
 | live-stack-test-2026-10-09.md | Consolidated live test: zero-drift verifier, smoke, recovery, chatbot, security probes, bounded load, and DynamoDB point-in-time restore test |
