@@ -83,3 +83,33 @@ jobs:
           path: bandit.json
           if-no-files-found: warn
           retention-days: 14
+
+  terraform-static:
+    name: Terraform static scan (report only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Checkov
+        run: python -m pip install --disable-pip-version-check "checkov==3.3.26"
+
+      - name: Scan Terraform (findings are triaged in evidence, not enforced)
+        run: checkov -d src/infrastructure --framework terraform --soft-fail --compact --quiet --output json --output-file-path checkov-report
+
+      - name: Upload Checkov report
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: checkov-${{ github.run_id }}
+          path: checkov-report
+          if-no-files-found: warn
+          retention-days: 14
