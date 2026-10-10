@@ -16,7 +16,7 @@
 
 ## Model comparison
 
-- **Objective:** Compare a simple baseline and two candidate regressors on an untouched test partition, then select using a currency-aware aggregate criterion.
+- **Objective:** Compare a simple baseline and two candidate regressors on a held-out evaluation partition, then select using a currency-aware aggregate criterion. The same held-out partition is used for candidate selection and the reported final metrics, so it is not a separate untouched final test set and the figures may be slightly optimistic.
 - **Setup:** 279,599 eligible positive-price listings. Data is split 80/20 with city stratification. City-specific 99th-percentile limits are learned from the training partition, leaving 221,470 training rows and 55,363 test rows in the supported V1 scope.
 - **Command / steps:**
   ```powershell
