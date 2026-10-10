@@ -138,7 +138,7 @@ python tests/evaluate_deployed_chatbot.py `
   --i-confirm-authorized-target
 ```
 
-Both evaluators cover 24 factual, history, date, arithmetic, currency,
+Both evaluators cover 26 factual, history, date, arithmetic, currency,
 authentication, privacy, prompt-injection, causal-boundary, transaction, and
 scope scenarios. The deployed evaluator creates an exact disposable DynamoDB
 fixture for each scenario, verifies an owner sees one record while another

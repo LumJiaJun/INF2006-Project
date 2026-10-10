@@ -8,25 +8,25 @@ project:
   problem_statement: "Help prospective and existing Airbnb hosts compare listing configurations, estimate a reasonable nightly price, and understand surrounding historical market conditions before deciding whether hosting may suit a property."
   cloud_provider: "AWS"
   # A commit cannot contain its own hash, so this records the reviewed predecessor.
-  repository_commit: "d7fb1bd"
+  repository_commit: "17ed907"
 
 team:
   members:
     - name: "Lum Jia Jun"
       student_id: "2500022"
-      role: "Cloud Alternatives and Portability Reviewer"
+      role: "Functional Testing and Cloud Deployment Support"
     - name: "Nixon Lee Disheng"
       student_id: "2500594"
-      role: "Infrastructure and Cloud Deployment Lead"
+      role: "Infrastructure, Terraform and AWS Lead"
     - name: "Madugula Adheesh"
       student_id: "2500670"
-      role: "Application and Data Prototype Contributor"
+      role: "Data and Machine Learning Lead"
     - name: "Leow Yi Hao Ignatius"
       student_id: "2501538"
-      role: "Application QA and Presentation Reviewer"
+      role: "Frontend and AWS Integration Contributor"
     - name: "Wong Zhen Ho Brendan"
       student_id: "2503427"
-      role: "Frontend Navigation and Test Contributor"
+      role: "Documentation and Model/Frontend Contributor"
 
 architecture:
   diagram: "evidence/architecture-current.png"

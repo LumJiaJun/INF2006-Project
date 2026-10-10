@@ -6,7 +6,7 @@ Class: EP2, Group G014
 
 Deployment region: AWS Asia Pacific (Singapore), `ap-southeast-1`
 
-Evidence dates: 1-7 October 2026
+Evidence dates: 1-9 October 2026
 
 Live URL (as of 7 October 2026): https://dqvmcy3nxs3v.cloudfront.net - CloudFront assigns a new domain whenever the stack is destroyed and recreated; no custom domain is configured, so `terraform output -raw frontend_url` gives the current address.
 
@@ -33,6 +33,13 @@ Five focused Lambda functions separate health, prediction, analytics, history, a
 The analytical data path uses a separate private S3 data lake. The uploaded raw listing CSV remains under `raw/listings/`. An AWS Glue 5.0 Spark job selects documented fields, rejects invalid required values, applies the same typical-market boundary used by modelling, and writes city-partitioned Parquet under `processed/listings/`. A Glue Catalog table uses partition projection for the ten observed cities. Athena runs in an enforced workgroup with encrypted output, CloudWatch metrics, a 1 GiB scan cutoff, and seven-day query-result expiry.
 
 The architecture has two explicit trust areas: the public browser and the AWS account. HTTPS protects data in transit. IAM execution roles constrain each Lambda and the Glue job to required resources and operations. CloudWatch receives logs and metrics; API and function alarms target an encrypted SNS topic. DynamoDB point-in-time recovery provides a managed application-record recovery mechanism. Authenticated prediction writes require a caller-generated idempotency key, which is stored with a request fingerprint and response for safe retries. The current labelled diagram is stored at `evidence/architecture-current.png`.
+
+<figure class="architecture-diagram">
+  <img src="evidence/architecture-current.png" alt="Current AWS architecture">
+  <figcaption>Current AWS architecture</figcaption>
+</figure>
+
+<div class="section-break"></div>
 
 ## 3. Cloud service/deployment choices and trade-offs
 
@@ -118,7 +125,7 @@ For a longer-lived deployment, the team should monitor use of the approved 1,000
 
 ## 8. Team contribution, ethical considerations and reflection
 
-The EP2 Group G014 roster is Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427). Git history records Jia Jun's Azure portability alternative, Nixon's AWS infrastructure and integration work, Adheesh's application and data prototype, and Brendan's frontend navigation and edge-case tests. Ignatius is assigned an independent clean-machine QA and presentation review, which can be linked when a dated review artefact or commit exists. `TEAM_CONTRIBUTIONS.md` links the currently attributable commits and gives each member space to review or expand their contribution summary.
+The EP2 Group G014 roster is Lum Jia Jun (2500022), Nixon Lee Disheng (2500594), Madugula Adheesh (2500670), Leow Yi Hao Ignatius (2501538), and Wong Zhen Ho Brendan (2503427). The team confirmed the final contribution summary: Jia Jun completed final functional testing and supported Nixon during cloud deployment; Nixon created the diagrams, planned the infrastructure, wrote the Terraform configuration, and set up the cloud database and AWS services; Adheesh cleaned the data, trained and created the machine-learning model, and tested it; Ignatius created the website frontend, linked it to AWS, and completed the independent review recorded on 9 October; and Brendan prepared documentation and made minor model and frontend changes. `TEAM_CONTRIBUTIONS.md` records the same approved summary.
 
 The project uses OpenAI Codex for repository inspection, implementation support, Terraform, tests, documentation, and deployment verification. AI-assisted output was not accepted as evidence by itself. Claims were checked with unit tests, live HTTP requests, Terraform plans, AWS CLI output, CloudWatch metrics, and source review. The use and verification process is declared in `AI_USE_DECLARATION.md`.
 

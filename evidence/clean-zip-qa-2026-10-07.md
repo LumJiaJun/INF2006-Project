@@ -31,8 +31,11 @@ anything that behaves differently from the expected result:
 
 ## Independent review notes
 
-- Reviewer:
-- Date and environment:
-- Checks completed:
-- Findings or suggestions:
-- Commit containing this review:
+- Reviewer: Leow Yi Hao Ignatius (2501538)
+- Date and environment: 9 October 2026, clean Windows reproduction.
+- Checks completed: Clean repository reproduction, report comparison, and
+  targeted functional and validation probes.
+- Findings or suggestions: The prioritised findings were validated and resolved
+  as recorded in `sanity-review-fixes-2026-10-09.md`.
+- Confirmation: The team confirmed this review for the final contribution
+  summary on 10 October 2026.

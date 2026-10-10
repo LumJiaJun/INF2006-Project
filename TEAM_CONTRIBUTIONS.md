@@ -4,14 +4,12 @@ Class: EP2
 
 Group: G014
 
-This matrix was drafted from the Git history across `main`, `nixon`,
-`origin/adheesh`, `origin/brendan`, and `origin/jj`. Each member is invited to
-review the wording and add any completed work that is not yet represented.
+The team confirmed the following final contribution summary for submission.
 
-| Member | Role | Artefacts / commits | Test / evidence ownership | Reflection |
-|--------|------|---------------------|---------------------------|------------|
-| Lum Jia Jun (2500022) | Cloud Alternatives and Portability Reviewer | Created the repository baseline and developed the Azure VM migration alternative, Terraform configuration, analytics export, and VM API on `origin/jj` (`5206523`, `9038862`, `4e705d7`, `2f1cdaa`). | Compared an Azure IaaS alternative with the selected AWS serverless direction; branch artefacts support the architecture trade-off discussion but are not deployed in the final AWS runtime. | The alternative design showed how VM administration, scaling, patching, and deployment responsibility differ from the managed serverless approach. Draft reflection for member review. |
-| Nixon Lee Disheng (2500594) | Infrastructure and Cloud Deployment Lead | Implemented and integrated the AWS serverless application, Terraform, ML pipeline, security controls, CI/CD, monitoring, testing, evidence, and final report across the `nixon` and `main` history. | Owns Terraform and cloud verification, model replay, Cognito and DynamoDB integration, security, load/resilience, monitoring, FinOps, evidence synchronization, and submission preflight. | Managed services reduce server administration but still require careful IAM, network, evidence, cost, failure, and lifecycle design. |
-| Madugula Adheesh (2500670) | Application and Data Prototype Contributor | Developed the StaySphere application prototype, frontend interactions, admin and chatbot routes, synthetic data, ML exploration, historical review seeding, responsible-AI documentation, and supporting design documents on `origin/adheesh` (`8ff78af`, `719b35e`, `77e255b`). | Owned prototype functional, security, data/AI, and resilience tests; ideas were reviewed and selectively adapted into the final serverless application rather than merging the incompatible runtime wholesale. | The prototype helped explore a broader feature set, while integration showed the importance of matching implementation choices to the final serverless architecture and evidence requirements. Draft reflection for member review. |
-| Leow Yi Hao Ignatius (2501538) | Application QA and Presentation Reviewer | Planned contribution: independently repeat the clean-ZIP preflight, review an end-to-end user journey, and add a short dated QA record. This contribution can be linked here once the review is complete. | Independent clean-machine reproduction and evidence-navigation review. | Reflection can be added after the independent review. |
-| Wong Zhen Ho Brendan (2503427) | Frontend Navigation and Test Contributor | Improved shared navigation and frontend styling, hardened analytics/chat/history edge-case tests, and updated CI/security evidence on `origin/brendan` (`b38dcda`, `2024589`); integrated through `9463fbd` and merge `852be28`. | Owns navigation regression review and edge cases for empty Athena results, bounded chat behavior, and authenticated history tests. | The changes highlighted that frontend consistency and failure-path tests are both necessary for a usable and defensible cloud application. Draft reflection for member review. |
+| Member | Role | Confirmed contribution |
+|--------|------|------------------------|
+| Lum Jia Jun (2500022) | Functional Testing and Cloud Deployment Support | Final testing of all functions and assistance to Nixon with cloud deployment. |
+| Nixon Lee Disheng (2500594) | Infrastructure, Terraform and AWS Lead | Created the diagrams, planned the infrastructure, wrote the Terraform files, and set up the cloud database and AWS services used by the project. |
+| Madugula Adheesh (2500670) | Data and Machine Learning Lead | Cleaned the data, trained and created the machine-learning model, and tested it. |
+| Leow Yi Hao Ignatius (2501538) | Frontend and AWS Integration Contributor | Created the website frontend, linked it to AWS, and completed the independent review recorded on 9 October 2026. |
+| Wong Zhen Ho Brendan (2503427) | Documentation and Model/Frontend Contributor | Prepared documentation and made minor changes to the model and frontend. |

@@ -8,11 +8,11 @@ Prospective and existing Airbnb hosts lack a simple way to estimate an appropria
 
 | Name | Student ID | Role |
 |------|-----------|------|
-| Lum Jia Jun | 2500022 | Cloud Alternatives and Portability Reviewer |
-| Nixon Lee Disheng | 2500594 | Infrastructure and Cloud Deployment Lead |
-| Madugula Adheesh | 2500670 | Application and Data Prototype Contributor |
-| Leow Yi Hao Ignatius | 2501538 | Application QA and Presentation Reviewer |
-| Wong Zhen Ho Brendan | 2503427 | Frontend Navigation and Test Contributor |
+| Lum Jia Jun | 2500022 | Functional Testing and Cloud Deployment Support |
+| Nixon Lee Disheng | 2500594 | Infrastructure, Terraform and AWS Lead |
+| Madugula Adheesh | 2500670 | Data and Machine Learning Lead |
+| Leow Yi Hao Ignatius | 2501538 | Frontend and AWS Integration Contributor |
+| Wong Zhen Ho Brendan | 2503427 | Documentation and Model/Frontend Contributor |
 
 ## Deployment status
 
